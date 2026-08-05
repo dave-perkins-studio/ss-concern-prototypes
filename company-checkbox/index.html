@@ -1,0 +1,1708 @@
+<!doctype html>
+<html lang="en-IE">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2032%2032'%3E%3Crect%20width='32'%20height='32'%20rx='6'%20fill='%23015d59'/%3E%3Crect%20x='8'%20y='8'%20width='16'%20height='16'%20rx='3'%20fill='none'%20stroke='%23fff'%20stroke-width='2.4'/%3E%3Cpath%20d='M11.5%2016.2l3.2%203.2L21%2012.8'%20stroke='%23fff'%20stroke-width='2.6'%20stroke-linecap='round'%20stroke-linejoin='round'%20fill='none'/%3E%3C/svg%3E">
+<title>Concern Worldwide Ireland — the company checkbox: two suggested fixes, and three more (prototype)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+/* ==================================================================
+   Concern Worldwide Ireland — "I am donating on behalf of a company"
+   The details step of the donation form, rebuilt: the live control, the
+   two suggested fixes built out in full and evaluated
+   fairly (Niamh's copy on wider spacing, then on a box-only target),
+   and three designed replacements, side by side.
+
+   Concern colours, type and layout are carried over from the
+   Donation forms Figma (node 10166:1078) via the attribution
+   prototype in ../../concern-attribution/design/prototypes/.
+   The dark chrome around the screen is SystemSeed brand v0.6.
+
+   Working prototype. Not an official Concern build.
+   ================================================================== */
+:root{
+  /* --- Concern --- */
+  --teal:#007c76;
+  --teal-dark:#015d59;
+  --teal-darkest:#004440;
+  --teal-tint:#eaf3f2;
+  --teal-tint-soft:#f2f7f6;
+  --card:#fcfbf9;
+  --grey-step:#ededed;
+  --logo:#0b7b51;
+  --ink:#000000;
+  --ink-soft:#2b2e35;
+  --muted:#5c5f68;
+  --line:#000000;
+  --line-soft:#d9d7d1;
+  --box-line:#4d4d4d;      /* measured border of the live .indicator */
+  --white:#fff;
+
+  /* --- the hit-area visualiser --- */
+  --viz-red:#b3261e;
+  --viz-green:#1b6b4f;
+
+  /* --- accent for 0A / 0B, the two proposed fixes — kept
+     off both the current-state yellow and the numbered options’ teal, so
+     the tab group reads as its own thing: genuinely on the table, not
+     mistaken for either "today" or one of the numbered options --- */
+  --diag:#e0a24a;
+  --diag-active:#4a3520;
+
+  /* --- SystemSeed chrome --- */
+  --ss-cream:#F5F3E6;
+  --ss-dark-cream:#D4D2C6;
+  --ss-brown:#BFBDB1;
+  --ss-black:#373C39;
+  --ss-lighter-black:#4D4C47;
+  --ss-green:#024C40;
+  --ss-yellow:#DAFF00;
+  --ss-focus:#6E4EB1;
+  --ss-sans:'DM Sans',-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;
+
+  --ease:cubic-bezier(.2,.8,.2,1);
+  --ease-soft:cubic-bezier(.4,0,.2,1);
+  --dur-fast:150ms;
+  --dur:260ms;
+
+  --rail-w:352px;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:#1a1a1a;color:var(--ink);
+  font-family:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  font-size:16px;line-height:1.4;-webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,p,ul,ol,figure{margin:0;padding:0}
+ul,ol{list-style:none}
+button{font:inherit;color:inherit}
+fieldset{border:0;min-width:0;margin:0;padding:0}
+legend{padding:0}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+
+/* ============================================================
+   1. The prototype bar — SystemSeed chrome, switcher, one-liner
+   ============================================================ */
+.bar{
+  background:var(--ss-black);color:var(--ss-cream);font-family:var(--ss-sans);
+  padding:16px 24px 0;position:sticky;top:0;z-index:60;
+  border-bottom:1px solid var(--ss-lighter-black);
+}
+.bar-top{display:flex;align-items:center;gap:20px;flex-wrap:wrap;padding-bottom:14px}
+.brand-logo{height:20px;width:auto;display:block;color:var(--ss-cream);flex:0 0 auto}
+.bar-title{font-size:13.5px;font-weight:500;color:var(--ss-dark-cream);line-height:1.35}
+.bar-title b{color:var(--ss-cream);font-weight:600}
+
+.switcher{display:flex;gap:4px;overflow-x:auto;padding-bottom:0;-webkit-overflow-scrolling:touch}
+.swtab{
+  flex:0 0 auto;display:flex;align-items:center;gap:9px;
+  background:none;border:0;border-bottom:3px solid transparent;
+  padding:12px 16px 13px;cursor:pointer;white-space:nowrap;   /* 45px — over the 44 target floor */
+  color:var(--ss-dark-cream);font-family:var(--ss-sans);
+  font-size:14.5px;font-weight:500;line-height:1.2;border-radius:6px 6px 0 0;
+  transition:background var(--dur-fast) var(--ease-soft),color var(--dur-fast) var(--ease-soft);
+}
+.swtab .num{font-size:11.5px;font-weight:600;color:var(--ss-yellow)}
+.swtab:hover{background:var(--ss-lighter-black);color:var(--ss-cream)}
+.swtab[aria-current="true"]{background:var(--ss-green);color:var(--ss-cream);border-bottom-color:var(--ss-yellow)}
+.swtab[aria-current="true"] .num{color:var(--ss-cream)}
+.swtab:focus-visible{outline:3px solid var(--ss-focus);outline-offset:-3px}
+
+/* 0A / 0B — the two proposed fixes, built out in full.
+   Same tab shape, a different accent, and a divider before the
+   own numbered options start — a distinct group, not a lesser one. */
+.swtab--diag .num{color:var(--diag)}
+.swtab--diag[aria-current="true"]{background:var(--diag-active);border-bottom-color:var(--diag)}
+.sw-div{flex:0 0 auto;align-self:stretch;width:1px;margin:8px 2px;background:var(--ss-lighter-black)}
+
+.oneline{
+  font-family:var(--ss-sans);font-size:13.5px;line-height:1.55;
+  color:var(--ss-dark-cream);padding:12px 2px 14px;max-width:104ch;
+}
+.oneline b{color:var(--ss-cream);font-weight:600}
+
+/* ============================================================
+   2. Work area — framed screen plus annotation rail
+   ============================================================ */
+.work{display:flex;align-items:flex-start;gap:0}
+.viewport{flex:1 1 auto;min-width:0;padding:24px}
+.screen{
+  background:var(--card);border-radius:4px;overflow:hidden;
+  box-shadow:0 8px 60px rgba(0,0,0,.5);
+}
+
+/* Pinned beside the form so the notes and the thing they describe stay on
+   screen together. It is taller than the viewport on some tabs, so it gets
+   its own scroll — a sticky element taller than the viewport would otherwise
+   pin and put its own bottom out of reach. */
+.rail{
+  flex:0 0 var(--rail-w);width:var(--rail-w);
+  align-self:flex-start;position:sticky;top:0;
+  height:100vh;overflow-y:auto;overscroll-behavior:contain;
+  background:var(--ss-black);color:var(--ss-cream);
+  font-family:var(--ss-sans);padding:24px 24px 32px;
+  border-left:1px solid var(--ss-lighter-black);
+}
+.rail::-webkit-scrollbar{width:10px}
+.rail::-webkit-scrollbar-thumb{background:var(--ss-lighter-black);border-radius:6px}
+.rail::-webkit-scrollbar-track{background:transparent}
+.rail h2{
+  font-size:11.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--ss-brown);margin:0 0 8px;
+}
+.rail h3{
+  font-size:12px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;
+  color:var(--ss-yellow);margin:22px 0 7px;
+}
+.rail h3:first-of-type{margin-top:18px}
+.rail p{font-size:13px;line-height:1.6;color:var(--ss-dark-cream);margin:0 0 9px}
+.rail p:last-child{margin-bottom:0}
+.rail ul + p{margin-top:12px}
+.rail .lede{font-size:15.5px;line-height:1.45;font-weight:600;color:var(--ss-cream);margin-bottom:14px}
+.rail .diagflag{
+  display:inline-block;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--ss-black);background:var(--diag);border-radius:3px;padding:4px 9px;margin:0 0 14px;
+}
+.rail--diag{border-left-color:var(--diag)}
+.rail ul{display:flex;flex-direction:column;gap:7px;margin:0}
+.rail li{
+  font-size:13px;line-height:1.55;color:var(--ss-dark-cream);
+  padding-left:15px;position:relative;
+}
+.rail li::before{
+  content:"";position:absolute;left:0;top:8px;width:5px;height:5px;border-radius:50%;
+  background:var(--ss-brown);
+}
+.rail li b{color:var(--ss-cream);font-weight:600}
+.rail .cost li::before{background:#e0a24a}
+.rail .fix li::before{background:var(--ss-yellow)}
+
+/* the live measurement readout */
+.metrics{
+  margin-top:20px;border:1px solid var(--ss-lighter-black);border-radius:6px;
+  background:rgba(0,0,0,.16);padding:12px 14px;
+}
+.metrics dl{margin:0;display:grid;grid-template-columns:1fr auto;gap:6px 10px}
+.metrics dt{font-size:12px;color:var(--ss-brown);line-height:1.4}
+.metrics dd{
+  margin:0;font-size:12.5px;font-weight:600;color:var(--ss-cream);
+  text-align:right;font-variant-numeric:tabular-nums;line-height:1.4;
+}
+.metrics dd.warn{color:#ffb4a8}
+.metrics dd.good{color:#b9e6a1}
+.metrics .caveat{font-size:11.5px;color:var(--ss-brown);margin:10px 0 0;line-height:1.5}
+
+/* rail controls */
+.railctl{display:flex;flex-direction:column;gap:8px;margin-top:18px}
+.tgl{
+  display:flex;align-items:center;gap:11px;width:100%;
+  background:var(--ss-lighter-black);border:1px solid transparent;border-radius:6px;
+  padding:11px 13px;cursor:pointer;text-align:left;
+  color:var(--ss-cream);font-family:var(--ss-sans);font-size:13px;font-weight:500;line-height:1.35;
+  transition:background var(--dur-fast) var(--ease-soft),border-color var(--dur-fast) var(--ease-soft);
+  min-height:44px;
+}
+.tgl:hover{background:#5a5952}
+.tgl:focus-visible{outline:3px solid var(--ss-focus);outline-offset:2px}
+.tgl[aria-pressed="true"]{background:var(--ss-green);border-color:var(--ss-yellow)}
+.tgl .sw{
+  flex:0 0 auto;width:34px;height:20px;border-radius:999px;background:#2c302d;
+  border:1px solid #6f6e67;position:relative;transition:background var(--dur) var(--ease-soft);
+}
+.tgl .sw::after{
+  content:"";position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;
+  background:var(--ss-dark-cream);transition:transform var(--dur) var(--ease);
+}
+.tgl[aria-pressed="true"] .sw{background:var(--ss-yellow);border-color:var(--ss-yellow)}
+.tgl[aria-pressed="true"] .sw::after{transform:translateX(14px);background:var(--ss-black)}
+
+.rail-foot{
+  margin-top:24px;padding-top:16px;border-top:1px solid var(--ss-lighter-black);
+  font-size:11.5px;line-height:1.55;color:var(--ss-brown);
+}
+.rail-foot b{display:block;color:var(--ss-dark-cream);font-weight:600;margin-bottom:4px}
+
+/* ============================================================
+   3. The Concern page inside the frame
+   ============================================================ */
+.masthead{background:var(--white);height:82px;display:flex;align-items:center}
+.masthead-in{
+  max-width:1440px;width:100%;margin:0 auto;padding:0 36px;
+  display:flex;align-items:center;justify-content:space-between;gap:20px;
+}
+.logo{display:flex;flex-direction:column;line-height:.85;text-decoration:none}
+.logo b{font-size:25px;font-weight:700;color:var(--logo);letter-spacing:.01em}
+.logo span{font-size:11.5px;font-weight:700;color:var(--logo);letter-spacing:.05em;align-self:flex-end}
+.trust{display:flex;gap:26px;align-items:center}
+.trust div{display:flex;align-items:center;gap:8px;font-size:11.5px;line-height:1.25;color:#3d4048}
+.trust b{display:block;font-size:12.5px;font-weight:700;color:var(--ink)}
+.trust svg{width:26px;height:26px;flex:0 0 auto}
+
+.stage{position:relative;background:var(--teal);overflow:hidden}
+.stage::before{
+  content:"";position:absolute;inset:0;background:var(--teal-dark);opacity:.22;
+}
+/* Stand-in for the campaign photograph that sits beside the form on the
+   real page, so the empty teal does not read as a layout error. */
+.photo{
+  position:absolute;top:0;right:0;bottom:0;width:min(42%,520px);
+  border-radius:0 0 0 90px;
+  background:
+    radial-gradient(80% 60% at 62% 28%, rgba(255,255,255,.20), transparent 62%),
+    linear-gradient(150deg,#5f7f4a,#2f4a33 45%,#1d2a22);
+  display:grid;place-items:end center;padding:22px;
+}
+.photo span{color:rgba(255,255,255,.5);font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:600}
+.shell{position:relative;z-index:2;max-width:1440px;margin:0 auto;padding:56px 36px 64px}
+.formcard{
+  background:var(--card);border-radius:6px;width:100%;max-width:588px; /* 588 − 80 padding = 508 measured column */
+  padding:32px 40px 40px;box-shadow:0 8px 40px rgba(0,0,0,.10);
+}
+.formcard h1{font-size:30px;line-height:1.22;font-weight:700;text-align:center;letter-spacing:-.01em}
+
+.steps{display:flex;margin:28px 0 0;height:34px;font-size:14px;font-weight:700}
+.step{
+  flex:1 1 0;display:flex;align-items:center;justify-content:center;gap:7px;
+  position:relative;background:var(--grey-step);color:var(--ink);
+}
+.step.now{background:var(--teal-darkest);color:var(--white)}
+.step.now::after{
+  content:"";position:absolute;left:100%;top:0;z-index:2;
+  border:17px solid transparent;border-left-width:11px;border-right-width:0;
+  border-left-color:var(--teal-darkest);
+}
+
+/* --- fields --- */
+.field{margin-top:28px}
+.field:first-child{margin-top:0}
+.labelrow{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:32px}
+.flabel{font-size:16px;font-weight:700;line-height:21px;display:block}
+.flabel .opt{font-weight:400;font-size:14px;color:var(--ink)}
+.control{
+  margin-top:8px;width:100%;height:46px;background:var(--white);
+  border:1px solid var(--line);border-radius:2px;
+  padding:0 12px;font:inherit;font-size:16px;color:var(--ink);
+  display:block;
+}
+input.control::placeholder{color:#6a6d75}
+input.control:focus-visible{outline:3px solid var(--teal);outline-offset:1px}
+.ic{padding-left:42px;background-repeat:no-repeat;background-position:12px 50%;background-size:20px 20px}
+.ic-person{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23212431' stroke-width='1.8'%3E%3Ccircle cx='12' cy='8' r='3.6'/%3E%3Cpath d='M4.8 20c.9-3.7 3.7-5.6 7.2-5.6s6.3 1.9 7.2 5.6'/%3E%3C/svg%3E")}
+.ic-mail{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23212431' stroke-width='1.8'%3E%3Crect x='3' y='5.5' width='18' height='13' rx='1.6'/%3E%3Cpath d='M3.6 6.4L12 13l8.4-6.6'/%3E%3C/svg%3E")}
+.ic-phone{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23212431' stroke-width='1.8'%3E%3Cpath d='M6.4 3.6h3.2l1.7 4.2-2.1 1.6a12.4 12.4 0 006.2 6.2l1.6-2.1 4.2 1.7v3.2a2 2 0 01-2.2 2A17 17 0 014.4 5.8a2 2 0 012-2.2z'/%3E%3C/svg%3E")}
+.money{position:relative}
+.money .cur{
+  position:absolute;left:14px;top:0;height:46px;display:flex;align-items:center;
+  font-size:16px;color:var(--ink);pointer-events:none;
+}
+.money .control{padding-left:32px}
+.row2{display:flex;gap:32px}
+.row2 > *{flex:1 1 0}
+.hint{margin-top:8px;font-size:14px;line-height:20px;color:var(--ink-soft)}
+
+/* help "?" — 32px visible, 44px target via the pseudo-element, which stops
+   6px short of the input below so it cannot steal a click from it */
+.help{
+  position:relative;flex:0 0 auto;width:32px;height:32px;border-radius:50%;
+  border:1.5px solid var(--teal-dark);background:var(--white);color:var(--teal-dark);
+  font-size:15px;font-weight:700;line-height:1;cursor:pointer;
+  display:grid;place-items:center;padding:0;
+  transition:background var(--dur-fast) var(--ease-soft);
+}
+.help::after{content:"";position:absolute;inset:-6px;border-radius:50%}
+.help:hover{background:var(--teal-tint)}
+.help:focus-visible{outline:3px solid var(--teal);outline-offset:2px}
+.help[aria-expanded="true"]{background:var(--teal-dark);color:var(--white)}
+.helptext{
+  margin-top:8px;font-size:14px;line-height:20px;color:var(--ink-soft);
+  background:var(--teal-tint-soft);border-left:4px solid var(--teal-dark);padding:9px 12px;
+}
+.helptext[hidden]{display:none}
+
+/* --- primary CTA: 50px tall, centred, overlapping the row above --- */
+.submit{
+  display:block;margin:0 auto;border:0;border-radius:999px;height:50px;
+  background:var(--teal-dark);color:var(--white);
+  padding:0 34px;font-size:15px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;
+  cursor:pointer;
+  transition:background var(--dur) var(--ease-soft),transform var(--dur-fast) var(--ease);
+}
+.submit:hover{background:var(--teal-darkest);transform:translateY(-1px)}
+.submit:focus-visible{outline:3px solid var(--teal-darkest);outline-offset:3px}
+
+/* ============================================================
+   4. CURRENT STATE — the live control, reproduced
+      Deliberately faithful, including the faults.
+   ============================================================ */
+.cs-block{margin-top:32px;position:relative}  /* measured: 32px from the phone input */
+.cs-item{display:flex;align-items:center;gap:8px}
+.cs-label{
+  width:306px;max-width:100%;height:24px;   /* measured: 306 × 24 */
+  display:flex;align-items:center;gap:8px;cursor:default;position:relative;
+}
+.cs-label input{display:none}      /* as live: removed from the a11y tree */
+.cs-label .indicator{
+  flex:0 0 auto;width:24px;height:24px;border-radius:4px;
+  border:1px solid var(--box-line);background:var(--white);position:relative;
+}
+.cs-label input:checked + .indicator{background:var(--teal-dark);border-color:var(--teal-dark)}
+.cs-label input:checked + .indicator::after{
+  content:"";position:absolute;inset:0;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E") no-repeat 50%/16px 16px;
+}
+.cs-text{font-size:16px;line-height:24px;white-space:nowrap;cursor:default}
+.cs-cta{margin-top:36px}           /* measured: 36px to the CTA */
+
+/* 0B only — the label shrinks to wrap the box alone; the text moves
+   outside it as a plain, inert sibling in .cs-item. Both 0A and 0B carry
+   Niamh’s longer wording, so this text may now need to wrap. */
+.cs-label--boxonly{width:24px}
+.cs-item > .cs-text{min-width:0;white-space:normal}
+
+/* 0A only — the row's own CTA gap, widened a moderate amount (not the
+   most it could take — the proposal evaluated fairly). */
+.cs-cta-wide{margin-top:64px}      /* 36px → 64px: nearly double, and more than Option 1's own 48px */
+
+/* 0A only — the reworded label is longer than the live text, so
+   the label is left to size to its content rather than pinned at the
+   live control's measured 306px, and its fixed 24px height is dropped
+   too so a wrapped second line is not cut off. The resulting size is
+   read at runtime, not assumed — see the rail: the point is that it
+   comes out wider (and, once it wraps, taller). */
+.cs-label--fit{width:auto;height:auto;min-width:0;max-width:100%}
+.cs-label--fit .cs-text{white-space:normal}
+
+/* --- the hit-area visualiser --- */
+.viz .cs-label::before{
+  content:"";position:absolute;inset:0;z-index:1;
+  background:rgba(179,38,30,.14);
+  outline:2px dashed var(--viz-red);outline-offset:0;
+  animation:vizin var(--dur) var(--ease) both;
+}
+.viz .cs-label .indicator{box-shadow:0 0 0 2px var(--viz-green);z-index:2}
+@keyframes vizin{from{opacity:0}to{opacity:1}}
+.vizpath{display:none}
+.viz .vizpath{
+  display:block;position:absolute;z-index:3;pointer-events:none;
+  border-left:2px dotted var(--viz-red);
+}
+.vizlegend{display:none}
+.viz .vizlegend{
+  display:block;margin-top:28px;border-left:4px solid var(--viz-red);
+  background:#fdf3f2;padding:10px 13px;font-size:13.5px;line-height:1.55;color:var(--ink-soft);
+}
+.vizlegend b{font-weight:700}
+.vizlegend .key{display:inline-flex;align-items:center;gap:6px;margin-right:14px;white-space:nowrap}
+.vizlegend .sq{width:12px;height:12px;flex:0 0 auto;border-radius:2px}
+.vizlegend .sq.r{background:rgba(179,38,30,.2);border:2px dashed var(--viz-red)}
+.vizlegend .sq.g{background:var(--white);border:2px solid var(--viz-green)}
+.vizlegend .keys{display:flex;flex-wrap:wrap;gap:4px 0;margin-bottom:6px}
+
+/* ============================================================
+   5. THE OPTIONS — shared parts
+   ============================================================ */
+
+/* Real inputs, styled with appearance:none, so they keep their native
+   role, state and keyboard behaviour. This is the reference build. */
+.cbx,.rdo{
+  appearance:none;-webkit-appearance:none;margin:0;flex:0 0 auto;
+  width:24px;height:24px;background:var(--white);
+  border:1px solid var(--box-line);cursor:pointer;position:relative;
+  transition:background var(--dur-fast) var(--ease-soft),border-color var(--dur-fast) var(--ease-soft);
+}
+.cbx{border-radius:4px}
+.rdo{border-radius:50%}
+.cbx:checked,.rdo:checked{background:var(--teal-dark);border-color:var(--teal-dark)}
+.cbx:checked::after{
+  content:"";position:absolute;inset:0;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23fff' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7.5'/%3E%3C/svg%3E") no-repeat 50%/16px 16px;
+}
+.rdo:checked::after{
+  content:"";position:absolute;inset:6px;border-radius:50%;background:var(--white);
+}
+.cbx:focus-visible,.rdo:focus-visible{outline:3px solid var(--teal);outline-offset:3px}
+
+/* Option 1 and 2: the row itself is the visible boundary of the target. */
+.optgroup{display:flex;flex-direction:column;gap:8px}
+.optrow{
+  display:flex;align-items:center;gap:13px;min-height:52px;
+  padding:13px 16px;background:var(--white);
+  border:1px solid var(--muted);border-radius:4px;cursor:pointer;
+  transition:background var(--dur-fast) var(--ease-soft),border-color var(--dur-fast) var(--ease-soft);
+}
+.optrow:hover{background:var(--teal-tint-soft);border-color:var(--teal-dark)}
+.optrow:has(:checked){background:var(--teal-tint);border-color:var(--teal-dark);box-shadow:inset 0 0 0 1px var(--teal-dark)}
+.optrow:has(:focus-visible){background:var(--teal-tint-soft);border-color:var(--teal-dark)}
+.optrow-text{font-size:16px;line-height:1.35}
+.optrow + .reveal,.optgroup + .reveal{margin-top:16px}
+
+/* Option 3: the row stays visually close to today's, but gains a
+   hover extent and a cursor. Nothing is drawn at rest. */
+.plainrow{
+  display:inline-flex;align-items:center;gap:10px;min-height:44px;
+  padding:10px 14px 10px 10px;margin-left:-10px;border-radius:4px;cursor:pointer;
+  transition:background var(--dur-fast) var(--ease-soft);
+}
+.plainrow:hover{background:var(--teal-tint-soft)}
+.plainrow:has(:focus-visible){background:var(--teal-tint-soft)}
+.plainrow span{font-size:16px;line-height:1.35}
+
+/* the conditional company block, tied to the control above it */
+.reveal{
+  padding-left:14px;border-left:4px solid var(--teal-dark);
+  animation:reveal var(--dur) var(--ease) both;
+}
+.reveal[hidden]{display:none}
+.reveal .flabel{font-size:15px}
+.reveal .control{max-width:340px}
+@keyframes reveal{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+
+/* section headings, Option 3 only */
+.grouph{
+  font-size:18px;font-weight:700;line-height:1.3;
+  margin-top:34px;padding-bottom:9px;border-bottom:1px solid var(--line-soft);
+}
+.grouph:first-child{margin-top:0}
+.grouph + .field{margin-top:20px}
+
+/* per-option spacing to the CTA */
+.cta-48{margin-top:48px}
+.cta-56{margin-top:56px}
+
+.pane[hidden]{display:none}
+
+/* ============================================================
+   6. Footer
+   ============================================================ */
+.protofoot{
+  background:var(--ss-black);color:var(--ss-brown);font-family:var(--ss-sans);
+  font-size:12px;line-height:1.6;padding:18px 24px 24px;
+  border-top:1px solid var(--ss-lighter-black);
+}
+.protofoot b{color:var(--ss-dark-cream);font-weight:600}
+
+/* ============================================================
+   7. Responsive
+   ============================================================ */
+@media (max-width:1180px){
+  :root{--rail-w:300px}
+  .rail{padding:20px 18px 28px}
+  .shell{padding:40px 24px 48px}
+}
+@media (max-width:980px){
+  .work{flex-direction:column}
+  .viewport{width:100%;padding:0}
+  .screen{border-radius:0;box-shadow:none}
+  .rail{
+    flex:1 1 auto;width:100%;position:static;
+    height:auto;overflow:visible;
+    border-left:0;border-top:1px solid var(--ss-lighter-black);
+  }
+  .rail--diag{border-top-color:var(--diag)}  /* the accent moves from left edge to top rule once stacked */
+  .bar{position:static}
+}
+@media (max-width:640px){
+  .bar{padding:14px 16px 0}
+  .bar-top{gap:12px;padding-bottom:12px}
+  .oneline{font-size:13px;padding:10px 2px 12px}
+  .masthead{height:64px}
+  .masthead-in{padding:0 16px}
+  .photo{display:none}   /* the form goes full-bleed here, as it does live */
+  .trust{display:none}
+  .logo b{font-size:21px}
+  /* 375 viewport − 20px each side = the measured 335px column */
+  .shell{padding:24px 0 36px}
+  .formcard{max-width:none;border-radius:0;padding:24px 20px 32px;box-shadow:none}
+  .formcard h1{font-size:24px}
+  .steps{font-size:12.5px}
+  .row2{flex-direction:column;gap:24px}
+  .cs-text{white-space:normal}
+  .rail{padding:20px 16px 26px}
+  .protofoot{padding:16px}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{transition-duration:1ms !important;animation-duration:1ms !important}
+  .submit:hover{transform:none}
+}
+</style>
+</head>
+<body>
+
+<!-- ==========================================================
+     Prototype bar
+     ========================================================== -->
+<header class="bar">
+  <div class="bar-top">
+    <svg class="brand-logo" width="149" height="22" viewBox="0 0 149 22" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="SystemSeed">
+      <path fill-rule="evenodd" clip-rule="evenodd" d="M19.626 16.5528C21.8417 14.5335 23.2331 11.6263 23.2331 8.39258C23.2331 5.15891 21.8417 2.25165 19.626 0.23233C17.4103 2.25165 16.0189 5.15891 16.0189 8.39258C16.0189 11.6263 17.4103 14.5363 19.626 16.5528Z" fill="currentColor"/>
+      <path d="M7.01505 13.2998C7.01505 15.3053 5.44386 16.929 3.50752 16.929C1.57119 16.929 0 15.3025 0 13.2998C0 11.2971 1.57119 9.67055 3.50752 9.67055C5.44386 9.67055 7.01505 11.2971 7.01505 13.2998Z" fill="currentColor"/>
+      <path d="M11.2142 16.9289C8.97915 14.8266 7.69841 11.8059 7.70671 8.69675C7.7233 6.69126 9.2862 5.07028 11.2142 5.07028C13.1423 5.07028 14.7079 6.69126 14.7218 8.69675C14.7301 11.8059 13.4465 14.8266 11.2142 16.9289Z" fill="currentColor"/>
+      <path d="M33.5041 16.3121C31.2801 16.3121 29.7338 15.8668 28.4614 15.4657L27.9524 10.6359H28.4392C29.6674 13.5598 31.8085 15.5736 33.991 15.5736C35.2828 15.5736 36.511 14.8958 36.511 13.3495C36.511 11.7175 35.3464 10.8074 32.464 9.98033C29.2442 9.04813 27.8888 7.58481 27.8888 5.59315C27.8888 3.11465 29.9855 0.846375 33.778 0.846375C35.1749 0.846375 36.5967 1.20598 37.7834 1.52409L38.0158 5.86701H37.5289C36.6825 3.34702 35.2828 1.60985 32.9537 1.60985C31.471 1.60985 30.3258 2.47843 30.3258 3.87535C30.3258 5.52953 31.5125 6.37599 34.3091 7.0952C37.4017 7.90016 38.8429 9.29708 38.8429 11.5239C38.8429 14.1075 36.8291 16.3121 33.5041 16.3121Z" fill="currentColor"/>
+      <path d="M41.2855 21.1834C40.2897 21.1834 39.4626 17.922 40.013 17.922H42.2149C44.1015 17.922 44.5662 17.2637 44.97 16.3536L45.0558 16.1627L40.5441 6.24873L39.0836 6.43959L39.2966 5.54887H46.3946L46.1816 6.07722L45.5897 6.16297C44.7211 6.29021 44.4887 6.7577 44.8704 7.64565L46.8621 12.2652L49.6587 6.24873L47.7086 6.43959L47.9216 5.54887H52.0515L51.8385 6.07722L51.1829 6.16297C50.4416 6.24872 50.2507 6.64982 49.8053 7.58202L45.2079 17.4324C44.107 19.8058 43.0697 21.1834 41.2882 21.1834" fill="currentColor"/>
+      <path d="M55.9461 16.3123C54.5907 16.3123 53.1274 16.0993 51.9213 15.7397L51.7305 12.4341H52.2173C53.8687 14.5115 55.4178 15.5267 56.7732 15.5267C57.6418 15.5267 58.2144 15.2307 58.2144 14.4036C58.2144 13.4493 57.1135 12.8573 54.9088 12.0745C52.7899 11.311 51.7305 10.5697 51.7305 8.89611C51.7305 7.11745 53.191 5.33603 56.4966 5.33603C57.5145 5.33603 58.8478 5.56839 59.8437 5.80352L60.0567 8.76887H59.5698C58.3831 7.37194 56.6681 6.16312 55.332 6.16312C54.5686 6.16312 54.0596 6.56422 54.0596 7.22257C54.0596 8.04966 55.1412 8.64163 57.0886 9.34147C59.4813 10.2101 60.5629 10.9929 60.5629 12.7937C60.5629 14.7853 58.953 16.3095 55.9434 16.3095" fill="currentColor"/>
+      <path d="M65.9045 16.3123C64.1673 16.3123 62.7898 15.2943 62.7898 13.4299V6.2489H61.0941V5.65693L62.7898 5.08433L65.8409 2.88245H66.0539V5.55182H69.5061V6.25166H66.0539V12.7135C66.0539 13.6678 66.4135 14.4092 67.6002 14.4092C68.1949 14.4092 68.809 14.2819 69.4867 14.0689L69.6997 14.2819C68.7454 15.5958 67.4536 16.3151 65.9073 16.3151" fill="currentColor"/>
+      <path d="M73.5807 9.00123H75.6359C76.3552 9.00123 76.4824 8.74674 76.4824 8.23776C76.4824 6.62784 75.9513 6.03587 75.3372 6.03587C74.5101 6.03587 73.7909 7.0732 73.5779 9.00123M75.0412 16.3095C72.2446 16.3095 70.0621 14.2127 70.0621 11.1201C70.0621 7.81453 72.3497 5.33603 75.4866 5.33603C78.156 5.33603 79.7659 6.88233 79.7659 8.45076C79.7659 9.02336 79.6386 9.44658 79.4892 9.70107H73.5143V10.1464C73.5143 12.3926 74.6373 13.9804 76.8199 13.9804C78.0287 13.9804 78.7064 13.7259 79.7852 12.9624L79.9982 13.1726C78.9609 14.9098 77.4976 16.3095 75.0412 16.3095Z" fill="currentColor"/>
+      <path d="M94.7999 16.0992L95.0129 15.5681L95.7322 15.4823C96.1139 15.4408 96.2605 15.25 96.2605 14.8461V8.91262C96.2605 7.59868 95.6049 7.44931 94.6727 7.44931C93.8041 7.44931 93.1679 7.68167 92.5538 7.98042C92.5759 8.10766 92.5759 8.25703 92.5759 8.40364V15.3938L94.291 15.2029L94.078 16.0936H87.8485L88.0615 15.5625L88.7614 15.4768C89.1625 15.4353 89.3118 15.2444 89.3118 14.8406V9.0371C89.3118 7.64018 88.6562 7.44654 87.6161 7.44654C86.8748 7.44654 86.2386 7.6789 85.6245 7.95552V15.391L87.3395 15.2002L87.1265 16.0909H80.8971L81.1101 15.5598L81.8099 15.474C82.2138 15.4325 82.3604 15.2417 82.3604 14.8378V7.54889L80.8141 6.46731V6.1492C82.1059 5.66235 83.9703 5.34424 85.0934 5.32211H85.3064L85.583 7.41888C86.3022 6.52817 87.7877 5.32211 89.7987 5.32211C91.3865 5.32211 92.2578 6.02195 92.4902 7.41888C93.2536 6.52817 94.7585 5.32211 96.7695 5.32211C98.6754 5.32211 99.5246 6.38156 99.5246 8.30959V15.3855L101.284 15.1946L101.071 16.0854H94.7999" fill="currentColor"/>
+      <path d="M108.233 16.3121C106.009 16.3121 104.462 15.8668 103.19 15.4657L102.681 10.6359H103.168C104.396 13.5598 106.537 15.5736 108.72 15.5736C110.011 15.5736 111.24 14.8958 111.24 13.3495C111.24 11.7175 110.075 10.8074 107.193 9.98033C103.973 9.04813 102.617 7.58481 102.617 5.59315C102.617 3.11465 104.714 0.846375 108.507 0.846375C109.903 0.846375 111.325 1.20598 112.509 1.52409L112.742 5.86701H112.255C111.408 3.34702 110.009 1.60985 107.679 1.60985C106.197 1.60985 105.052 2.47843 105.052 3.87535C105.052 5.52953 106.238 6.37599 109.035 7.0952C112.127 7.90016 113.569 9.29708 113.569 11.5239C113.569 14.1075 111.555 16.3121 108.23 16.3121" fill="currentColor"/>
+      <path d="M118.407 9.00123H120.462C121.181 9.00123 121.308 8.74674 121.308 8.23776C121.308 6.62784 120.78 6.03587 120.163 6.03587C119.336 6.03587 118.617 7.0732 118.404 9.00123M119.864 16.3095C117.068 16.3095 114.885 14.2127 114.885 11.1201C114.885 7.81453 117.173 5.33603 120.31 5.33603C122.979 5.33603 124.589 6.88233 124.589 8.45076C124.589 9.02336 124.462 9.44658 124.312 9.70107H118.337V10.1464C118.337 12.3926 119.461 13.9804 121.643 13.9804C122.852 13.9804 123.53 13.7259 124.608 12.9624L124.821 13.1726C123.784 14.9098 122.321 16.3095 119.864 16.3095Z" fill="currentColor"/>
+      <path d="M129.14 9.00123H131.195C131.914 9.00123 132.041 8.74674 132.041 8.23776C132.041 6.62784 131.513 6.03587 130.896 6.03587C130.069 6.03587 129.35 7.0732 129.137 9.00123M130.6 16.3095C127.804 16.3095 125.621 14.2127 125.621 11.1201C125.621 7.81453 127.909 5.33603 131.045 5.33603C133.715 5.33603 135.325 6.88233 135.325 8.45076C135.325 9.02336 135.198 9.44658 135.048 9.70107H129.073V10.1464C129.073 12.3926 130.196 13.9804 132.379 13.9804C133.585 13.9804 134.265 13.7259 135.344 12.9624L135.557 13.1726C134.52 14.9098 133.057 16.3095 130.6 16.3095Z" fill="currentColor"/>
+      <path d="M139.681 10.5281C139.681 13.1117 140.699 14.575 142.246 14.575C142.86 14.575 143.369 14.4699 143.751 14.3206V8.15472C143.751 6.48118 143.073 6.03582 142.163 6.03582C140.489 6.03582 139.684 7.70936 139.684 10.5281M140.702 16.3122C138.182 16.3122 136.381 14.0661 136.381 11.3746C136.381 7.87811 138.882 5.33598 142.207 5.33598C142.821 5.33598 143.289 5.42173 143.753 5.54897V1.96953L141.739 1.10095V0.782836C142.757 0.486854 145.128 0.0193633 146.824 0H147.228C147.1 1.86441 147.017 3.72882 147.017 5.59323V14.3427L148.5 14.9347V15.2528C147.482 15.7202 145.789 16.1435 144.58 16.3122H144.199L143.922 14.6387C143.372 15.4436 142.058 16.3122 140.702 16.3122Z" fill="currentColor"/>
+    </svg>
+    <p class="bar-title"><b>Concern Worldwide Ireland</b> — the company checkbox on the details step. The live control, the two fixes suggested so far built out in full, and three more.</p>
+  </div>
+
+  <nav class="switcher" aria-label="Choose an approach">
+    <button class="swtab" type="button" data-pane="current" aria-current="true"><span class="num">00</span><span>Current state</span></button>
+    <button class="swtab swtab--diag" type="button" data-pane="d1" aria-current="false"><span class="num">0A</span><span>Spacing only</span></button>
+    <button class="swtab swtab--diag" type="button" data-pane="d2" aria-current="false"><span class="num">0B</span><span>Box only</span></button>
+    <span class="sw-div" aria-hidden="true"></span>
+    <button class="swtab" type="button" data-pane="p1" aria-current="false"><span class="num">01</span><span>Honest target</span></button>
+    <button class="swtab" type="button" data-pane="p2" aria-current="false"><span class="num">02</span><span>Two-way choice</span></button>
+    <button class="swtab" type="button" data-pane="p3" aria-current="false"><span class="num">03</span><span>Out of the path</span></button>
+  </nav>
+
+  <p class="oneline" id="oneline"></p>
+</header>
+
+<!-- ==========================================================
+     Work area
+     ========================================================== -->
+<div class="work">
+  <div class="viewport">
+    <div class="screen">
+
+      <header class="masthead">
+        <div class="masthead-in">
+          <a class="logo" href="#" onclick="return false"><b>CONCERN</b><span>worldwide</span></a>
+          <div class="trust">
+            <div>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="#4285f4"/><path d="M12 7v10" stroke="#fff" stroke-width="2"/></svg>
+              <span>Protected by<b>reCAPTCHA</b></span>
+            </div>
+            <div>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10" width="14" height="10" rx="2" fill="#28a745"/><path d="M8.5 10V7.5a3.5 3.5 0 017 0V10" stroke="#28a745" stroke-width="2" fill="none"/></svg>
+              <span>Secured by<b>SSL Encryption</b></span>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div class="stage">
+        <div class="photo" aria-hidden="true"><span>Photo placeholder</span></div>
+        <div class="shell">
+          <form class="formcard" id="form" novalidate>
+            <h1>Your donation will transform lives</h1>
+
+            <ol class="steps">
+              <li class="step now">Name &amp; email</li>
+              <li class="step">Address</li>
+              <li class="step">Payment</li>
+            </ol>
+
+            <!-- ========================================================
+                 PANE 00 — CURRENT STATE
+                 A faithful rebuild of the live details step, faults and
+                 all. Do not "fix" anything in this pane.
+                 ======================================================== -->
+            <section class="pane" id="pane-current" aria-label="Current state — the live control">
+              <div class="field" style="margin-top:28px">
+                <label class="flabel" for="p0-amount">Your donation <span class="opt">(required)</span></label>
+                <div class="money"><span class="cur" aria-hidden="true">€</span>
+                  <input class="control" id="p0-amount" type="text" inputmode="decimal" value="104"></div>
+              </div>
+
+              <div class="field row2">
+                <div>
+                  <label class="flabel" for="p0-first">First name <span class="opt">(required)</span></label>
+                  <input class="control ic ic-person" id="p0-first" type="text" autocomplete="given-name" placeholder="Jane">
+                </div>
+                <div>
+                  <label class="flabel" for="p0-last">Last name <span class="opt">(required)</span></label>
+                  <input class="control" id="p0-last" type="text" autocomplete="family-name" placeholder="Bloggs">
+                </div>
+              </div>
+
+              <div class="field">
+                <div class="labelrow">
+                  <label class="flabel" for="p0-email">Email address <span class="opt">(required)</span></label>
+                  <button class="help" type="button" aria-expanded="false" aria-controls="p0-email-help" aria-label="Why we ask for your email address">
+                    <span aria-hidden="true">?</span>
+                  </button>
+                </div>
+                <input class="control ic ic-mail" id="p0-email" type="email" inputmode="email" autocomplete="email" placeholder="jane@email.com">
+                <p class="helptext" id="p0-email-help" hidden>We send your receipt to this address.</p>
+              </div>
+
+              <div class="field">
+                <div class="labelrow">
+                  <label class="flabel" for="p0-phone">Phone number <span class="opt">(required)</span></label>
+                  <button class="help" type="button" aria-expanded="false" aria-controls="p0-phone-help" aria-label="Why we ask for your phone number">
+                    <span aria-hidden="true">?</span>
+                  </button>
+                </div>
+                <input class="control ic ic-phone" id="p0-phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="+353 1 000 0000">
+                <p class="helptext" id="p0-phone-help" hidden>We use this only if there is a query about your donation.</p>
+              </div>
+
+              <!-- the live markup, reproduced ------------------------- -->
+              <div class="cs-block" data-block>
+                <div class="cs-wrap" role="group" aria-labelledby="">
+                  <p class="sr-only">The control below reproduces the live one, including its faults: the checkbox has no role and no state, and this prototype also simulates it not responding to the keyboard. Both are deliberate here. The two proposed fixes follow, built out in full and evaluated fairly, then three designed options that are built correctly.</p>
+                  <div class="cs-item">
+                    <label class="cs-label" for="p0-company-donation" tabindex="0" data-target>
+                      <input id="p0-company-donation" data-analytics="opt-in" type="checkbox" value="company_donation" name="company_donation">
+                      <span class="indicator"></span>
+                      <span class="cs-text">I am donating on behalf of a company</span>
+                    </label>
+                  </div>
+                </div>
+
+                <div class="field" id="p0-reveal" hidden>
+                  <label class="flabel" for="p0-company">Company name <span class="opt">(required)</span></label>
+                  <input class="control" id="p0-company" type="text" placeholder="Your company" aria-required="true">
+                </div>
+
+                <div class="vizpath" id="vizpath" aria-hidden="true"></div>
+              </div>
+
+              <div class="cs-cta">
+                <button class="submit" type="button" data-cta>Proceed to address</button>
+              </div>
+
+              <!-- Prototype annotation, deliberately below the button so it
+                   cannot affect the measured geometry of the form above. -->
+              <div class="vizlegend" id="vizlegend">
+                <div class="keys">
+                  <span class="key"><span class="sq g" aria-hidden="true"></span> Visible box — <b>24 × 24</b></span>
+                  <span class="key"><span class="sq r" aria-hidden="true"></span> Actually clickable — <b>306 × 24</b></span>
+                </div>
+                The clickable strip is <b>12.75 times</b> the area of the box the donor can see, it has no
+                hover state and no pointer cursor, and it lies across the dotted route from the last field
+                to the button. Nothing on screen tells the donor it is there.
+              </div>
+            </section>
+
+            <!-- ========================================================
+                 PANE 0A — SPACING ONLY (Niamh's proposal, built)
+                 Niamh's three suggested copy changes, plus the gap to the
+                 button widened from 36px to 64px. This is Niamh’s
+                 own fix, built out fully and evaluated fairly — not a
+                 design. Do not add a boundary, a hover state or a
+                 cursor here — that is option 01, not
+                 this one.
+                 ======================================================== -->
+            <section class="pane" id="pane-d1" aria-label="0A — spacing only (Niamh’s proposal, built in full)" hidden>
+              <div class="field" style="margin-top:28px">
+                <label class="flabel" for="d1-amount">Your donation <span class="opt">(required)</span></label>
+                <div class="money"><span class="cur" aria-hidden="true">€</span>
+                  <input class="control" id="d1-amount" type="text" inputmode="decimal" value="104"></div>
+              </div>
+
+              <div class="field row2">
+                <div>
+                  <label class="flabel" for="d1-first">First name <span class="opt">(required)</span></label>
+                  <input class="control ic ic-person" id="d1-first" type="text" autocomplete="given-name" placeholder="Jane">
+                </div>
+                <div>
+                  <label class="flabel" for="d1-last">Last name <span class="opt">(required)</span></label>
+                  <input class="control" id="d1-last" type="text" autocomplete="family-name" placeholder="Bloggs">
+                </div>
+              </div>
+
+              <div class="field">
+                <div class="labelrow">
+                  <label class="flabel" for="d1-email">Email address <span class="opt">(required)</span></label>
+                  <button class="help" type="button" aria-expanded="false" aria-controls="d1-email-help" aria-label="Why we ask for your email address">
+                    <span aria-hidden="true">?</span>
+                  </button>
+                </div>
+                <input class="control ic ic-mail" id="d1-email" type="email" inputmode="email" autocomplete="email" placeholder="jane@email.com">
+                <p class="helptext" id="d1-email-help" hidden>We send your receipt to this address.</p>
+              </div>
+
+              <div class="field">
+                <div class="labelrow">
+                  <label class="flabel" for="d1-phone">Phone number <span class="opt">(required)</span></label>
+                  <button class="help" type="button" aria-expanded="false" aria-controls="d1-phone-help" aria-label="Why we ask for your phone number">
+                    <span aria-hidden="true">?</span>
+                  </button>
+                </div>
+                <input class="control ic ic-phone" id="d1-phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="+353 1 000 0000">
+                <p class="helptext" id="d1-phone-help" hidden>We use this only if there is a query about your donation.</p>
+              </div>
+
+              <!-- Niamh’s suggested copy, on the live markup —
+                   only the wording and the gap below change -->
+              <div class="cs-block" data-block>
+                <div class="cs-wrap" role="group" aria-labelledby="">
+                  <p class="sr-only">This combines Niamh’s suggested wording with a wider gap to the button below: 64px instead of 36px. The missing role and state and the simulated keyboard failure are unchanged, on purpose — this is Niamh’s proposal, evaluated in full, not a redesign. See “01 Honest target” onward for the three options that follow.</p>
+                  <div class="cs-item">
+                    <label class="cs-label cs-label--fit" for="d1-company-donation" tabindex="0" data-target>
+                      <input id="d1-company-donation" data-analytics="opt-in" type="checkbox" value="company_donation" name="company_donation">
+                      <span class="indicator"></span>
+                      <span class="cs-text">This donation is being made by a company or organisation</span>
+                    </label>
+                  </div>
+                </div>
+
+                <div class="field" id="d1-reveal" hidden>
+                  <label class="flabel" for="d1-company">Company name <span class="opt">(required if donating on behalf of a company)</span></label>
+                  <input class="control" id="d1-company" type="text" placeholder="Your company" aria-required="true" aria-describedby="d1-escape">
+                  <p class="hint" id="d1-escape">If this donation is not from a company, untick the box above to remove this field.</p>
+                </div>
+
+                <div class="vizpath" id="d1-vizpath" aria-hidden="true"></div>
+              </div>
+
+              <div class="cs-cta-wide">
+                <button class="submit" type="button" data-cta>Proceed to address</button>
+              </div>
+
+              <!-- Prototype annotation, deliberately below the button so it
+                   cannot affect the measured geometry of the form above. -->
+              <div class="vizlegend" id="d1-vizlegend">
+                <div class="keys">
+                  <span class="key"><span class="sq g" aria-hidden="true"></span> Visible box — <b>24 × 24</b></span>
+                  <span class="key"><span class="sq r" aria-hidden="true"></span> Actually clickable — <b>446 × 24</b> (desktop)</span>
+                </div>
+                Niamh’s wording is longer than today’s, so the silent strip is now wider, not narrower:
+                <b>18.59×</b> the visible box on desktop, up from 12.75× today, and <b>335 × 48 — 27.92×</b> on
+                mobile, once it wraps to two lines. Same lack of boundary, hover or cursor as today — just a
+                bigger target to miss it on.
+              </div>
+            </section>
+
+            <!-- ========================================================
+                 PANE 0B — BOX ONLY (Niamh's and Elise's proposals, built)
+                 Elise's suggested fix — only the box is clickable — plus
+                 Niamh's three suggested copy changes. This is the
+                 proposals built out fully and evaluated
+                 fairly, on its own terms. Do not add a boundary or a
+                 hover state here — that is option 01.
+                 ======================================================== -->
+            <section class="pane" id="pane-d2" aria-label="0B — box only (Niamh’s proposal, built in full)" hidden>
+              <div class="field" style="margin-top:28px">
+                <label class="flabel" for="d2-amount">Your donation <span class="opt">(required)</span></label>
+                <div class="money"><span class="cur" aria-hidden="true">€</span>
+                  <input class="control" id="d2-amount" type="text" inputmode="decimal" value="104"></div>
+              </div>
+
+              <div class="field row2">
+                <div>
+                  <label class="flabel" for="d2-first">First name <span class="opt">(required)</span></label>
+                  <input class="control ic ic-person" id="d2-first" type="text" autocomplete="given-name" placeholder="Jane">
+                </div>
+                <div>
+                  <label class="flabel" for="d2-last">Last name <span class="opt">(required)</span></label>
+                  <input class="control" id="d2-last" type="text" autocomplete="family-name" placeholder="Bloggs">
+                </div>
+              </div>
+
+              <div class="field">
+                <div class="labelrow">
+                  <label class="flabel" for="d2-email">Email address <span class="opt">(required)</span></label>
+                  <button class="help" type="button" aria-expanded="false" aria-controls="d2-email-help" aria-label="Why we ask for your email address">
+                    <span aria-hidden="true">?</span>
+                  </button>
+                </div>
+                <input class="control ic ic-mail" id="d2-email" type="email" inputmode="email" autocomplete="email" placeholder="jane@email.com">
+                <p class="helptext" id="d2-email-help" hidden>We send your receipt to this address.</p>
+              </div>
+
+              <div class="field">
+                <div class="labelrow">
+                  <label class="flabel" for="d2-phone">Phone number <span class="opt">(required)</span></label>
+                  <button class="help" type="button" aria-expanded="false" aria-controls="d2-phone-help" aria-label="Why we ask for your phone number">
+                    <span aria-hidden="true">?</span>
+                  </button>
+                </div>
+                <input class="control ic ic-phone" id="d2-phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="+353 1 000 0000">
+                <p class="helptext" id="d2-phone-help" hidden>We use this only if there is a query about your donation.</p>
+              </div>
+
+              <!-- Niamh’s suggested copy, on the live markup —
+                   only the wording changes, and the label's extent: the
+                   text sits outside it, as an inert sibling, so only the
+                   box is wired to the input. -->
+              <div class="cs-block" data-block>
+                <div class="cs-wrap" role="group" aria-labelledby="">
+                  <p class="sr-only">This combines Niamh’s suggested wording with Elise’s suggestion that only the 24 × 24 box below should be clickable, not the label text beside it. The missing role and state and the simulated keyboard failure are unchanged, on purpose — this is Niamh’s proposal, evaluated in full, not a redesign. See “01 Honest target” onward for the three options that follow.</p>
+                  <div class="cs-item">
+                    <label class="cs-label cs-label--boxonly" for="d2-company-donation" tabindex="0" data-target>
+                      <input id="d2-company-donation" data-analytics="opt-in" type="checkbox" value="company_donation" name="company_donation">
+                      <span class="indicator"></span>
+                    </label>
+                    <span class="cs-text">This donation is being made by a company or organisation</span>
+                  </div>
+                </div>
+
+                <div class="field" id="d2-reveal" hidden>
+                  <label class="flabel" for="d2-company">Company name <span class="opt">(required if donating on behalf of a company)</span></label>
+                  <input class="control" id="d2-company" type="text" placeholder="Your company" aria-required="true" aria-describedby="d2-escape">
+                  <p class="hint" id="d2-escape">If this donation is not from a company, untick the box above to remove this field.</p>
+                </div>
+
+                <div class="vizpath" id="d2-vizpath" aria-hidden="true"></div>
+              </div>
+
+              <div class="cs-cta">
+                <button class="submit" type="button" data-cta>Proceed to address</button>
+              </div>
+
+              <!-- Prototype annotation, deliberately below the button so it
+                   cannot affect the measured geometry of the form above. -->
+              <div class="vizlegend" id="d2-vizlegend">
+                <div class="keys">
+                  <span class="key"><span class="sq g" aria-hidden="true"></span> Visible box — <b>24 × 24</b></span>
+                  <span class="key"><span class="sq r" aria-hidden="true"></span> Actually clickable — <b>24 × 24</b></span>
+                </div>
+                The clickable area now matches the box the donor can see — but it is also below the 44 × 44
+                and 48dp touch guidelines, and the words beside it no longer do anything: tapping the sentence
+                that describes what you are opting into has no effect any more.
+              </div>
+            </section>
+
+            <!-- ========================================================
+                 PANE 01 — HONEST TARGET
+                 Same control, same position. It gains a visible
+                 boundary, real keyboard operation, more clearance from
+                 the button, and a stated way out of the company field.
+                 ======================================================== -->
+            <section class="pane" id="pane-p1" aria-label="Option 1 — honest target, conditional requirement, visible escape" hidden>
+              <div class="field" style="margin-top:28px">
+                <label class="flabel" for="p1-amount">Your donation <span class="opt">(required)</span></label>
+                <div class="money"><span class="cur" aria-hidden="true">€</span>
+                  <input class="control" id="p1-amount" type="text" inputmode="decimal" value="104"></div>
+              </div>
+
+              <div class="field row2">
+                <div>
+                  <label class="flabel" for="p1-first">First name <span class="opt">(required)</span></label>
+                  <input class="control ic ic-person" id="p1-first" type="text" autocomplete="given-name" placeholder="Jane">
+                </div>
+                <div>
+                  <label class="flabel" for="p1-last">Last name <span class="opt">(required)</span></label>
+                  <input class="control" id="p1-last" type="text" autocomplete="family-name" placeholder="Bloggs">
+                </div>
+              </div>
+
+              <div class="field">
+                <div class="labelrow">
+                  <label class="flabel" for="p1-email">Email address <span class="opt">(required)</span></label>
+                  <button class="help" type="button" aria-expanded="false" aria-controls="p1-email-help" aria-label="Why we ask for your email address">
+                    <span aria-hidden="true">?</span>
+                  </button>
+                </div>
+                <input class="control ic ic-mail" id="p1-email" type="email" inputmode="email" autocomplete="email" placeholder="jane@email.com">
+                <p class="helptext" id="p1-email-help" hidden>We send your receipt to this address.</p>
+              </div>
+
+              <div class="field">
+                <div class="labelrow">
+                  <label class="flabel" for="p1-phone">Phone number <span class="opt">(required)</span></label>
+                  <button class="help" type="button" aria-expanded="false" aria-controls="p1-phone-help" aria-label="Why we ask for your phone number">
+                    <span aria-hidden="true">?</span>
+                  </button>
+                </div>
+                <input class="control ic ic-phone" id="p1-phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="+353 1 000 0000">
+                <p class="helptext" id="p1-phone-help" hidden>We use this only if there is a query about your donation.</p>
+              </div>
+
+              <div class="field" data-block>
+                <label class="optrow" for="p1-company-donation" data-target>
+                  <input class="cbx" type="checkbox" id="p1-company-donation" name="company_donation" value="company_donation">
+                  <span class="optrow-text">This donation is from a company or organisation</span>
+                </label>
+
+                <div class="reveal" id="p1-reveal" hidden>
+                  <label class="flabel" for="p1-company">Company name <span class="opt">(required for company donations)</span></label>
+                  <input class="control" id="p1-company" type="text" placeholder="Your company" aria-describedby="p1-escape">
+                  <p class="hint" id="p1-escape">Only company donations need this. Untick the box above to remove it.</p>
+                </div>
+              </div>
+
+              <div class="cta-48">
+                <button class="submit" type="button" data-cta>Proceed to address</button>
+              </div>
+            </section>
+
+            <!-- ========================================================
+                 PANE 02 — TWO-WAY CHOICE
+                 The silent opt-in becomes a visible question with two
+                 equal answers. Nobody can opt in without saying so, and
+                 the way back is on screen the whole time.
+                 ======================================================== -->
+            <section class="pane" id="pane-p2" aria-label="Option 2 — an explicit two-way choice" hidden>
+              <div class="field" style="margin-top:28px">
+                <label class="flabel" for="p2-amount">Your donation <span class="opt">(required)</span></label>
+                <div class="money"><span class="cur" aria-hidden="true">€</span>
+                  <input class="control" id="p2-amount" type="text" inputmode="decimal" value="104"></div>
+              </div>
+
+              <div class="field row2">
+                <div>
+                  <label class="flabel" for="p2-first">First name <span class="opt">(required)</span></label>
+                  <input class="control ic ic-person" id="p2-first" type="text" autocomplete="given-name" placeholder="Jane">
+                </div>
+                <div>
+                  <label class="flabel" for="p2-last">Last name <span class="opt">(required)</span></label>
+                  <input class="control" id="p2-last" type="text" autocomplete="family-name" placeholder="Bloggs">
+                </div>
+              </div>
+
+              <div class="field">
+                <div class="labelrow">
+                  <label class="flabel" for="p2-email">Email address <span class="opt">(required)</span></label>
+                  <button class="help" type="button" aria-expanded="false" aria-controls="p2-email-help" aria-label="Why we ask for your email address">
+                    <span aria-hidden="true">?</span>
+                  </button>
+                </div>
+                <input class="control ic ic-mail" id="p2-email" type="email" inputmode="email" autocomplete="email" placeholder="jane@email.com">
+                <p class="helptext" id="p2-email-help" hidden>We send your receipt to this address.</p>
+              </div>
+
+              <div class="field">
+                <div class="labelrow">
+                  <label class="flabel" for="p2-phone">Phone number <span class="opt">(required)</span></label>
+                  <button class="help" type="button" aria-expanded="false" aria-controls="p2-phone-help" aria-label="Why we ask for your phone number">
+                    <span aria-hidden="true">?</span>
+                  </button>
+                </div>
+                <input class="control ic ic-phone" id="p2-phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="+353 1 000 0000">
+                <p class="helptext" id="p2-phone-help" hidden>We use this only if there is a query about your donation.</p>
+              </div>
+
+              <fieldset class="field" data-block>
+                <legend class="flabel">Who is this donation from?</legend>
+                <div class="optgroup" style="margin-top:8px">
+                  <label class="optrow" for="p2-from-me" data-target>
+                    <input class="rdo" type="radio" name="p2-from" id="p2-from-me" value="individual" checked>
+                    <span class="optrow-text">Me personally</span>
+                  </label>
+                  <label class="optrow" for="p2-from-co">
+                    <input class="rdo" type="radio" name="p2-from" id="p2-from-co" value="company">
+                    <span class="optrow-text">A company or organisation</span>
+                  </label>
+                </div>
+
+                <div class="reveal" id="p2-reveal" hidden>
+                  <label class="flabel" for="p2-company">Company name <span class="opt">(required)</span></label>
+                  <input class="control" id="p2-company" type="text" placeholder="Your company" aria-describedby="p2-escape">
+                  <p class="hint" id="p2-escape">Giving as an individual? Choose “Me personally” above.</p>
+                </div>
+              </fieldset>
+
+              <div class="cta-48">
+                <button class="submit" type="button" data-cta>Proceed to address</button>
+              </div>
+            </section>
+
+            <!-- ========================================================
+                 PANE 03 — OUT OF THE PATH
+                 The control barely changes. It moves up beside the
+                 amount, where the nature of the gift belongs, and the
+                 step gains two group headings. Nothing now sits between
+                 the last field and the button.
+                 ======================================================== -->
+            <section class="pane" id="pane-p3" aria-label="Option 3 — move the checkbox out of the path to the button" hidden>
+              <h2 class="grouph" style="margin-top:28px">About this donation</h2>
+
+              <div class="field">
+                <label class="flabel" for="p3-amount">Your donation <span class="opt">(required)</span></label>
+                <div class="money"><span class="cur" aria-hidden="true">€</span>
+                  <input class="control" id="p3-amount" type="text" inputmode="decimal" value="104"></div>
+              </div>
+
+              <div class="field" data-block>
+                <label class="plainrow" for="p3-company-donation" data-target>
+                  <input class="cbx" type="checkbox" id="p3-company-donation" name="company_donation" value="company_donation">
+                  <span>This donation is from a company or organisation</span>
+                </label>
+
+                <div class="reveal" id="p3-reveal" hidden style="margin-top:12px">
+                  <label class="flabel" for="p3-company">Company name <span class="opt">(required for company donations)</span></label>
+                  <input class="control" id="p3-company" type="text" placeholder="Your company" aria-describedby="p3-escape">
+                  <p class="hint" id="p3-escape">Only company donations need this. Untick the box above to remove it.</p>
+                </div>
+              </div>
+
+              <h2 class="grouph">About you</h2>
+
+              <div class="field row2">
+                <div>
+                  <label class="flabel" for="p3-first">First name <span class="opt">(required)</span></label>
+                  <input class="control ic ic-person" id="p3-first" type="text" autocomplete="given-name" placeholder="Jane">
+                </div>
+                <div>
+                  <label class="flabel" for="p3-last">Last name <span class="opt">(required)</span></label>
+                  <input class="control" id="p3-last" type="text" autocomplete="family-name" placeholder="Bloggs">
+                </div>
+              </div>
+
+              <div class="field">
+                <div class="labelrow">
+                  <label class="flabel" for="p3-email">Email address <span class="opt">(required)</span></label>
+                  <button class="help" type="button" aria-expanded="false" aria-controls="p3-email-help" aria-label="Why we ask for your email address">
+                    <span aria-hidden="true">?</span>
+                  </button>
+                </div>
+                <input class="control ic ic-mail" id="p3-email" type="email" inputmode="email" autocomplete="email" placeholder="jane@email.com">
+                <p class="helptext" id="p3-email-help" hidden>We send your receipt to this address.</p>
+              </div>
+
+              <div class="field">
+                <div class="labelrow">
+                  <label class="flabel" for="p3-phone">Phone number <span class="opt">(required)</span></label>
+                  <button class="help" type="button" aria-expanded="false" aria-controls="p3-phone-help" aria-label="Why we ask for your phone number">
+                    <span aria-hidden="true">?</span>
+                  </button>
+                </div>
+                <input class="control ic ic-phone" id="p3-phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="+353 1 000 0000">
+                <p class="helptext" id="p3-phone-help" hidden>We use this only if there is a query about your donation.</p>
+              </div>
+
+              <div class="cta-56">
+                <button class="submit" type="button" data-cta>Proceed to address</button>
+              </div>
+            </section>
+
+            <p class="sr-only" role="status" aria-live="polite" id="live"></p>
+          </form>
+        </div>
+      </div>
+
+    </div><!-- /.screen -->
+  </div><!-- /.viewport -->
+
+  <!-- ==========================================================
+       Annotation rail
+       ========================================================== -->
+  <aside class="rail" aria-label="Notes on the approach shown">
+    <h2 id="rail-h">Current state</h2>
+    <div id="railbody"></div>
+
+    <div class="railctl" id="railctl"></div>
+
+    <div class="metrics" aria-live="off">
+      <dl>
+        <dt>Target you can hit</dt><dd id="m-target">—</dd>
+        <dt>Boundary you can see</dt><dd id="m-visible">—</dd>
+        <dt>Block height</dt><dd id="m-height">—</dd>
+        <dt>Clearance to button</dt><dd id="m-gap">—</dd>
+      </dl>
+      <p class="caveat" id="m-note"></p>
+    </div>
+
+    <div class="rail-foot">
+      <b>SystemSeed design prototype</b>
+      Not an official Concern build. Concern colours, type and layout are a
+      reconstruction from the Donation forms Figma. Tooltip wording is
+      indicative. Measurements of the live control come from
+      <code>research/current-state.md</code>, taken from production on
+      5 August 2026.
+    </div>
+  </aside>
+</div>
+
+<footer class="protofoot">
+  <b>SystemSeed design prototype — not an official Concern build.</b>
+  Concern Worldwide Ireland · donation form, details step · CWIEDEV-2737 ·
+  nothing here is live, no data is submitted, no payment is taken.
+</footer>
+
+<script>
+(function () {
+  'use strict';
+
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var live    = document.getElementById('live');
+  var oneline = document.getElementById('oneline');
+  var railH   = document.getElementById('rail-h');
+  var railB   = document.getElementById('railbody');
+  var railC   = document.getElementById('railctl');
+  var tabs    = [].slice.call(document.querySelectorAll('.swtab'));
+
+  /* ------------------------------------------------------------------
+     Copy for the six tabs: the current state, the two
+     proposed fixes (d1/d2 — Niamh's copy changes on top of a wider gap,
+     then on top of a box-only target, each built out in full and judged
+     fairly, on their own terms), and three of our own
+     designed options. "One line" in the bar, full annotation in the
+     rail. Honest about the cost of each — a sheet that only lists
+     benefits is a sales document, not a design one.
+     ------------------------------------------------------------------ */
+  var CONTENT = {
+
+    current: {
+      title: 'Current state',
+      one: '<b>The live control, reproduced.</b> A 306 × 24 clickable strip with nothing drawn around it, 36px above the button and across the route to it — then a field marked “(required)” with no way out. It costs Donor Care a manual clean-up per junk record, and it gives screen-reader users a focusable sentence with no role and no state.',
+      body: [
+        '<p class="lede">This is what donors meet today, rebuilt to the measurements taken from production.</p>',
+        '<h3>The chain</h3>',
+        '<ul>',
+        '<li>The clickable label is <b>306 × 24</b>. The box the donor can see is <b>24 × 24</b>. The target is <b>12.75×</b> the area of the thing that signals it, with no hover state and no pointer cursor.</li>',
+        '<li>It sits <b>36px</b> above the primary button and overlaps it horizontally — directly across the route from the phone field to “Proceed to address”.</li>',
+        '<li>Tick it and a field appears marked <b>“Company name (required)”</b>. Nothing on screen says unticking removes it.</li>',
+        '<li>So the donor types “N/A”, and Donor Care fixes it by hand.</li>',
+        '</ul>',
+        '<h3>Also broken here</h3>',
+        '<ul class="cost">',
+        '<li>The real <code>&lt;input&gt;</code> is <code>display:none</code>, so it is not in the accessibility tree and cannot be focused.</li>',
+        '<li>The <code>&lt;label&gt;</code> takes <code>tabindex="0"</code> but has <b>no role and no checked state</b>. A screen-reader user focusing it hears a plain sentence — not a checkbox, and not whether it is ticked.</li>',
+        '<li>WCAG 2.2 <b>4.1.2 Name, Role, Value</b> — Level A, failed. This one is provable from the markup.</li>',
+        '<li>WCAG 2.2 <b>2.1.1 Keyboard</b> — Level A, <b>very likely failed, pending manual confirmation</b>. Synthetic key events reach the label and toggle nothing, and the input cannot be focused — but that stops short of proof. Tab to the control on the live form and press Space to settle it.</li>',
+        '</ul>',
+        '<p>The reproduction above is built the same way as the live one, so it behaves the same way. Use the buttons below to see the hit area and the ticked state.</p>',
+        '<h3>“Make only the box clickable”?</h3>',
+        '<p>The diagnosis behind that suggestion is right — this is accidental activation, not misreading. The remedy is the wrong lever, for three reasons.</p>',
+        '<ul class="cost">',
+        '<li>It would cut the target to exactly <b>24 × 24</b>: the bare floor of WCAG 2.2 <b>2.5.8</b> with no margin, and well under the 44 × 44 and 48dp that Apple and Google set for touch. Note the 24 × 24 box as built <i>passes</i> 2.5.8 — the defect is a concealed larger hit area, not an undersized one, so this is not a target-size failure and should not be argued as one.</li>',
+        '<li>Label-clickability is standard, expected behaviour. Removing it penalises <b>every</b> corporate donor — the people we want to succeed — to guard against a mistake made by a different group.</li>',
+        '<li>On its own it does nothing about the “(required)” trap, so a donor who mis-taps the smaller box still ends up typing “N/A”. Paired with Niamh’s copy changes it is a different proposition — see <b>0B</b>, where that trap is genuinely closed and only the first two costs remain.</li>',
+        '</ul>',
+        '<p>The useful half of the insight is that the hit area is <i>silent and badly placed</i>, not that it is too big. <b>0A</b> and <b>0B</b> build the suggestions already on the table out in full; the three numbered options then act on the silence itself.</p>',
+        '<h3>Side note</h3>',
+        '<p>This checkbox is one of five instances of the same shared component. That is the argument for fixing the component rather than patching this one instance — once it is open, the marginal cost of doing it properly is close to zero, and the fix carries to all five.</p>'
+      ].join(''),
+      note: 'Measured from production, 5 Aug 2026.'
+    },
+
+    d1: {
+      title: '0A — spacing only',
+      one: '<b>Niamh’s suggestions, built in full.</b> Her three copy changes, plus the gap to the button widened from 36px to 64px. The “(required)” trap is genuinely gone — but the target stays silent, and the screen-reader failure stays untouched.',
+      body: [
+        '<p class="diagflag">Built from Niamh’s suggestions</p>',
+        '<p class="lede">Niamh’s three suggested copy changes, plus more room before the button. Built out in full and judged on its own merits.</p>',
+        '<h3>What changes</h3>',
+        '<ul>',
+        '<li>The label reads <b>“This donation is being made by a company or organisation”</b>, replacing “I am donating on behalf of a company”.</li>',
+        '<li>The revealed field reads <b>“Company name (required if donating on behalf of a company)”</b> — the required text is now conditional, not absolute.</li>',
+        '<li>A new line under the field: <b>“If this donation is not from a company, untick the box above to remove this field.”</b></li>',
+        '<li>The gap to the button goes from 36px to <b>64px</b> — nearly double, and more than Option 1’s own 48px clearance, though deliberately short of the most it could take: more would cost too much height on mobile for what it buys.</li>',
+        '</ul>',
+        '<h3>What this achieves</h3>',
+        '<ul class="fix">',
+        '<li>The “(required)” trap is genuinely gone. A donor who ticks by accident now meets a field that says plainly it only applies to company donations, with a stated line telling them how to remove it. This is a real fix, credited in full — not a smaller version of one.</li>',
+        '<li>The extra clearance does reduce mis-taps caused by reaching for “Proceed to address”: one genuine trigger, genuinely reduced.</li>',
+        '</ul>',
+        '<h3>What it still leaves</h3>',
+        '<ul class="cost">',
+        '<li><b>The target is still silent.</b> Niamh’s rewording changes what the label says, not what it is: the clickable strip still has no visible boundary, no hover state and no pointer cursor, so the donor still cannot see where it begins and ends. Worth stating plainly, because the effect runs the opposite way to what you would expect: the new wording is longer than today’s, so the same unbounded strip now measures <b>446 × 24</b> on desktop — <b>18.59×</b> the visible box, up from 12.75× today — and <b>335 × 48</b> on mobile, where it wraps to two lines: <b>27.92×</b>. Better copy, bigger invisible target.</li>',
+        '<li><b>The screen-reader failure is untouched.</b> The real input is still <code>display:none</code>, and the <code>&lt;label tabindex="0"&gt;</code> still carries no role and no <code>aria-checked</code>. A screen-reader user gets a focusable sentence with no role and no state — just a longer one now. WCAG 2.2 <b>4.1.2 Name, Role, Value</b> fails, provably, from the markup; <b>2.1.1 Keyboard</b> is very likely failed too, pending the thirty seconds of manual confirmation on the live form that this still needs.</li>',
+        '</ul>',
+        '<p><b>Niamh’s changes fix what the donor reads. They don’t change what the control is.</b></p>'
+      ].join(''),
+      note: 'Gap and target measured live in this page, both widths. Wording is Niamh’s, verbatim.'
+    },
+
+    d2: {
+      title: '0B — box only',
+      one: '<b>Niamh’s wording, with Elise’s fix to the target.</b> Niamh’s copy changes, plus only the 24 × 24 box clickable. The “(required)” trap is genuinely gone too — but the same two gaps remain, and shrinking the target costs something of its own.',
+      body: [
+        '<p class="diagflag">Built from Niamh’s suggestions</p>',
+        '<p class="lede">Niamh’s own three suggested copy changes, plus Elise’s suggested fix to the target: only the 24 × 24 box responds to a tap, the sentence beside it no longer does. Built out in full and judged on its own merits.</p>',
+        '<h3>What changes</h3>',
+        '<ul>',
+        '<li>The label reads <b>“This donation is being made by a company or organisation”</b>, replacing “I am donating on behalf of a company”.</li>',
+        '<li>The revealed field reads <b>“Company name (required if donating on behalf of a company)”</b> — the required text is now conditional, not absolute.</li>',
+        '<li>A new line under the field: <b>“If this donation is not from a company, untick the box above to remove this field.”</b></li>',
+        '<li>The label text moves outside the clickable element entirely: only the 24 × 24 box toggles the control now.</li>',
+        '</ul>',
+        '<h3>What this achieves</h3>',
+        '<ul class="fix">',
+        '<li>The “(required)” trap is genuinely gone here too, for the same reason as 0A: the conditional wording and the escape line together give a donor who ticks by accident a stated way back.</li>',
+        '<li>It reduces mis-taps further than 0A: a stray tap now has to land inside a 24 × 24 box rather than anywhere across a much wider strip. The diagnosis behind it — accidental activation, not misunderstanding — is correct, and credited as such.</li>',
+        '</ul>',
+        '<h3>What it still leaves</h3>',
+        '<ul class="cost">',
+        '<li><b>The target is still silent.</b> Niamh’s rewording changes what the label says, not what the box is. Nothing here signals the box’s extent — no boundary, no hover, no cursor change — and the longer sentence beside it now reads as more prominent than ever, while doing nothing at all when tapped.</li>',
+        '<li><b>The screen-reader failure is untouched.</b> The real input is still <code>display:none</code>, and the <code>&lt;label tabindex="0"&gt;</code> still carries no role and no <code>aria-checked</code>. WCAG 2.2 <b>4.1.2 Name, Role, Value</b> fails, provably; <b>2.1.1 Keyboard</b> is very likely failed too, pending manual confirmation on the live form.</li>',
+        '</ul>',
+        '<p><b>Niamh’s changes fix what the donor reads. They don’t change what the control is.</b></p>',
+        '<h3>What it costs, beyond that</h3>',
+        '<ul class="cost">',
+        '<li>The strongest reason, stated first: <b>it converts a visible problem into an invisible one.</b> Today’s failure produces junk records Donor Care can see and report. Shrink the target and you get fewer of those — and more corporate donors who quietly fail to tick a box they meant to tick, which nobody files a ticket about. Fewer complaints is not the same as fewer problems.</li>',
+        '<li>24 × 24 is the bare floor of WCAG 2.2 SC 2.5.8, with no margin, and well under the 44 × 44 (Apple) and 48dp (Material) set for touch. It is also hostile to anyone with a tremor, limited dexterity, or a phone in motion.</li>',
+        '<li>Clicking a checkbox’s label to toggle it is universal, expected behaviour. Removing it makes the control feel broken <b>to the people who actually want it</b> — corporate donors, the high-value minority the field exists to serve.</li>',
+        '</ul>'
+      ].join(''),
+      note: 'Target measured live in this page, unaffected by the wording at either width. The wording itself is Niamh’s, verbatim.'
+    },
+
+    p1: {
+      title: 'Option 1 — honest target',
+      one: '<b>Changes:</b> the checkbox row gets a visible boundary so the hit area stops being a secret, real keyboard operation, and a company field you are told how to escape. <b>Costs:</b> about 40px of extra height on desktop and 60px on mobile, and a checkbox that more people will now notice.',
+      body: [
+        '<p class="lede">The smallest change that treats every link in the chain. Same control, same place — it just stops hiding.</p>',
+        '<h3>What changes</h3>',
+        '<ul>',
+        '<li>The row is drawn: 1px border, white fill, 4px radius. What you can hit is now exactly what you can see, and it fills the column rather than stopping at 306px.</li>',
+        '<li>A hover tint and a pointer cursor, so the target announces itself before you commit.</li>',
+        '<li>Clearance to the button goes from 36px to 48px, so it is no longer a near miss.</li>',
+        '<li>Wording moves from “I am donating on behalf of a company” to <b>“This donation is from a company or organisation”</b> — third person, no “on behalf of” to over-read, and “organisation” covers the clubs, schools and parishes that also give.</li>',
+        '<li>The revealed field reads <b>“Company name (required for company donations)”</b> and carries one line beneath it: <b>“Only company donations need this. Untick the box above to remove it.”</b></li>',
+        '</ul>',
+        '<h3>Why this one</h3>',
+        '<p>The measurements say the tick is accidental, not misunderstood — a donor who misread the label would type a real company name, not “N/A”. So the fix has to be about the target, not the sentence. Drawing a boundary around it does that without taking anything away from the corporate donors we want to succeed.</p>',
+        '<p>And the second half matters as much: the moment a donor sees “required” with no stated exit, typing something is the rational move. Naming the exit is one line of copy and it removes the reason the junk data exists.</p>',
+        '<h3>What it costs</h3>',
+        '<ul class="cost">',
+        '<li>About 40px more height on desktop — 28px on the row, 12px on the extra clearance. Nearer 60px on mobile, where the label wraps to two lines and the row grows to 71px.</li>',
+        '<li>A drawn row is more noticeable than a bare line of text, so expect a few more deliberate ticks from curious donors. Better than silent ones, but not nothing.</li>',
+        '<li>It does not stop a determined mis-tap. It makes one obvious, reversible, and non-blocking — which is the realistic goal.</li>',
+        '<li>Two visual changes plus copy, not one, so it will not land in a fifteen-minute patch.</li>',
+        '<li><b>The escape line has no precedent.</b> Desk research turned up no guidance anywhere on how to tell a donor that a revealed field can be dismissed by reversing the control that revealed it. This wording is original, so it is the thing to test rather than assume.</li>',
+        '</ul>',
+        '<h3>Accessibility</h3>',
+        '<ul class="fix">',
+        '<li>A real <code>&lt;input type="checkbox"&gt;</code> styled with <code>appearance:none</code>, so it keeps its native role, state and keyboard behaviour. Space toggles it.</li>',
+        '<li>3px teal focus ring on the box, plus a row tint, both visible against the card (4.9:1).</li>',
+        '<li>Target 508 × 52 on desktop, 335 × 71 on mobile — clears WCAG 2.5.5 (44 × 44) and Material’s 48dp, never mind the 24px floor of 2.5.8.</li>',
+        '<li>Revealing the field announces it politely through a live region and does not steal focus, so an accidental ticker is not dropped into a text box with the keyboard up. GOV.UK’s own testing found conditional reveal was the single biggest problem screen-reader users reported, mostly because the change goes unannounced — so this part is deliberate, not incidental.</li>',
+        '</ul>'
+      ].join(''),
+      note: 'Compared with the current state, measured live in this page.'
+    },
+
+    p2: {
+      title: 'Option 2 — two-way choice',
+      one: '<b>Changes:</b> the silent opt-in becomes a question with two visible answers, so nobody can opt in without saying so. <b>Costs:</b> roughly 130px of height, and it asks every donor something only a handful need to answer.',
+      body: [
+        '<p class="lede">Replace the checkbox with a question. Both answers stay on screen, so the way back is never hidden.</p>',
+        '<h3>What changes</h3>',
+        '<ul>',
+        '<li>“Who is this donation from?” with two equal rows: <b>Me personally</b> (preselected) and <b>A company or organisation</b>.</li>',
+        '<li>A stray tap now selects a visible answer that is plainly wrong, rather than switching on a state the donor never saw. Correcting it is one tap on the row above.</li>',
+        '<li>Because the other answer is permanently on screen, “(required)” on the company field stops being a trap and can stay — the escape route is the thing next to it.</li>',
+        '<li>Every record now carries an explicit individual-or-company flag rather than a checkbox that is usually absent.</li>',
+        '</ul>',
+        '<h3>Why this one</h3>',
+        '<p>It is the only option here where accidental opt-in is structurally impossible rather than made less likely. If the “N/A” records are costing real money, or Donor Care want certainty rather than an improvement, this is the one that gives it.</p>',
+        '<h3>What it costs</h3>',
+        '<ul class="cost">',
+        '<li>The most height of the three: the block goes from 24px to 141px, and with the extra clearance the step grows about 130px on the longest page of the form.</li>',
+        '<li>It taxes the 99% to protect against a mistake made by a few: every donor now reads a question they did not need. That is a real conversion argument, not a hypothetical one.</li>',
+        '<li>Biggest development change — a new field type, a new value, and a CRM mapping to agree. Furthest from the “small tweak” framing.</li>',
+        '<li>A preselected default is still a default. Most people will leave it, which is what we want, but nobody should claim it makes the answer meaningful data.</li>',
+        '<li><b>It breaks a GOV.UK rule to keep a different promise.</b> “Do not pre-select radio options” is explicit in their Radios guidance. Preselecting is what keeps this a zero-effort step for the ordinary donor; leaving both blank would make every donor answer before they can continue. Worth deciding deliberately rather than inheriting from this build.</li>',
+        '</ul>',
+        '<h3>Accessibility</h3>',
+        '<ul class="fix">',
+        '<li>A real radio group in a <code>&lt;fieldset&gt;</code> with a <code>&lt;legend&gt;</code>, so the question is announced with each answer.</li>',
+        '<li>Arrow keys move between the two, Space selects — native behaviour, nothing reimplemented.</li>',
+        '<li>Rows are 508 × 52 desktop, 335 × 52 mobile, with 8px between them so neighbours are not mis-tapped.</li>',
+        '</ul>'
+      ].join(''),
+      note: 'Compared with the current state, measured live in this page.'
+    },
+
+    p3: {
+      title: 'Option 3 — out of the path',
+      one: '<b>Changes:</b> the checkbox barely changes — it moves up beside the amount, where the nature of the gift belongs, so nothing sits between the last field and the button. <b>Costs:</b> a change to the form’s field order, and a target that is still invisible until you hover it.',
+      body: [
+        '<p class="lede">Do not redesign the control. Move it. The step gains two headings and the button gains a clear run-up.</p>',
+        '<h3>What changes</h3>',
+        '<ul>',
+        '<li>Two groups: <b>About this donation</b> (amount, and who it is from) and <b>About you</b> (name, email, phone). The checkbox belongs with the first — it describes the gift, not the person.</li>',
+        '<li>That puts four fields between the checkbox and the button — 447px of clearance on desktop, 547px on mobile, against 36px today. The route from the last field to “Proceed to address” is now empty.</li>',
+        '<li>The row keeps today’s look — no border, no fill — but gains a hover tint, a pointer cursor and a proper focus ring, so it is no longer completely silent.</li>',
+        '<li>Same wording change and same escape line as Option 1, because moving the control does nothing about the “(required)” trap on its own.</li>',
+        '</ul>',
+        '<h3>Why this one</h3>',
+        '<p>The strip is only dangerous because of where it is. Put it somewhere the donor is not travelling through and the accident rate falls without touching the control, the component’s visual language, or the height of the step. It is also the option that best matches Concern’s own framing of a small change.</p>',
+        '<h3>What it costs</h3>',
+        '<ul class="cost">',
+        '<li><b>Hover does nothing on a phone</b> — and the phone is where the mis-taps happen. On touch this option is protected by position alone.</li>',
+        '<li>Corporate donors meet the question before they have invested anything, which is arguably better, but anyone hunting for it near the button will not find it there any more.</li>',
+        '<li>Two new headings are new furniture for the shared component, and reordering fields may touch form configuration rather than CSS.</li>',
+        '<li>It leaves the hit area larger than the visible box. Safer, but not honest.</li>',
+        '</ul>',
+        '<h3>Accessibility</h3>',
+        '<ul class="fix">',
+        '<li>Same real checkbox as Option 1: native role, native state, Space toggles, visible focus ring.</li>',
+        '<li>The two <code>&lt;h2&gt;</code> headings give screen-reader users a way to skim the step, which the current one does not have.</li>',
+        '<li>Row is 401 × 44 on desktop and 345 × 63 on mobile, so it meets WCAG 2.5.5’s 44 × 44 but sits under Material’s 48dp on desktop, and it does not fill the column the way Options 1 and 2 do.</li>',
+        '</ul>'
+      ].join(''),
+      note: 'Compared with the current state, measured live in this page.'
+    }
+  };
+
+  /* ------------------------------------------------------------------
+     Measurement. Every number in the rail is read off this page rather
+     than typed in, so the annotation cannot drift from the build.
+     ------------------------------------------------------------------ */
+  var baseline = null;
+
+  function px(n) { return Math.round(n) + 'px'; }
+  function fmt(n) { return Math.round(n).toLocaleString('en-IE'); }
+
+  /* The current-state pane's field ids kept their original "p0" prefix;
+     the two diagnostic panes use their own pane name as the prefix
+     ("d1"/"d2") since they did not exist when "p0" was chosen. */
+  function idPrefix(name) { return name === 'current' ? 'p0' : name; }
+
+  function measure(pane) {
+    var block  = pane.querySelector('[data-block]');
+    var target = pane.querySelector('[data-target]');
+    var cta    = pane.querySelector('[data-cta]');
+    if (!block || !target || !cta) return null;
+
+    var b = block.getBoundingClientRect();
+    var t = target.getBoundingClientRect();
+    var c = cta.getBoundingClientRect();
+
+    /* On the current state the visible boundary is only the 24 × 24
+       indicator; on the options the visible boundary is the target. */
+    var ind = target.querySelector('.indicator');
+    var v = ind ? ind.getBoundingClientRect() : t;
+
+    return {
+      targetW: t.width, targetH: t.height, targetA: t.width * t.height,
+      visW: v.width,    visH: v.height,    visA: v.width * v.height,
+      blockH: b.height,
+      gap: c.top - b.bottom
+    };
+  }
+
+  function paint(m, isCurrent) {
+    var el = {
+      target:  document.getElementById('m-target'),
+      visible: document.getElementById('m-visible'),
+      height:  document.getElementById('m-height'),
+      gap:     document.getElementById('m-gap'),
+      note:    document.getElementById('m-note')
+    };
+    if (!m) { el.target.textContent = el.visible.textContent = el.height.textContent = el.gap.textContent = '—'; return; }
+
+    var ratio = m.targetA / m.visA;
+
+    el.target.textContent  = Math.round(m.targetW) + ' × ' + Math.round(m.targetH) +
+                             ' (' + fmt(m.targetA) + ' px²)';
+    el.target.className    = m.targetH >= 44 ? 'good' : '';
+
+    if (ratio > 1.2) {
+      el.visible.textContent = Math.round(m.visW) + ' × ' + Math.round(m.visH) +
+                               ' — ' + ratio.toFixed(2) + '× smaller';
+      el.visible.className   = 'warn';
+    } else {
+      el.visible.textContent = 'the whole target';
+      el.visible.className   = 'good';
+    }
+
+    el.height.textContent = px(m.blockH) +
+      (baseline && !isCurrent ? '  (' + (m.blockH > baseline.blockH ? '+' : '') +
+       px(m.blockH - baseline.blockH) + ')' : '');
+    el.height.className = '';
+
+    el.gap.textContent = px(m.gap);
+    el.gap.className   = m.gap >= 44 ? 'good' : (m.gap < 40 ? 'warn' : '');
+
+    el.note.innerHTML = isCurrent
+      ? 'Measured live in this page at the current window width. The live form measures 306 × 24 and 36px on both desktop and mobile.'
+      : 'Measured live in this page at the current window width. Height is compared with the current state at the same width.';
+  }
+
+  /* ------------------------------------------------------------------
+     The switcher
+     ------------------------------------------------------------------ */
+  var current = 'current';
+
+  function pane(name) { return document.getElementById('pane-' + name); }
+
+  function resetPane(name) {
+    var p = pane(name);
+    [].forEach.call(p.querySelectorAll('input[type=checkbox]'), function (i) { i.checked = false; });
+    var me = p.querySelector('#p2-from-me');
+    if (me) me.checked = true;
+    /* Options 1–3 mark their reveal with class="reveal"; the current
+       state and the two diagnostics use a plain field div instead, so
+       catch those by id pattern rather than hardcoding each one. */
+    [].forEach.call(p.querySelectorAll('.reveal, [id$="-reveal"]'), function (r) { r.hidden = true; });
+    [].forEach.call(p.querySelectorAll('input[type=text], input[type=email], input[type=tel]'), function (i) {
+      if (i.id.indexOf('-company') > -1) i.value = '';
+    });
+    [].forEach.call(p.querySelectorAll('.helptext'), function (h) { h.hidden = true; });
+    [].forEach.call(p.querySelectorAll('.help'), function (h) { h.setAttribute('aria-expanded', 'false'); });
+  }
+
+  /* The hit-area overlay's live-region message. Current state and 0A
+     share the same numbers (the target itself never changes in 0A); 0B
+     needs its own, because the ratio really has changed. */
+  function vizOnMessage(name) {
+    if (name === 'd2') {
+      return 'Hit area shown: the clickable box is now 24 by 24, the same size as the box you can see — but the words beside it no longer respond to a tap.';
+    }
+    return 'Hit area shown: the clickable strip is 306 by 24, the visible box is 24 by 24.';
+  }
+
+  function railControls(name) {
+    /* The current state and both diagnostics reproduce the same broken
+       control, so all three get the hit-area/tick toggles. The three
+       designed options use real controls with nothing to demonstrate. */
+    var hasBrokenDemo = (name === 'current' || name === 'd1' || name === 'd2');
+    if (!hasBrokenDemo) { railC.innerHTML = ''; return; }
+
+    var prefix = idPrefix(name);
+
+    railC.innerHTML =
+      '<button class="tgl" type="button" id="t-viz" aria-pressed="false">' +
+        '<span class="sw" aria-hidden="true"></span>' +
+        '<span>Show the true hit area</span></button>' +
+      '<button class="tgl" type="button" id="t-tick" aria-pressed="false">' +
+        '<span class="sw" aria-hidden="true"></span>' +
+        '<span>Show the ticked state</span></button>';
+
+    document.getElementById('t-viz').addEventListener('click', function () {
+      var on = this.getAttribute('aria-pressed') !== 'true';
+      this.setAttribute('aria-pressed', String(on));
+      pane(current).classList.toggle('viz', on);
+      if (on) drawPath();
+      live.textContent = on ? vizOnMessage(name) : 'Hit area hidden.';
+    });
+
+    document.getElementById('t-tick').addEventListener('click', function () {
+      var on = this.getAttribute('aria-pressed') !== 'true';
+      this.setAttribute('aria-pressed', String(on));
+      document.getElementById(prefix + '-company-donation').checked = on;
+      document.getElementById(prefix + '-reveal').hidden = !on;
+      live.textContent = on
+        ? 'Ticked. A field marked Company name, required, has appeared, with no stated way to remove it.'
+        : 'Unticked.';
+      remeasure();
+    });
+  }
+
+  /* the dotted route from the last field down to the button — drawn in
+     whichever pane is active, since 0A and 0B can now show it too */
+  function drawPath() {
+    var p    = pane(current);
+    var wrap = p.querySelector('.cs-block');
+    var cta  = p.querySelector('[data-cta]');
+    var path = p.querySelector('.vizpath');
+    if (!wrap || !cta || !path) return;
+    var w = wrap.getBoundingClientRect();
+    var c = cta.getBoundingClientRect();
+    /* from the bottom of the phone field (32px above this block) down to
+       the top of the button, at the button's horizontal centre */
+    path.style.left   = (c.left + c.width / 2 - w.left) + 'px';
+    path.style.top    = '-32px';
+    path.style.height = (c.top - w.top + 32) + 'px';
+  }
+
+  function select(name) {
+    if (name === current) return;
+    tabs.forEach(function (t) {
+      t.setAttribute('aria-current', String(t.getAttribute('data-pane') === name));
+    });
+
+    pane(current).hidden = true;
+    pane(current).classList.remove('viz');  /* clear whichever pane we're leaving — current, 0A and 0B can all carry it */
+    resetPane(current);
+    pane(name).hidden = false;
+    current = name;
+
+    oneline.innerHTML = CONTENT[name].one;
+    railH.textContent = CONTENT[name].title;
+    railB.innerHTML   = CONTENT[name].body;
+    railControls(name);
+    /* start each set of notes at the top rather than wherever the last set
+       was left, and flag the rail itself while a diagnostic pane is shown */
+    var railEl = document.querySelector('.rail');
+    if (railEl) {
+      railEl.classList.toggle('rail--diag', name === 'd1' || name === 'd2');
+      railEl.scrollTop = 0;
+    }
+    remeasure();
+
+    /* So a link to one option can be sent on its own. */
+    try { history.replaceState(null, '', '#' + name); } catch (e) {}
+
+    live.textContent = CONTENT[name].title + ' shown.';
+  }
+
+  tabs.forEach(function (t) {
+    t.addEventListener('click', function () { select(t.getAttribute('data-pane')); });
+  });
+
+  function remeasure() {
+    var m = measure(pane(current));
+    paint(m, current === 'current');
+    if (pane(current).classList.contains('viz')) drawPath();
+  }
+
+  /* ------------------------------------------------------------------
+     The conditional company field, on all three options.
+
+     Deliberately does NOT move focus. A donor who ticked by accident
+     should not find themselves inside a text box with the software
+     keyboard up — recovery has to stay one tap away. The field is the
+     next thing in the DOM, so a donor who ticked on purpose reaches it
+     with one Tab.
+     ------------------------------------------------------------------ */
+  function wireReveal(boxId, revealId, onText, offText) {
+    var box = document.getElementById(boxId);
+    var rev = document.getElementById(revealId);
+    if (!box || !rev) return;
+    box.addEventListener('change', function () {
+      var on = box.type === 'radio' ? box.checked : box.checked;
+      rev.hidden = !on;
+      if (!on) { var i = rev.querySelector('input'); if (i) i.value = ''; }
+      live.textContent = on ? onText : offText;
+      remeasure();
+    });
+  }
+
+  wireReveal('p1-company-donation', 'p1-reveal',
+    'Company name field added below. Untick the box to remove it.',
+    'Company name field removed.');
+
+  wireReveal('p3-company-donation', 'p3-reveal',
+    'Company name field added below. Untick the box to remove it.',
+    'Company name field removed.');
+
+  /* Option 2: two radios, either of which changes the answer. */
+  (function () {
+    var co  = document.getElementById('p2-from-co');
+    var me  = document.getElementById('p2-from-me');
+    var rev = document.getElementById('p2-reveal');
+    function sync(announce) {
+      rev.hidden = !co.checked;
+      if (!co.checked) rev.querySelector('input').value = '';
+      if (announce) {
+        live.textContent = co.checked
+          ? 'A company or organisation selected. Company name field added below.'
+          : 'Me personally selected. Company name field removed.';
+      }
+      remeasure();
+    }
+    co.addEventListener('change', function () { sync(true); });
+    me.addEventListener('change', function () { sync(true); });
+  })();
+
+  /* ------------------------------------------------------------------
+     Help disclosures. Plain buttons, plain aria-expanded — no tooltip
+     library, because a tooltip that only appears on hover is unusable
+     on a phone and unreachable by keyboard.
+     ------------------------------------------------------------------ */
+  [].forEach.call(document.querySelectorAll('.help'), function (b) {
+    b.addEventListener('click', function () {
+      var t  = document.getElementById(b.getAttribute('aria-controls'));
+      var on = b.getAttribute('aria-expanded') !== 'true';
+      b.setAttribute('aria-expanded', String(on));
+      t.hidden = !on;
+      remeasure();
+    });
+  });
+
+  /* The reproduced control: prove the fault rather than describe it.
+     Wired the same way on the current state and both diagnostics — all
+     three share the identical broken markup on purpose, so all three
+     get the identical demonstration. */
+  function wireBrokenControl(paneName) {
+    var prefix = idPrefix(paneName);
+    var root   = pane(paneName);
+    var lab    = root.querySelector('.cs-label');
+    var box    = document.getElementById(prefix + '-company-donation');
+    var rev    = document.getElementById(prefix + '-reveal');
+    if (!lab || !box || !rev) return;
+
+    lab.addEventListener('keydown', function (e) {
+      if (e.key === ' ' || e.key === 'Enter') {
+        /* Simulates the suspected live behaviour. Note this is asserted by this
+           handler, not inherited from the markup — the live 2.1.1 failure is
+           very likely but still pending manual confirmation. See the rail. */
+        e.preventDefault();
+        live.textContent = 'Nothing happened — the behaviour we believe the live control has. Worth confirming by hand on the real form.';
+      }
+    });
+    box.addEventListener('change', function () {
+      rev.hidden = !box.checked;
+      var t = document.getElementById('t-tick');
+      if (t) t.setAttribute('aria-pressed', String(box.checked));
+      live.textContent = box.checked
+        ? 'Ticked. A field marked Company name, required, has appeared, with no stated way to remove it.'
+        : 'Unticked.';
+      remeasure();
+    });
+  }
+  wireBrokenControl('current');
+  wireBrokenControl('d1');
+  wireBrokenControl('d2');
+
+  /* The buttons go nowhere. Say so rather than appearing broken. */
+  [].forEach.call(document.querySelectorAll('[data-cta]'), function (b) {
+    b.addEventListener('click', function () {
+      var was = b.textContent;
+      b.textContent = 'Prototype — no next step';
+      live.textContent = 'Prototype: this would go to the address step.';
+      setTimeout(function () { b.textContent = was; }, 1700);
+    });
+  });
+
+  /* ------------------------------------------------------------------
+     Boot
+     ------------------------------------------------------------------ */
+  oneline.innerHTML = CONTENT.current.one;
+  railH.textContent = CONTENT.current.title;
+  railB.innerHTML   = CONTENT.current.body;
+  railControls('current');
+
+  /* The baseline has to be read with the current-state pane laid out, and at
+     the same window width as whatever it is being compared with. If another
+     pane is showing, swap it in and out without painting a frame. */
+  function measureBaseline() {
+    var showing = current;
+    if (showing !== 'current') { pane(showing).hidden = true; pane('current').hidden = false; }
+    baseline = measure(pane('current'));
+    if (showing !== 'current') { pane('current').hidden = true; pane(showing).hidden = false; }
+  }
+
+  function boot() {
+    measureBaseline();
+    remeasure();
+  }
+  if (document.fonts && document.fonts.ready) { document.fonts.ready.then(boot); } else { boot(); }
+  setTimeout(boot, 400);
+
+  /* #d1 / #d2 / #p1 / #p2 / #p3 open straight on that pane. ?tick=1 opens
+     with the company field already showing, whichever pane is on. ?viz=1
+     turns on the hit-area overlay, on current state, 0A or 0B — the only
+     three panes that have one. */
+  (function deeplink() {
+    var s    = location.search;
+    var want = (location.hash || '').replace('#', '');
+    var tick = /[?&]tick=1/.test(s);
+    var viz  = /[?&]viz=1/.test(s);
+
+    if (CONTENT[want] && want !== 'current') {
+      select(want);
+      if (tick) {
+        var c = want === 'p2'
+          ? document.getElementById('p2-from-co')
+          : document.getElementById(want + '-company-donation');
+        if (c) { c.checked = true; c.dispatchEvent(new Event('change', { bubbles: true })); }
+      }
+      /* Only current/0A/0B have a viz toggle; on p1/p2/p3 this id does
+         not exist, so the lookup is a harmless no-op. */
+      if (viz) { var v2 = document.getElementById('t-viz'); if (v2) v2.click(); }
+      return;
+    }
+    if (viz)  { var v = document.getElementById('t-viz');  if (v) v.click(); }
+    if (tick) { var k = document.getElementById('t-tick'); if (k) k.click(); }
+  })();
+
+  var rt;
+  window.addEventListener('resize', function () {
+    clearTimeout(rt);
+    rt = setTimeout(function () { measureBaseline(); remeasure(); }, 180);
+  });
+})();
+</script>
+</body>
+</html>
