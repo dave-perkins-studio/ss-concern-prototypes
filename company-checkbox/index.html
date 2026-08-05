@@ -22,6 +22,17 @@
    prototype in ../../concern-attribution/design/prototypes/.
    The dark chrome around the screen is SystemSeed brand v0.6.
 
+   Desktop / Mobile preview: every tab defaults to the desktop
+   rendering. Switching to Mobile loads this same file a second time,
+   inside an iframe, at a genuine 375px width with ?embed=1 — so the
+   file's own @media rules re-evaluate for real rather than a desktop
+   layout being squeezed into a narrow box. See section 2b/2c below and
+   the script's "Mobile preview" block. Requires the page to be served
+   (http/https): opening it via file:// puts the iframe in a different
+   origin class in some browsers and the cross-frame measurement is
+   blocked, so the toggle detects that and explains rather than
+   breaking quietly.
+
    Working prototype. Not an official Concern build.
    ================================================================== */
 :root{
@@ -98,6 +109,18 @@ legend{padding:0}
 .bar-title{font-size:13.5px;font-weight:500;color:var(--ss-dark-cream);line-height:1.35}
 .bar-title b{color:var(--ss-cream);font-weight:600}
 
+/* The tab list and the Desktop/Mobile toggle share one row. The tab
+   list scrolls internally (never the page); the toggle sits outside
+   that scroll box so it is always visible, never carried off-screen
+   with the tabs — see the coordinator's steer: it must be one clear
+   click away on every tab, never auto-switched. */
+.switcher-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.switcher-wrap{position:relative;flex:1 1 auto;min-width:0;overflow:hidden;border-radius:6px 6px 0 0}
+.switcher-wrap.can-scroll::after{
+  content:"";position:absolute;top:0;right:0;bottom:0;width:34px;
+  background:linear-gradient(to right, transparent, var(--ss-black) 75%);
+  pointer-events:none;
+}
 .switcher{display:flex;gap:4px;overflow-x:auto;padding-bottom:0;-webkit-overflow-scrolling:touch}
 .swtab{
   flex:0 0 auto;display:flex;align-items:center;gap:9px;
@@ -119,6 +142,26 @@ legend{padding:0}
 .swtab--diag .num{color:var(--diag)}
 .swtab--diag[aria-current="true"]{background:var(--diag-active);border-bottom-color:var(--diag)}
 .sw-div{flex:0 0 auto;align-self:stretch;width:1px;margin:8px 2px;background:var(--ss-lighter-black)}
+
+/* Desktop / Mobile — always visible, never inside the scrolling tab
+   list. Desktop is the loaded state on every tab; this is a deliberate
+   switch the viewer makes, not something a tab choice triggers. */
+.viewtoggle{flex:0 0 auto;display:flex;align-items:center;gap:9px;padding:4px 0}
+.viewtoggle .vtlabel{
+  font-size:11px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;
+  color:var(--ss-brown);white-space:nowrap;
+}
+.vtgroup{display:flex;gap:2px;background:var(--ss-lighter-black);border-radius:9px;padding:3px}
+.vtbtn{
+  border:0;background:none;color:var(--ss-dark-cream);font-family:var(--ss-sans);
+  font-size:13.5px;font-weight:600;padding:0 15px;min-height:44px;border-radius:7px;
+  cursor:pointer;display:flex;align-items:center;gap:6px;
+  transition:background var(--dur-fast) var(--ease-soft),color var(--dur-fast) var(--ease-soft);
+}
+.vtbtn:hover{color:var(--ss-cream)}
+.vtbtn[aria-pressed="true"]{background:var(--ss-green);color:var(--ss-cream)}
+.vtbtn:focus-visible{outline:3px solid var(--ss-focus);outline-offset:2px}
+.vtbtn svg{width:15px;height:15px;flex:0 0 auto}
 
 .oneline{
   font-family:var(--ss-sans);font-size:13.5px;line-height:1.55;
@@ -226,6 +269,69 @@ legend{padding:0}
   font-size:11.5px;line-height:1.55;color:var(--ss-brown);
 }
 .rail-foot b{display:block;color:var(--ss-dark-cream);font-weight:600;margin-bottom:4px}
+
+/* ============================================================
+   2b. Mobile preview — a genuine 375px viewport, in a phone frame
+       Not a resized container: this loads the same file a second
+       time in an iframe with ?embed=1, so the file's own @media
+       rules evaluate against the iframe's real width. 375, not the
+       390 floated as a rough figure, because every measurement on
+       file and in the rail (306×24, 335×48, 27.92×...) was taken at
+       375 — see research/current-state.md — and 390 would quietly
+       shift the wrap point away from the numbers this page claims.
+       The bezel is drawn a little wider than the 375 screen so the
+       whole thing still reads as "a phone".
+   ============================================================ */
+#screenDesktop[hidden],#screenMobile[hidden]{display:none}
+.phonewrap{display:flex;flex-direction:column;align-items:center;gap:14px;padding:32px 24px 40px}
+.phone{
+  position:relative;display:flex;flex-direction:column;align-items:center;gap:10px;
+  background:#111;border-radius:44px;padding:26px 12px 16px;
+  box-shadow:0 8px 60px rgba(0,0,0,.5);
+}
+.phone::before{  /* speaker — the one bit of "phone" furniture; nothing else */
+  content:"";position:absolute;top:11px;left:50%;transform:translateX(-50%);
+  width:72px;height:5px;border-radius:3px;background:#000;
+}
+/* 1500: comfortably above the tallest pane×state combination measured
+   (0A/0B with the hit-area overlay and the ticked state both on,
+   ~1366px) — tall enough that no pane ever needs an internal scrollbar
+   on first paint. That matters beyond appearance: a scrollbar inside
+   the iframe eats into its 375px width the same way it would any
+   viewport, which quietly narrows what the media queries see and was
+   caught here shifting 0A's wrap from the genuine 335px column to
+   320px. JS corrects the height to the real content size once measured
+   (see "Mobile preview" in the script) — this is only the safe first
+   value, before that correction lands. */
+.phone-frame{display:block;width:375px;height:1500px;border:0;border-radius:26px;background:var(--card)}
+.phone-home{width:100px;height:4px;border-radius:3px;background:#3a3a3a;flex:0 0 auto}
+.phone-cap{
+  font-family:var(--ss-sans);font-size:12.5px;line-height:1.55;color:var(--ss-brown);
+  text-align:center;max-width:100%;
+}
+.phone-cap b{color:var(--ss-dark-cream);font-weight:600}
+.phone-note{
+  font-family:var(--ss-sans);font-size:13px;line-height:1.5;color:var(--ss-dark-cream);
+  background:var(--ss-lighter-black);border-radius:6px;padding:14px 18px;max-width:375px;
+  width:100%;text-align:left;
+}
+
+/* ============================================================
+   2c. Embed mode — this file, loaded inside the mobile iframe with
+       ?embed=1. Shows only the form pane: no prototype chrome, no
+       rail, and (deliberately, per the brief) no Concern masthead
+       either, so the phone frame stays focused on the field stack,
+       the checkbox and the button — the thing under test.
+   ============================================================ */
+body.is-embed{background:var(--card)}
+body.is-embed .bar,
+body.is-embed .rail,
+body.is-embed .protofoot,
+body.is-embed .masthead,
+body.is-embed .phonewrap{display:none}
+body.is-embed .work{display:block}
+body.is-embed .viewport{padding:0}
+body.is-embed .screen{border-radius:0;box-shadow:none}
 
 /* ============================================================
    3. The Concern page inside the frame
@@ -524,6 +630,24 @@ input.control:focus-visible{outline:3px solid var(--teal);outline-offset:1px}
   .cs-text{white-space:normal}
   .rail{padding:20px 16px 26px}
   .protofoot{padding:16px}
+  .phonewrap{padding:22px 12px 30px}
+}
+/* Down at the 320–480 end: the two-column metric readout and the
+   generic bar description are the two spots that get cramped rather
+   than just narrower. Everything else in the rail already reads as
+   normal paragraphs at these widths. */
+@media (max-width:480px){
+  .metrics dl{grid-template-columns:1fr;gap:2px 0}
+  .metrics dd{text-align:left;margin-bottom:6px}
+  .bar-title{
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
+    overflow:hidden;font-size:12.5px;
+  }
+  .viewtoggle .vtlabel{display:none}   /* "Desktop"/"Mobile" on the buttons already says it */
+}
+@media (max-width:360px){
+  .vtbtn{padding:0 11px;font-size:13px}
+  .swtab{padding:12px 12px 13px}
 }
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{transition-duration:1ms !important;animation-duration:1ms !important}
@@ -556,15 +680,36 @@ input.control:focus-visible{outline:3px solid var(--teal);outline-offset:1px}
     <p class="bar-title"><b>Concern Worldwide Ireland</b> — the company checkbox on the details step. The live control, the two fixes suggested so far built out in full, and three more.</p>
   </div>
 
-  <nav class="switcher" aria-label="Choose an approach">
-    <button class="swtab" type="button" data-pane="current" aria-current="true"><span class="num">00</span><span>Current state</span></button>
-    <button class="swtab swtab--diag" type="button" data-pane="d1" aria-current="false"><span class="num">0A</span><span>Spacing only</span></button>
-    <button class="swtab swtab--diag" type="button" data-pane="d2" aria-current="false"><span class="num">0B</span><span>Box only</span></button>
-    <span class="sw-div" aria-hidden="true"></span>
-    <button class="swtab" type="button" data-pane="p1" aria-current="false"><span class="num">01</span><span>Honest target</span></button>
-    <button class="swtab" type="button" data-pane="p2" aria-current="false"><span class="num">02</span><span>Two-way choice</span></button>
-    <button class="swtab" type="button" data-pane="p3" aria-current="false"><span class="num">03</span><span>Out of the path</span></button>
-  </nav>
+  <div class="switcher-row">
+    <div class="switcher-wrap" id="switcherWrap">
+      <nav class="switcher" aria-label="Choose an approach" id="switcherNav">
+        <button class="swtab" type="button" data-pane="current" aria-current="true"><span class="num">00</span><span>Current state</span></button>
+        <button class="swtab swtab--diag" type="button" data-pane="d1" aria-current="false"><span class="num">0A</span><span>Spacing only</span></button>
+        <button class="swtab swtab--diag" type="button" data-pane="d2" aria-current="false"><span class="num">0B</span><span>Box only</span></button>
+        <span class="sw-div" aria-hidden="true"></span>
+        <button class="swtab" type="button" data-pane="p1" aria-current="false"><span class="num">01</span><span>Honest target</span></button>
+        <button class="swtab" type="button" data-pane="p2" aria-current="false"><span class="num">02</span><span>Two-way choice</span></button>
+        <button class="swtab" type="button" data-pane="p3" aria-current="false"><span class="num">03</span><span>Out of the path</span></button>
+      </nav>
+    </div>
+
+    <!-- Always visible, never inside the scrolling tab list. Desktop is
+         how every tab loads; Mobile is a deliberate choice the viewer
+         makes, never triggered by which tab is selected. -->
+    <div class="viewtoggle">
+      <span class="vtlabel" id="vtlabel">Preview</span>
+      <div class="vtgroup" role="group" aria-labelledby="vtlabel">
+        <button type="button" class="vtbtn" id="vt-desktop" data-view="desktop" aria-pressed="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4.5" width="18" height="12" rx="1.5"/><path d="M9 20h6M12 16.5V20"/></svg>
+          <span>Desktop</span>
+        </button>
+        <button type="button" class="vtbtn" id="vt-mobile" data-view="mobile" aria-pressed="false">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="7" y="3" width="10" height="18" rx="2"/><path d="M11 18h2"/></svg>
+          <span>Mobile</span>
+        </button>
+      </div>
+    </div>
+  </div>
 
   <p class="oneline" id="oneline"></p>
 </header>
@@ -574,7 +719,7 @@ input.control:focus-visible{outline:3px solid var(--teal);outline-offset:1px}
      ========================================================== -->
 <div class="work">
   <div class="viewport">
-    <div class="screen">
+    <div class="screen" id="screenDesktop">
 
       <header class="masthead">
         <div class="masthead-in">
@@ -679,9 +824,9 @@ input.control:focus-visible{outline:3px solid var(--teal);outline-offset:1px}
               <div class="vizlegend" id="vizlegend">
                 <div class="keys">
                   <span class="key"><span class="sq g" aria-hidden="true"></span> Visible box — <b>24 × 24</b></span>
-                  <span class="key"><span class="sq r" aria-hidden="true"></span> Actually clickable — <b>306 × 24</b></span>
+                  <span class="key"><span class="sq r" aria-hidden="true"></span> Actually clickable — <b id="p0-legend-target">306 × 24</b></span>
                 </div>
-                The clickable strip is <b>12.75 times</b> the area of the box the donor can see, it has no
+                The clickable strip is <b id="p0-legend-ratio">12.75 times</b> the area of the box the donor can see, it has no
                 hover state and no pointer cursor, and it lies across the dotted route from the last field
                 to the button. Nothing on screen tells the donor it is there.
               </div>
@@ -768,7 +913,7 @@ input.control:focus-visible{outline:3px solid var(--teal);outline-offset:1px}
               <div class="vizlegend" id="d1-vizlegend">
                 <div class="keys">
                   <span class="key"><span class="sq g" aria-hidden="true"></span> Visible box — <b>24 × 24</b></span>
-                  <span class="key"><span class="sq r" aria-hidden="true"></span> Actually clickable — <b>446 × 24</b> (desktop)</span>
+                  <span class="key"><span class="sq r" aria-hidden="true"></span> Actually clickable — <b id="d1-legend-target">446 × 24</b> <span id="d1-legend-note">at this width</span></span>
                 </div>
                 Niamh’s wording is longer than today’s, so the silent strip is now wider, not narrower:
                 <b>18.59×</b> the visible box on desktop, up from 12.75× today, and <b>335 × 48 — 27.92×</b> on
@@ -859,7 +1004,7 @@ input.control:focus-visible{outline:3px solid var(--teal);outline-offset:1px}
               <div class="vizlegend" id="d2-vizlegend">
                 <div class="keys">
                   <span class="key"><span class="sq g" aria-hidden="true"></span> Visible box — <b>24 × 24</b></span>
-                  <span class="key"><span class="sq r" aria-hidden="true"></span> Actually clickable — <b>24 × 24</b></span>
+                  <span class="key"><span class="sq r" aria-hidden="true"></span> Actually clickable — <b id="d2-legend-target">24 × 24</b></span>
                 </div>
                 The clickable area now matches the box the donor can see — but it is also below the 44 × 44
                 and 48dp touch guidelines, and the words beside it no longer do anything: tapping the sentence
@@ -1077,6 +1222,21 @@ input.control:focus-visible{outline:3px solid var(--teal);outline-offset:1px}
       </div>
 
     </div><!-- /.screen -->
+
+    <!-- ========================================================
+         Mobile preview — this file, loaded a second time inside an
+         iframe with ?embed=1, at a genuine 375px width. Hidden until
+         the Desktop/Mobile toggle in the bar switches to Mobile;
+         desktop is what every tab loads first. See section 2b/2c in
+         the stylesheet and "Mobile preview" in the script.
+         ======================================================== -->
+    <div class="phonewrap" id="screenMobile" hidden>
+      <div class="phone" id="phoneBezel">
+        <iframe class="phone-frame" id="mobileFrame" title="Mobile-width render of the option currently shown"></iframe>
+        <div class="phone-home" aria-hidden="true"></div>
+      </div>
+      <p class="phone-cap" id="phoneCap">Rendered at a genuine <b>375px</b> viewport in an iframe — the same width the live form uses on a phone, not a resized browser window.</p>
+    </div>
   </div><!-- /.viewport -->
 
   <!-- ==========================================================
@@ -1104,7 +1264,11 @@ input.control:focus-visible{outline:3px solid var(--teal);outline-offset:1px}
       reconstruction from the Donation forms Figma. Tooltip wording is
       indicative. Measurements of the live control come from
       <code>research/current-state.md</code>, taken from production on
-      5 August 2026.
+      5 August 2026. The Mobile preview loads this same page a second
+      time in an iframe at a genuine 375px width, so its numbers are read
+      from that render directly rather than scaled down from desktop —
+      it needs the page served over http or https to do that; opening
+      the file directly disables it.
     </div>
   </aside>
 </div>
@@ -1126,6 +1290,41 @@ input.control:focus-visible{outline:3px solid var(--teal);outline-offset:1px}
   var railB   = document.getElementById('railbody');
   var railC   = document.getElementById('railctl');
   var tabs    = [].slice.call(document.querySelectorAll('.swtab'));
+
+  /* ------------------------------------------------------------------
+     Mobile preview — shared state. This exact script runs twice: once
+     as the page itself, and once inside the iframe the Mobile toggle
+     loads (this same file with ?embed=1). `embed` is only ever true in
+     the second case. viewMode stays 'desktop' for the lifetime of an
+     embed document — nothing in an embed document can change it — so
+     only the top document's copy of these hooks is ever assigned a
+     real function; see the "if (!embed)" block further down.
+     Desktop is what every tab loads. Mobile is a deliberate switch the
+     viewer makes; nothing here selects it automatically.
+     ------------------------------------------------------------------ */
+  var embed    = /[?&]embed=1/.test(location.search);
+  var viewMode = 'desktop';
+  var onPaneSwitch = null;  // (name) -> keep the mobile iframe in step
+  var onVizToggle  = null;  // (on)   -> ditto, hit-area overlay
+  var onTickToggle = null;  // (on)   -> ditto, ticked state
+  var onSetView    = null;  // (mode) -> deep-link support, ?view=mobile
+  var onResize     = null;  // ()     -> rescale the phone frame
+  if (embed) document.body.classList.add('is-embed');
+
+  /* The tab list scrolls itself rather than the page. A fade only
+     appears when there genuinely is more to scroll to, and the active
+     tab is kept in view whenever it changes — by deep link, keyboard,
+     or click — so nobody loses track of which of the six is showing. */
+  var switcherWrap = document.getElementById('switcherWrap');
+  var switcherNav  = document.getElementById('switcherNav');
+  function checkTabOverflow() {
+    if (!switcherWrap || !switcherNav) return;
+    switcherWrap.classList.toggle('can-scroll', switcherNav.scrollWidth > switcherNav.clientWidth + 2);
+  }
+  function scrollTabIntoView(name) {
+    var t = tabs.filter(function (x) { return x.getAttribute('data-pane') === name; })[0];
+    if (t && t.scrollIntoView) t.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: reduced ? 'auto' : 'smooth' });
+  }
 
   /* ------------------------------------------------------------------
      Copy for the six tabs: the current state, the two
@@ -1464,6 +1663,7 @@ input.control:focus-visible{outline:3px solid var(--teal);outline-offset:1px}
       pane(current).classList.toggle('viz', on);
       if (on) drawPath();
       live.textContent = on ? vizOnMessage(name) : 'Hit area hidden.';
+      if (onVizToggle) onVizToggle(on);
     });
 
     document.getElementById('t-tick').addEventListener('click', function () {
@@ -1475,6 +1675,7 @@ input.control:focus-visible{outline:3px solid var(--teal);outline-offset:1px}
         ? 'Ticked. A field marked Company name, required, has appeared, with no stated way to remove it.'
         : 'Unticked.';
       remeasure();
+      if (onTickToggle) onTickToggle(on);
     });
   }
 
@@ -1519,9 +1720,29 @@ input.control:focus-visible{outline:3px solid var(--teal);outline-offset:1px}
       railEl.scrollTop = 0;
     }
     remeasure();
+    /* A pane just switched from display:none to visible. Found while
+       verifying 0A's wrap, then again on Option 2's row: the first
+       layout right after that switch can measure short of its settled
+       size — 335 comes out narrower until a further layout pass has
+       happened, and that pass lands at an inconsistent point: two rAFs
+       was enough for 0A's label but not for Option 2's row, which only
+       settled after a second full hide/show cycle. getBoundingClientRect
+       is never "wrong" exactly, it is answering honestly for a frame
+       that has not finished settling — so rather than chase the exact
+       point for every element that can do this, remeasure a few more
+       times over the following half-second. Cheap (paint only changes
+       text, no visible flicker) and it stops being called the moment
+       the numbers hold, which they always have well inside this
+       window in testing. */
+    requestAnimationFrame(function () { requestAnimationFrame(remeasure); });
+    [60, 150, 300, 500].forEach(function (ms) { setTimeout(remeasure, ms); });
 
     /* So a link to one option can be sent on its own. */
     try { history.replaceState(null, '', '#' + name); } catch (e) {}
+
+    scrollTabIntoView(name);
+    checkTabOverflow();
+    if (onPaneSwitch) onPaneSwitch(name);
 
     live.textContent = CONTENT[name].title + ' shown.';
   }
@@ -1530,10 +1751,60 @@ input.control:focus-visible{outline:3px solid var(--teal);outline-offset:1px}
     t.addEventListener('click', function () { select(t.getAttribute('data-pane')); });
   });
 
+  /* The in-pane legend under the CTA (the hit-area overlay's caption)
+     used to hard-code its "actually clickable" figure per pane, one of
+     them labelled "(desktop)" — accurate only at desktop width, and
+     visibly wrong once shown inside a genuine mobile render. Reading it
+     from the same measurement as the rail keeps it honest at any width
+     and satisfies the same "never hardcode a number" rule the rest of
+     the rail already follows. */
+  function updateVizLegend(m) {
+    if (!m) return;
+    var targetEl = document.getElementById(idPrefix(current) + '-legend-target');
+    if (targetEl) targetEl.textContent = Math.round(m.targetW) + ' × ' + Math.round(m.targetH);
+    if (current === 'current') {
+      var ratioEl = document.getElementById('p0-legend-ratio');
+      if (ratioEl) ratioEl.textContent = (m.targetA / m.visA).toFixed(2) + ' times';
+    }
+  }
+
   function remeasure() {
     var m = measure(pane(current));
-    paint(m, current === 'current');
-    if (pane(current).classList.contains('viz')) drawPath();
+    updateVizLegend(m);
+    /* While this document's own view is showing mobile, its metrics
+       box mirrors the iframe instead (see mirrorMetricsFromFrame) —
+       don't let a stray desktop remeasure overwrite it. Inside an
+       embed document viewMode never leaves 'desktop', so this always
+       paints there, which is exactly what the parent later reads. */
+    if (viewMode !== 'mobile') {
+      paint(m, current === 'current');
+      if (pane(current).classList.contains('viz')) drawPath();
+    }
+    /* Tell the parent fresh numbers are ready, in case this document is
+       the mobile iframe and something inside it changed on its own
+       (fonts finishing late, its own resize) rather than because the
+       parent asked. The parent reads this document's DOM directly,
+       same-origin — this message is just the "look now" signal.
+
+       Height is read off .screen's own bottom edge, not
+       document.documentElement.scrollHeight. scrollHeight floors at
+       the viewport's own height in every browser tested — since the
+       iframe starts tall on purpose (section 2b, to keep a scrollbar
+       from ever narrowing its width), scrollHeight would just report
+       that starting height back forever and the frame could never
+       shrink to fit shorter panes. .screen's rendered bottom edge
+       reflects the true content extent regardless of how tall the
+       iframe around it currently is. */
+    if (window.parent && window.parent !== window) {
+      try {
+        var screenEl = document.querySelector('.screen');
+        var contentH = screenEl ? Math.ceil(screenEl.getBoundingClientRect().bottom + window.scrollY) : document.documentElement.scrollHeight;
+        window.parent.postMessage({
+          ccbMobile: true,
+          scrollHeight: contentH
+        }, location.origin);
+      } catch (e) {}
+    }
   }
 
   /* ------------------------------------------------------------------
@@ -1646,6 +1917,208 @@ input.control:focus-visible{outline:3px solid var(--teal);outline-offset:1px}
   });
 
   /* ------------------------------------------------------------------
+     Mobile preview
+
+     Both documents (the page itself, and the copy it loads into the
+     Mobile iframe with ?embed=1) run this exact script, so __ccb is
+     exposed unconditionally — it is the embed document's half of the
+     contract. Only the top document ever calls into someone else's
+     __ccb; an embed document's own copy just sits there unused.
+
+     Everything that drives the iframe or reads it back lives inside
+     "if (!embed)", so an embed document never tries to build a mobile
+     preview of itself. It could not reach the controls to do so
+     anyway — .bar is display:none there — but the guard makes the
+     intent explicit rather than relying on that.
+     ------------------------------------------------------------------ */
+  window.__ccb = {
+    select:  select,
+    getPane: function () { return current; },
+    setViz:  function (on) {
+      var b = document.getElementById('t-viz');
+      if (b && (b.getAttribute('aria-pressed') === 'true') !== on) b.click();
+    },
+    setTick: function (on) {
+      var b = document.getElementById('t-tick');
+      if (b && (b.getAttribute('aria-pressed') === 'true') !== on) b.click();
+    }
+  };
+
+  if (!embed) {
+    var FRAME_W  = 375;  /* keep in sync with .phone-frame{width} — section 2b.
+                            375, not the 390 floated as a rough figure, because
+                            every measurement this page claims (306×24, 335×48,
+                            27.92×...) was taken at 375 in research/current-state.md;
+                            390 would quietly move the wrap point 0A depends on. */
+    var mobileFrame  = document.getElementById('mobileFrame');
+    var screenD      = document.getElementById('screenDesktop');
+    var screenM      = document.getElementById('screenMobile');
+    var phoneBezel   = document.getElementById('phoneBezel');
+    var phoneCap     = document.getElementById('phoneCap');
+    var vtBtns       = [].slice.call(document.querySelectorAll('.vtbtn'));
+    var mobileSrcSet  = false;
+    var mobileBlocked = (location.protocol === 'file:');
+
+    function isVizOn()  { var b = document.getElementById('t-viz');  return !!b && b.getAttribute('aria-pressed') === 'true'; }
+    function isTickOn() { var b = document.getElementById('t-tick'); return !!b && b.getAttribute('aria-pressed') === 'true'; }
+
+    /* The iframe is same-origin (served, not file://), so its DOM is
+       read directly rather than trusting a serialised message payload
+       — the same #m-target etc. the desktop metrics box already uses,
+       just copied verbatim from the embed document's own copy of them. */
+    function mirrorMetricsFromFrame() {
+      if (viewMode !== 'mobile') return;
+      var doc;
+      try { doc = mobileFrame.contentDocument; } catch (e) { doc = null; }
+      if (!doc) return;
+      ['m-target', 'm-visible', 'm-height', 'm-gap'].forEach(function (id) {
+        var s = doc.getElementById(id), d = document.getElementById(id);
+        if (s && d) { d.textContent = s.textContent; d.className = s.className; }
+      });
+      var sNote = doc.getElementById('m-note'), dNote = document.getElementById('m-note');
+      if (sNote && dNote) {
+        dNote.innerHTML = 'Measured inside the ' + FRAME_W + 'px mobile render — not scaled down from desktop. ' + sNote.innerHTML;
+      }
+    }
+
+    /* The bezel is drawn a little wider than the 375 screen so it still
+       reads as "a phone" (see section 2b). At outer widths narrower than
+       that, scale the whole bezel down — a visual transform, not a
+       change to the iframe's own width, so what it measures is
+       unaffected; only its on-screen size changes. */
+    function fitPhone() {
+      if (viewMode !== 'mobile' || !phoneBezel || !screenM || phoneBezel.hidden) return;
+      phoneBezel.style.transform    = '';
+      phoneBezel.style.marginBottom = '';
+      var cs       = getComputedStyle(screenM);
+      var avail    = screenM.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+      var naturalW = phoneBezel.offsetWidth;
+      var naturalH = phoneBezel.offsetHeight;
+      if (!naturalW) return;
+      var scale = Math.max(0.55, Math.min(1, avail / naturalW));
+      if (scale < 0.999) {
+        phoneBezel.style.transform       = 'scale(' + scale.toFixed(4) + ')';
+        phoneBezel.style.transformOrigin = 'top center';
+        /* transform:scale shrinks the paint, not the layout box, which
+           would otherwise leave a gap below equal to the height removed. */
+        phoneBezel.style.marginBottom = (-(naturalH * (1 - scale))).toFixed(1) + 'px';
+      }
+    }
+
+    function onMobileFrameLoad() {
+      var win;
+      try { win = mobileFrame.contentWindow; } catch (e) { win = null; }
+      if (win && win.__ccb) {
+        var api = win.__ccb;
+        if (api.getPane() !== current) api.select(current);
+        api.setViz(isVizOn());
+        api.setTick(isTickOn());
+        mobileFrame.title = 'Mobile-width render — ' + CONTENT[current].title;
+      }
+      mirrorMetricsFromFrame();
+      fitPhone();
+    }
+
+    /* Set once. After that, pane/viz/tick changes are driven live
+       through __ccb rather than by reloading the iframe. */
+    function ensureMobileFrame() {
+      if (mobileSrcSet || mobileBlocked) return;
+      mobileSrcSet = true;
+      var qs = 'embed=1' + (isVizOn() ? '&viz=1' : '') + (isTickOn() ? '&tick=1' : '');
+      mobileFrame.addEventListener('load', onMobileFrameLoad);
+      mobileFrame.src = location.pathname + '?' + qs + '#' + current;
+    }
+
+    function setViewUrlParam(mode) {
+      try {
+        var params = new URLSearchParams(location.search);
+        if (mode === 'mobile') params.set('view', 'mobile'); else params.delete('view');
+        var qs = params.toString();
+        history.replaceState(null, '', location.pathname + (qs ? '?' + qs : '') + location.hash);
+      } catch (e) {}
+    }
+
+    function setView(mode) {
+      if (mode === viewMode) return;
+      viewMode = mode;
+      vtBtns.forEach(function (b) {
+        b.setAttribute('aria-pressed', String(b.getAttribute('data-view') === mode));
+      });
+
+      if (mode === 'mobile') {
+        screenD.hidden = true;
+        screenM.hidden = false;
+        if (mobileBlocked) {
+          phoneBezel.hidden = true;
+          phoneCap.innerHTML = 'Mobile preview needs this page to be served over http or https — opening the file directly cannot give the iframe a genuine viewport to measure. Serve the folder (see the footer for how) and reload from that address.';
+          live.textContent = 'Mobile preview unavailable: this copy was opened as a file rather than served.';
+        } else {
+          /* Neutral placeholders rather than a stale desktop number
+             sitting there for the instant before the iframe reports in. */
+          ['m-target', 'm-visible', 'm-height', 'm-gap'].forEach(function (id) {
+            var d = document.getElementById(id);
+            if (d) { d.textContent = '…'; d.className = ''; }
+          });
+          var note = document.getElementById('m-note');
+          if (note) note.textContent = 'Loading the mobile render…';
+          ensureMobileFrame();
+          if (mobileFrame.contentWindow) onMobileFrameLoad();  /* true up at once if the frame already existed */
+          setTimeout(fitPhone, 350);
+          live.textContent = CONTENT[current].title + ' shown at a genuine ' + FRAME_W + 'px width.';
+        }
+      } else {
+        screenM.hidden = true;
+        screenD.hidden = false;
+        measureBaseline();
+        remeasure();
+        live.textContent = CONTENT[current].title + ' shown at desktop width.';
+      }
+      setViewUrlParam(mode);
+    }
+    onSetView = setView;
+
+    vtBtns.forEach(function (b) {
+      b.addEventListener('click', function () { setView(b.getAttribute('data-view')); });
+    });
+
+    onPaneSwitch = function (name) {
+      if (viewMode !== 'mobile') return;
+      ensureMobileFrame();
+      var win;
+      try { win = mobileFrame.contentWindow; } catch (e) { win = null; }
+      if (win && win.__ccb) { win.__ccb.select(name); mirrorMetricsFromFrame(); fitPhone(); }
+    };
+    onVizToggle = function (on) {
+      if (viewMode !== 'mobile') return;
+      var win;
+      try { win = mobileFrame.contentWindow; } catch (e) { win = null; }
+      if (win && win.__ccb) { win.__ccb.setViz(on); mirrorMetricsFromFrame(); }
+    };
+    onTickToggle = function (on) {
+      if (viewMode !== 'mobile') return;
+      var win;
+      try { win = mobileFrame.contentWindow; } catch (e) { win = null; }
+      if (win && win.__ccb) { win.__ccb.setTick(on); mirrorMetricsFromFrame(); fitPhone(); }
+    };
+    onResize = fitPhone;
+
+    /* Backstop for changes the iframe makes on its own timetable —
+       fonts finishing late, its own debounced resize — rather than
+       ones the parent just asked for and already knows about. */
+    window.addEventListener('message', function (e) {
+      if (e.origin !== location.origin) return;
+      if (!mobileFrame || e.source !== mobileFrame.contentWindow) return;
+      var d = e.data;
+      if (!d || !d.ccbMobile) return;
+      if (typeof d.scrollHeight === 'number') {
+        mobileFrame.style.height = Math.max(360, Math.min(d.scrollHeight, 2200)) + 'px';
+      }
+      mirrorMetricsFromFrame();
+      fitPhone();
+    });
+  }
+
+  /* ------------------------------------------------------------------
      Boot
      ------------------------------------------------------------------ */
   oneline.innerHTML = CONTENT.current.one;
@@ -1664,21 +2137,48 @@ input.control:focus-visible{outline:3px solid var(--teal);outline-offset:1px}
   }
 
   function boot() {
-    measureBaseline();
+    if (viewMode !== 'mobile') measureBaseline();
     remeasure();
+    checkTabOverflow();
   }
+  /* Found while verifying 0A's wrap on a cold cache: on a page's very
+     first-ever load (fonts not yet cached by the browser), the label's
+     wrap can settle a moment after document.fonts.ready resolves and
+     after a single fixed-delay retry — document.fonts.ready resolves
+     once no load already IN PROGRESS is outstanding, not "every
+     @font-face this page might use has actually swapped in", so it can
+     fire before the real swap on a slow fetch. The layout itself is
+     never wrong — getBoundingClientRect always reflects it correctly
+     the moment it is queried — only this readout can go stale if
+     nothing asks again after the swap finishes. Rather than chase the
+     exact event (font-loading events proved unreliable to catch in
+     time here), poll boot() briefly: cheap, harmless if the numbers
+     were already right, and it guarantees the readout catches up
+     shortly after whatever the real settling point turns out to be.
+     Matters more than it would otherwise because the mobile metrics
+     box mirrors whatever this same measurement produces. */
   if (document.fonts && document.fonts.ready) { document.fonts.ready.then(boot); } else { boot(); }
-  setTimeout(boot, 400);
+  (function () {
+    var tries = 0;
+    var t = setInterval(function () {
+      boot();
+      if (++tries >= 14) clearInterval(t);  // ~3.5s at 250ms, then stop
+    }, 250);
+  })();
+  checkTabOverflow();
 
   /* #d1 / #d2 / #p1 / #p2 / #p3 open straight on that pane. ?tick=1 opens
      with the company field already showing, whichever pane is on. ?viz=1
      turns on the hit-area overlay, on current state, 0A or 0B — the only
-     three panes that have one. */
+     three panes that have one. ?view=mobile opens on the mobile preview
+     instead of desktop — the one thing here that is NOT the default and
+     has to be asked for explicitly, same as any other deep link. */
   (function deeplink() {
     var s    = location.search;
     var want = (location.hash || '').replace('#', '');
     var tick = /[?&]tick=1/.test(s);
     var viz  = /[?&]viz=1/.test(s);
+    var mobileWanted = /[?&]view=mobile\b/.test(s);
 
     if (CONTENT[want] && want !== 'current') {
       select(want);
@@ -1691,16 +2191,26 @@ input.control:focus-visible{outline:3px solid var(--teal);outline-offset:1px}
       /* Only current/0A/0B have a viz toggle; on p1/p2/p3 this id does
          not exist, so the lookup is a harmless no-op. */
       if (viz) { var v2 = document.getElementById('t-viz'); if (v2) v2.click(); }
-      return;
+    } else {
+      if (viz)  { var v = document.getElementById('t-viz');  if (v) v.click(); }
+      if (tick) { var k = document.getElementById('t-tick'); if (k) k.click(); }
     }
-    if (viz)  { var v = document.getElementById('t-viz');  if (v) v.click(); }
-    if (tick) { var k = document.getElementById('t-tick'); if (k) k.click(); }
+    /* Runs last, so viz/tick above are already set before the iframe is
+       first built with them baked into its own URL. onSetView only
+       exists in the top document — embed documents never see this
+       param, since the src this page builds never includes it. */
+    if (mobileWanted && onSetView) onSetView('mobile');
   })();
 
   var rt;
   window.addEventListener('resize', function () {
     clearTimeout(rt);
-    rt = setTimeout(function () { measureBaseline(); remeasure(); }, 180);
+    rt = setTimeout(function () {
+      if (viewMode !== 'mobile') measureBaseline();
+      remeasure();
+      checkTabOverflow();
+      if (onResize) onResize();
+    }, 180);
   });
 })();
 </script>
