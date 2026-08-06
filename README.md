@@ -8,6 +8,7 @@ link reaches all of them.
 | Path | Prototype | Source of truth (private) |
 |---|---|---|
 | `company-checkbox/` | The company checkbox on step 2 of the donation form — the live control measured and reproduced, the two fixes suggested so far built out in full, and three more | `dave-perkins-studio/ss-concern-company-checkbox` |
+| `gifts-payment-label/` | The gifts checkout payment-method step — the button says "Pay with debit or credit card" but leads to a Stripe page offering wallets too. Current state plus four treatments | `dave-perkins-studio/ss-concern-gifts-payment-label` |
 
 ## Not official Concern builds
 
