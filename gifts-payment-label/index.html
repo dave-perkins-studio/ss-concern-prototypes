@@ -1,0 +1,1140 @@
+<!doctype html>
+<html lang="en-IE">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2032%2032'%3E%3Crect%20width='32'%20height='32'%20rx='6'%20fill='%23015d59'/%3E%3Crect%20x='5'%20y='9'%20width='22'%20height='15'%20rx='2.5'%20fill='none'%20stroke='%23fff'%20stroke-width='2'/%3E%3Cpath%20d='M5%2014.5h22'%20stroke='%23fff'%20stroke-width='2'/%3E%3C/svg%3E">
+<title>Concern gifts — the payment-method step: current state and four options (prototype)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+/* ==================================================================
+   Concern Worldwide Ireland — gifts checkout, "Choose a payment method"
+   CWIEDEV-2739
+
+   The live step rebuilt to the measured pixel, plus four candidate
+   treatments of the card button and the space beneath it.
+
+   Concern gifts tokens are measured from production
+   (gifts.concern.net/checkout, 2026-08-05) — see
+   ../research/current-state.md, findings 2-4. The dark chrome around
+   the screen is SystemSeed brand v0.6.
+
+   Payment-scheme marks are SIMPLIFIED PLACEHOLDERS drawn for layout.
+   Production must use each scheme's official brand assets.
+
+   Working prototype. Not an official Concern build.
+   ================================================================== */
+:root{
+  /* --- Concern gifts, measured from production --- */
+  --teal-dark:#015D59;      /* button background */
+  --teal-darkest:#004440;   /* hover / focus / active */
+  --teal:#007C76;
+  --teal-light:#00B5AD;
+  --green-head:#00734A;     /* section h3 */
+  --green-panel:#EDFAF5;
+  --ink:#212431;
+  --line:#DCDCDC;
+  --input-line:#474954;
+  --disabled-bg:#DCDCDC;
+  --disabled-ink:#999999;
+  --white:#fff;
+
+  /* --- scheme marks --- */
+  --visa:#1434CB;
+  --mc-red:#EB001B;
+  --mc-orange:#F79E1B;
+  --amex:#006FCF;
+  --paypal-blue:#009CDE;
+  --paypal-navy:#003087;
+  --revolut:#0666EB;
+
+  /* --- annotation --- */
+  --bad:#B3261E;
+  --good:#1B6B4F;
+  --warn:#B26B00;
+  --warn-bg:#FFF6E6;
+
+  /* --- SystemSeed chrome v0.6 --- */
+  --ss-cream:#F5F3E6;
+  --ss-dark-cream:#D4D2C6;
+  --ss-black:#373C39;
+  --ss-lighter-black:#4D4C47;
+  --ss-green:#024C40;
+  --ss-yellow:#DAFF00;
+  --ss-focus:#6E4EB1;
+  --ss-sans:'DM Sans',-apple-system,'Segoe UI',Helvetica,Arial,sans-serif;
+
+  --gifts-sans:'IBM Plex Sans',Helvetica,Arial,sans-serif;
+  --ease:cubic-bezier(.2,.8,.2,1);
+  --dur:220ms;
+  --rail-w:360px;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:#1a1a1a;color:var(--ink);
+  font-family:var(--gifts-sans);font-size:16px;line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,h4,p,ul,ol,figure{margin:0;padding:0}
+ul,ol{list-style:none}
+button{font:inherit;color:inherit}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+
+/* ============================================================
+   1. Chrome — SystemSeed bar, tab switcher, controls
+   ============================================================ */
+.bar{
+  background:var(--ss-black);color:var(--ss-cream);font-family:var(--ss-sans);
+  padding:16px 24px 0;position:sticky;top:0;z-index:60;
+  border-bottom:1px solid var(--ss-lighter-black);
+}
+.bar-top{display:flex;align-items:baseline;gap:18px;flex-wrap:wrap;padding-bottom:14px}
+.bar-mark{
+  font-size:13px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--ss-yellow);flex:0 0 auto;
+}
+.bar-title{font-size:13.5px;font-weight:500;color:var(--ss-dark-cream);line-height:1.35}
+.bar-title b{color:var(--ss-cream);font-weight:600}
+.bar-title .long{display:inline}
+
+.switcher{
+  display:flex;gap:4px;overflow-x:auto;-webkit-overflow-scrolling:touch;
+  scrollbar-width:none;position:relative;
+}
+.switcher::-webkit-scrollbar{display:none}
+.swtab{
+  flex:0 0 auto;display:flex;align-items:center;gap:9px;
+  background:none;border:0;border-bottom:3px solid transparent;
+  padding:12px 16px 13px;cursor:pointer;white-space:nowrap;
+  color:var(--ss-dark-cream);font-family:var(--ss-sans);
+  font-size:14.5px;font-weight:500;line-height:1.2;border-radius:6px 6px 0 0;
+  transition:background var(--dur) var(--ease),color var(--dur) var(--ease);
+}
+.swtab .num{font-size:11.5px;font-weight:600;color:var(--ss-yellow)}
+.swtab:hover{background:var(--ss-lighter-black);color:var(--ss-cream)}
+.swtab[aria-current="true"]{background:var(--ss-green);color:var(--ss-cream);border-bottom-color:var(--ss-yellow)}
+.swtab[aria-current="true"] .num{color:var(--ss-cream)}
+.swtab:focus-visible{outline:3px solid var(--ss-focus);outline-offset:-3px}
+.sw-div{flex:0 0 auto;align-self:stretch;width:1px;margin:8px 2px;background:var(--ss-lighter-black)}
+
+.controls{
+  background:var(--ss-lighter-black);font-family:var(--ss-sans);
+  padding:10px 24px;display:flex;gap:26px;align-items:center;flex-wrap:wrap;
+  position:sticky;top:var(--bar-h,116px);z-index:59;
+}
+.ctl-toggles{display:flex;gap:26px;align-items:center;flex-wrap:wrap}
+.lbl-short{display:none}
+.ctl{display:flex;align-items:center;gap:9px}
+.ctl-label{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ss-dark-cream)}
+.seg{display:flex;background:#2c302e;border-radius:7px;padding:3px;gap:2px}
+.seg button{
+  border:0;background:none;color:var(--ss-dark-cream);cursor:pointer;
+  font-family:var(--ss-sans);font-size:13px;font-weight:500;
+  padding:7px 13px;border-radius:5px;line-height:1.2;
+  transition:background var(--dur) var(--ease),color var(--dur) var(--ease);
+}
+.seg button:hover{color:var(--ss-cream)}
+.seg button[aria-pressed="true"]{background:var(--ss-cream);color:var(--ss-black);font-weight:600}
+.seg button:focus-visible{outline:2px solid var(--ss-focus);outline-offset:1px}
+.switch{display:flex;align-items:center;gap:9px;cursor:pointer;color:var(--ss-dark-cream);font-size:13px;font-family:var(--ss-sans)}
+.switch input{width:0;height:0;opacity:0;position:absolute}
+.switch .track{
+  width:38px;height:22px;border-radius:11px;background:#2c302e;position:relative;
+  transition:background var(--dur) var(--ease);flex:0 0 auto;
+}
+.switch .track::after{
+  content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;
+  background:var(--ss-dark-cream);transition:transform var(--dur) var(--ease),background var(--dur) var(--ease);
+}
+.switch input:checked + .track{background:var(--ss-green)}
+.switch input:checked + .track::after{transform:translateX(16px);background:var(--ss-yellow)}
+.switch input:focus-visible + .track{outline:2px solid var(--ss-focus);outline-offset:2px}
+
+/* ============================================================
+   2. Stage — phone(s) + annotation rail
+   ============================================================ */
+.stage{
+  display:flex;gap:32px;align-items:flex-start;
+  padding:32px 24px 80px;max-width:1500px;margin:0 auto;
+}
+.screens{display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap;flex:1 1 auto;justify-content:center}
+.screen-wrap{display:flex;flex-direction:column;gap:10px;align-items:center;flex:0 0 auto}
+.screen-cap{
+  font-family:var(--ss-sans);font-size:12px;font-weight:600;letter-spacing:.06em;
+  text-transform:uppercase;color:var(--ss-dark-cream);
+}
+.screen-cap .dom{color:#8b8f8c;font-weight:500;text-transform:none;letter-spacing:0}
+
+/* device frame */
+.phone{
+  width:390px;flex:0 0 auto;background:var(--white);border-radius:26px;overflow:hidden;
+  box-shadow:0 0 0 9px #2a2a2a,0 0 0 10px #3d3d3d,0 18px 50px rgba(0,0,0,.55);
+  transition:width var(--dur) var(--ease);
+}
+body[data-device="desktop"] .phone{width:560px;border-radius:10px}
+body[data-device="desktop"] .phone-body{height:600px}
+.phone-chrome{
+  background:#f1f1f3;padding:9px 14px 10px;display:flex;align-items:center;gap:9px;
+  border-bottom:1px solid #dcdcde;
+}
+.phone-url{
+  flex:1;background:#e2e2e6;border-radius:999px;padding:5px 12px;
+  font-size:12.5px;color:#3a3a3c;text-align:center;font-family:var(--gifts-sans);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.phone-url b{color:#000;font-weight:600}
+.phone-url .lock{color:#1b6b4f}
+.phone-body{height:660px;overflow-y:auto;overflow-x:hidden;background:var(--white);scroll-behavior:smooth}
+
+/* ============================================================
+   3. The Concern gifts UI, rebuilt from production
+   ============================================================ */
+.gifts-head{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 16px;border-bottom:1px solid var(--line);position:sticky;top:0;
+  background:var(--white);z-index:5;
+}
+.gifts-logo{font-family:var(--gifts-sans);font-weight:700;font-size:15px;color:#0B7B51;line-height:1;letter-spacing:-.01em}
+.gifts-logo span{display:block;font-size:10.5px;font-weight:600;letter-spacing:.02em;margin-top:1px}
+.gifts-burger,.gifts-cart{width:26px;height:20px;position:relative;color:#0B7B51}
+.gifts-burger::before,.gifts-burger::after,.gifts-burger i{
+  content:"";position:absolute;left:2px;right:2px;height:2.5px;background:currentColor;border-radius:2px;
+}
+.gifts-burger::before{top:2px}.gifts-burger i{top:8.5px}.gifts-burger::after{top:15px}
+.gifts-cart{display:flex;align-items:center;justify-content:center;font-size:19px}
+.cart-pip{
+  position:absolute;top:-5px;right:-7px;background:#8C1D40;color:#fff;
+  font-size:10px;font-weight:700;width:17px;height:17px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;font-family:var(--gifts-sans);
+}
+
+.gifts-main{padding:22px 16px 44px}
+
+/* the tail of the previous block, so the payment step is seen in context */
+.prev-panel{
+  background:var(--green-panel);border:1px solid var(--line);border-radius:8px;
+  padding:20px 17px;margin-bottom:34px;
+}
+.prev-check{display:flex;gap:11px;align-items:flex-start;margin-bottom:13px}
+.prev-box{width:22px;height:22px;border:1px solid var(--input-line);border-radius:3px;background:var(--white);flex:0 0 auto}
+.prev-check span{font-size:15px;line-height:1.35;color:var(--ink)}
+.prev-legal{font-size:13px;line-height:1.5;color:#4a4d57}
+.prev-legal a{color:var(--teal-dark)}
+
+/* --- the payment block itself --- */
+.payment-wrap{max-width:420px;margin:0 auto}
+.payment-options-label{
+  font-family:var(--gifts-sans);font-size:22px;font-weight:700;color:var(--ink);
+  text-align:center;margin-bottom:40px;line-height:1.3;
+}
+.payment{display:flex;flex-direction:column;justify-content:space-between;gap:16px}
+.payment__method{flex:1 1 0}
+
+.btn-card{
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  width:100%;text-align:center;
+  background:var(--teal-dark);border:1px solid var(--teal-dark);color:var(--white);
+  font-family:var(--gifts-sans);font-size:18px;font-weight:600;line-height:30px;
+  border-radius:56px;padding:6px 28px 8px;cursor:pointer;
+  transition:background var(--dur) var(--ease),border-color var(--dur) var(--ease);
+}
+.btn-card:hover,.btn-card:focus-visible{background:var(--teal-darkest);border-color:var(--teal-darkest)}
+.btn-card:focus-visible{outline:3px solid var(--ss-focus);outline-offset:2px}
+.btn-card svg{flex:0 0 auto;margin-top:-2px}
+.btn-card .lbl{display:inline-block}
+
+/* PayPal — the SDK-rendered iframe, reproduced as an inert image of itself.
+   Nothing inside this box is ours to change. */
+.btn-paypal{
+  width:100%;height:46px;border-radius:23px;background:#FFC439;
+  display:flex;align-items:center;justify-content:center;gap:7px;
+  border:0;cursor:pointer;position:relative;
+}
+.btn-paypal.blue{background:#2C93D6}
+.pp-word{font-family:Verdana,Geneva,sans-serif;font-size:17px;font-style:italic;font-weight:700;letter-spacing:-.02em;line-height:1}
+.pp-word .pal{color:#fff}
+.pp-word .pay{color:var(--paypal-navy)}
+.btn-paypal.blue .pp-word .pay{color:#fff}
+.btn-paypal .checkout{font-family:Verdana,Geneva,sans-serif;font-size:15px;color:#fff;line-height:1}
+.pp-lock{
+  position:absolute;right:-1px;top:-1px;bottom:-1px;left:-1px;border-radius:24px;
+  border:2px dashed rgba(179,38,30,.85);pointer-events:none;opacity:0;
+  transition:opacity var(--dur) var(--ease);
+}
+body[data-locked="1"] .pp-lock{opacity:1}
+.pp-lock::after{
+  content:"PayPal iframe — not ours to style";
+  position:absolute;bottom:-11px;right:8px;background:var(--bad);color:#fff;
+  font-family:var(--ss-sans);font-size:10px;font-weight:600;padding:2px 7px;border-radius:3px;
+  white-space:nowrap;
+}
+
+/* --- the caption slot: .payment__label, already in the stylesheet, unused --- */
+.payment__label{
+  text-align:center;padding-top:8px;margin-bottom:8px;
+  font-family:var(--gifts-sans);
+}
+
+/* ---- grouping: making the marks belong to the card button, not float
+   between the two. Shipped spacing is 8px above and 8px below — exactly
+   equidistant, which is why they read as unowned. ---- */
+
+/* 1. tight — proximity only. Pull the marks up to the button, push PayPal away. */
+body[data-group="tight"] .btn-card,
+body[data-group="divider"] .btn-card,
+body[data-group="panel"] .btn-card{margin-bottom:0}
+body[data-group="tight"] .payment__label,
+body[data-group="divider"] .payment__label,
+body[data-group="panel"] .payment__label{padding-top:10px;margin-bottom:0}
+body[data-group="tight"] .payment{gap:30px}
+body[data-group="panel"] .payment{gap:26px}
+
+/* 2. divider — proximity plus an explicit "or". They are alternatives. */
+.or-div{
+  display:none;align-items:center;gap:14px;margin:2px 0;
+  font-family:var(--gifts-sans);font-size:14px;color:var(--muted,#5c5f68);
+}
+.or-div::before,.or-div::after{content:"";height:1px;background:var(--line);flex:1}
+body[data-group="divider"] .or-div{display:flex}
+body[data-tab="04"] .or-div{display:none !important}
+
+/* 3. panel — the card method sits in its own container. Unambiguous. */
+body[data-group="panel"] .payment__method--card{
+  background:#F4F8F7;border:1px solid var(--line);border-radius:12px;
+  padding:14px 14px 12px;
+}
+.method-row{
+  display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap;
+}
+.method-note{
+  font-size:13.5px;line-height:1.45;color:#4a4d57;margin-top:9px;
+}
+.method-note .pad{color:var(--good);font-weight:600}
+
+/* scheme marks */
+.mk{
+  width:41px;height:27px;border-radius:4px;background:var(--white);
+  border:1px solid var(--line);display:flex;align-items:center;justify-content:center;
+  flex:0 0 auto;position:relative;transition:opacity var(--dur) var(--ease),filter var(--dur) var(--ease);
+}
+.mk svg{display:block}
+.mk.wide{width:52px}
+/* a mark this device will not be offered */
+.mk.absent{opacity:.34;filter:grayscale(1)}
+body[data-flag="1"] .mk.absent::after{
+  content:"";position:absolute;inset:-1px;border-radius:4px;
+  border:1.5px solid var(--bad);
+  background:linear-gradient(to bottom right,transparent calc(50% - 1px),var(--bad) 50%,transparent calc(50% + 1px));
+}
+body[data-flag="1"] .mk.absent{opacity:.5}
+
+/* bordered row-per-method structure */
+.mrow{
+  border:1px solid var(--line);border-radius:8px;background:var(--white);
+  padding:14px 15px;display:flex;align-items:center;gap:12px;width:100%;
+  cursor:pointer;text-align:left;transition:border-color var(--dur) var(--ease),box-shadow var(--dur) var(--ease);
+}
+.mrow:hover,.mrow:focus-visible{border-color:var(--teal-dark);box-shadow:0 0 0 1px var(--teal-dark)}
+.mrow:focus-visible{outline:3px solid var(--ss-focus);outline-offset:2px}
+.mrow-txt{flex:1 1 auto;min-width:0}
+.mrow-t{font-family:var(--gifts-sans);font-size:16px;font-weight:700;color:var(--ink);line-height:1.3}
+.mrow-s{font-family:var(--gifts-sans);font-size:13px;color:#4a4d57;line-height:1.35;margin-top:2px}
+.mrow-marks{display:flex;gap:4px;flex:0 0 auto;flex-wrap:wrap;justify-content:flex-end;max-width:150px}
+.mrow-marks .mk{width:34px;height:23px}
+.mrow.is-paypal{padding:0;border-style:dashed;border-color:var(--bad);background:#fff}
+.mrow.is-paypal .pp-inner{padding:14px 15px;width:100%}
+
+/* the section heading above, for context */
+.step-h3{
+  font-family:var(--gifts-sans);font-size:24px;font-weight:700;color:var(--green-head);
+  margin-bottom:18px;line-height:1.3;
+}
+
+/* ============================================================
+   4. The Stripe page — what the button actually leads to
+   ============================================================ */
+.stripe-body{background:#fff;padding:0 0 40px}
+.stripe-top{padding:16px 20px 6px;display:flex;align-items:center;gap:10px}
+.stripe-back{color:#6b7280;font-size:17px}
+.stripe-hero{text-align:center;padding:14px 20px 20px}
+.stripe-thumb{
+  width:120px;height:88px;margin:0 auto 12px;border-radius:6px;
+  background:linear-gradient(160deg,#dff0e4,#c7e4d2);display:flex;align-items:center;justify-content:center;
+  font-size:34px;
+}
+.stripe-name{font-size:19px;color:#6b7280;font-family:var(--gifts-sans);line-height:1.3}
+.stripe-amt{font-size:34px;font-weight:700;color:#1a1f36;font-family:var(--gifts-sans);margin-top:4px;letter-spacing:-.01em}
+.stripe-wallets{display:flex;gap:12px;padding:8px 20px 0}
+.sw-btn{
+  flex:1;height:46px;border-radius:6px;display:flex;align-items:center;justify-content:center;
+  gap:5px;border:0;cursor:pointer;font-family:var(--gifts-sans);font-weight:600;font-size:16px;
+}
+.sw-apple{background:#000;color:#fff}
+.sw-link{background:#33DDB3;color:#011E0F}
+.stripe-or{
+  display:flex;align-items:center;gap:12px;padding:20px 20px 14px;
+  color:#6b7280;font-size:14px;font-family:var(--gifts-sans);
+}
+.stripe-or::before,.stripe-or::after{content:"";height:1px;background:#e6e6e6;flex:1}
+.stripe-field{margin:0 20px 18px;background:#f6f8fa;border-radius:6px;padding:9px 12px;display:flex;gap:12px;align-items:baseline}
+.stripe-field .k{font-size:14px;color:#6b7280;font-family:var(--gifts-sans)}
+.stripe-field .v{font-size:15px;color:#1a1f36;font-family:var(--gifts-sans)}
+.stripe-mh{padding:0 20px 10px;font-size:17px;font-weight:600;color:#1a1f36;font-family:var(--gifts-sans)}
+.stripe-methods{margin:0 20px;border:1px solid #e6e6e6;border-radius:6px;overflow:hidden}
+.stripe-m{display:flex;align-items:center;gap:11px;padding:13px 14px;border-bottom:1px solid #e6e6e6}
+.stripe-m:last-child{border-bottom:0}
+.stripe-radio{width:17px;height:17px;border-radius:50%;border:1.5px solid #c4c8d0;flex:0 0 auto}
+.stripe-m .nm{flex:1;font-size:15px;color:#1a1f36;font-family:var(--gifts-sans)}
+.stripe-m .mks{display:flex;gap:3px}
+.stripe-m .mks .mk{width:31px;height:21px}
+
+/* the arrow between the two screens */
+.leads-to{
+  align-self:center;display:flex;flex-direction:column;align-items:center;gap:8px;
+  font-family:var(--ss-sans);color:var(--ss-dark-cream);flex:0 0 auto;padding:0 2px;
+}
+.leads-to .arrow{font-size:26px;color:var(--ss-yellow);line-height:1}
+.leads-to .t{font-size:11.5px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;text-align:center;max-width:110px;line-height:1.35}
+
+/* ============================================================
+   5. Annotation rail
+   ============================================================ */
+.rail{
+  width:var(--rail-w);flex:0 0 var(--rail-w);
+  background:#232523;border:1px solid #33352f;border-radius:12px;
+  padding:22px 22px 26px;color:var(--ss-cream);font-family:var(--ss-sans);
+  position:sticky;top:190px;max-height:calc(100vh - 220px);overflow-y:auto;
+}
+.rail h2{font-size:21px;font-weight:700;line-height:1.22;margin-bottom:14px;color:var(--ss-cream);letter-spacing:-.01em}
+.rail .kicker{font-size:11px;font-weight:700;letter-spacing:.11em;text-transform:uppercase;color:var(--ss-yellow);margin-bottom:7px}
+.rail p{font-size:13.5px;line-height:1.55;color:var(--ss-dark-cream);margin-bottom:10px}
+.rail p b,.rail li b{color:var(--ss-cream);font-weight:600}
+.rail .tip{font-size:12.5px;color:#9a9c92;margin-bottom:12px}
+.rail .src{font-size:11.5px;color:#8b8f8c;margin-bottom:0}
+.rail code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;color:#b6e8d0}
+.rail h3{
+  font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  color:#9a9c92;margin:16px 0 8px;padding-top:12px;border-top:1px solid #33352f;
+}
+.rail ul{margin-bottom:10px}
+.rail li{font-size:13.5px;line-height:1.5;color:var(--ss-dark-cream);padding-left:15px;position:relative;margin-bottom:6px}
+.rail li::before{content:"";position:absolute;left:2px;top:7px;width:5px;height:5px;border-radius:50%;background:var(--ss-yellow)}
+.verdict{
+  border-radius:8px;padding:11px 13px;margin-bottom:10px;font-size:13.5px;line-height:1.45;
+}
+.verdict.bad{background:rgba(179,38,30,.16);border:1px solid rgba(179,38,30,.5);color:#ffc9c5}
+.verdict.good{background:rgba(27,107,79,.18);border:1px solid rgba(27,107,79,.6);color:#b6e8d0}
+.verdict.warn{background:rgba(178,107,0,.16);border:1px solid rgba(178,107,0,.55);color:#ffdca5}
+.verdict b{color:#fff}
+.measured{
+  background:#1b1d1b;border:1px solid #33352f;border-radius:8px;padding:12px 14px;margin-bottom:14px;
+}
+.measured .mt{font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#9a9c92;margin-bottom:8px}
+.mline{display:flex;justify-content:space-between;gap:12px;font-size:12.5px;line-height:1.7;color:var(--ss-dark-cream)}
+.mline .v{font-variant-numeric:tabular-nums;color:var(--ss-cream);font-weight:600;flex:0 0 auto}
+.mline .v.over{color:#ff9c94}
+.mline .v.ok{color:#8fe0b8}
+.cost{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px}
+.chip{
+  font-size:11.5px;font-weight:600;padding:4px 10px;border-radius:999px;
+  background:#2e312d;color:var(--ss-dark-cream);border:1px solid #3d4039;
+}
+.chip.dev{background:rgba(110,78,177,.2);border-color:rgba(110,78,177,.6);color:#d3c4f5}
+
+/* real-browser detection readout */
+.detect{background:#1b1d1b;border:1px solid #33352f;border-radius:8px;padding:12px 14px;margin-bottom:14px}
+.detect .mt{font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#9a9c92;margin-bottom:8px}
+.dline{display:flex;justify-content:space-between;font-size:12.5px;line-height:1.8;color:var(--ss-dark-cream)}
+.dline .y{color:#8fe0b8;font-weight:600}
+.dline .n{color:#ff9c94;font-weight:600}
+
+.panelnote{
+  font-family:var(--ss-sans);font-size:12px;color:#8b8f8c;text-align:center;
+  padding:14px 24px 0;line-height:1.55;
+}
+
+/* visibility plumbing */
+[hidden]{display:none !important}
+[data-pane]{display:none}
+[data-pane].on{display:block}
+/* Visibility only — these must never set `display` on .payment, or they
+   override its flex layout and the gap silently stops working. */
+.only-04{display:none}
+body[data-tab="04"] .only-04{display:flex}
+body[data-tab="04"] .hide-04{display:none}
+/* the grouping control only means anything where a caption exists */
+.ctl-group{display:none}
+body[data-tab="02"] .ctl-group,
+body[data-tab="03"] .ctl-group{display:flex}
+
+.protofoot{
+  background:var(--ss-black);color:var(--ss-brown);font-family:var(--ss-sans);
+  font-size:12px;line-height:1.6;padding:18px 24px 24px;
+  border-top:1px solid var(--ss-lighter-black);
+}
+.protofoot b{color:var(--ss-dark-cream);font-weight:600}
+
+/* ============================================================
+   6. Breakpoints
+   ============================================================ */
+
+/* rail drops under the screens */
+@media (max-width:1180px){
+  .stage{flex-direction:column;align-items:center}
+  .rail{position:static;width:100%;max-width:640px;flex:1 1 auto;max-height:none}
+}
+
+/* tablet — the two phones stop fitting side by side */
+@media (max-width:900px){
+  .bar{padding:14px 16px 0}
+  .bar-title .long{display:none}
+  .controls{padding:10px 16px;gap:16px}
+  .stage{padding:24px 16px 60px;gap:20px}
+  .screens{gap:18px}
+  .leads-to{flex-direction:row;gap:6px}
+  .leads-to .arrow{transform:rotate(90deg)}
+  .leads-to .t{max-width:none}
+}
+
+/* phone — the prototype itself is being read on a handset */
+@media (max-width:680px){
+  /* the header has to earn its height: title only, no strapline */
+  .bar-title .mid{display:none}
+  .bar-top{padding-bottom:10px;gap:10px}
+  .bar-mark{font-size:11.5px}
+  .bar-title{font-size:13px}
+
+  /* only the tab bar stays pinned; the controls scroll away */
+  .controls{position:static;flex-direction:column;align-items:stretch;gap:10px}
+  .ctl{justify-content:space-between;gap:12px}
+  .ctl-label{font-size:11px;flex:0 0 auto}
+  .seg{overflow-x:auto;scrollbar-width:none}
+  .seg::-webkit-scrollbar{display:none}
+  .seg button{flex:0 0 auto;padding:14px 13px}     /* 44px touch target */
+  .swtab{padding:14px 14px 15px;font-size:14px}    /* 49px */
+
+  /* toggles become chips — three stacked rows of switches is too tall */
+  .ctl-toggles{gap:8px}
+  .lbl-long{display:none}
+  .lbl-short{display:inline}
+  .switch{
+    background:#2c302e;border:1px solid #3d4039;border-radius:999px;
+    padding:14px 14px;font-size:12.5px;gap:7px;line-height:1.2;   /* 44px */
+  }
+  .switch .track{width:26px;height:15px}
+  .switch .track::after{width:11px;height:11px}
+  .switch input:checked + .track::after{transform:translateX(11px)}
+  .switch:has(input:checked){background:var(--ss-green);border-color:var(--ss-green);color:var(--ss-cream)}
+
+  .stage{padding:18px 12px 48px}
+  .screens{flex-direction:column;align-items:center;gap:14px}
+  /* frames shrink to fit rather than scale, so the live measurements
+     in the rail keep describing what is actually on screen */
+  .phone{width:min(390px,calc(100vw - 46px))}
+  body[data-device="desktop"] .phone{width:min(560px,calc(100vw - 46px))}
+  .phone-body{height:min(660px,66vh)}
+  body[data-device="desktop"] .phone-body{height:min(600px,66vh)}
+
+  .rail{padding:18px 16px 20px;border-radius:10px}
+  .rail h2{font-size:19px}
+  .protofoot{padding:16px}
+}
+
+/* very narrow */
+@media (max-width:400px){
+  .bar{padding:12px 12px 0}
+  .controls{padding:10px 12px}
+  .stage{padding:14px 8px 40px}
+  .phone{width:min(390px,calc(100vw - 38px))}
+  body[data-device="desktop"] .phone{width:min(560px,calc(100vw - 38px))}
+  .gifts-main{padding:18px 12px 32px}
+}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{transition-duration:.01ms !important;scroll-behavior:auto !important}
+}
+</style>
+</head>
+<body data-tab="00" data-device="ios" data-flag="0" data-locked="0" data-group="divider">
+
+<!-- ============================ CHROME ============================ -->
+<header class="bar">
+  <div class="bar-top">
+    <span class="bar-mark">SystemSeed</span>
+    <p class="bar-title">
+      <b>Concern gifts — “Choose a payment method”.</b>
+      <span class="long">The live step, and four ways to stop the button lying about what comes next.</span>
+      <span class="mid">CWIEDEV-2739 · prototype, not an official Concern build.</span>
+    </p>
+  </div>
+  <div class="switcher" role="tablist" aria-label="Design options">
+    <button class="swtab" role="tab" id="tab-00" aria-selected="true"  aria-controls="stage" data-tab="00"><span class="num">00</span> Current state</button>
+    <span class="sw-div" aria-hidden="true"></span>
+    <button class="swtab" role="tab" id="tab-01" aria-selected="false" aria-controls="stage" data-tab="01" tabindex="-1"><span class="num">01</span> Label only</button>
+    <button class="swtab" role="tab" id="tab-02" aria-selected="false" aria-controls="stage" data-tab="02" tabindex="-1"><span class="num">02</span> Label + marks <em style="font-style:normal;opacity:.65;font-size:12px">(the AC)</em></button>
+    <button class="swtab" role="tab" id="tab-03" aria-selected="false" aria-controls="stage" data-tab="03" tabindex="-1"><span class="num">03</span> Marks that tell the truth</button>
+    <button class="swtab" role="tab" id="tab-04" aria-selected="false" aria-controls="stage" data-tab="04" tabindex="-1"><span class="num">04</span> Bordered rows</button>
+  </div>
+</header>
+
+<div class="controls">
+  <div class="ctl">
+    <span class="ctl-label" id="devlab">Device</span>
+    <div class="seg" role="group" aria-labelledby="devlab">
+      <button data-dev="ios" aria-pressed="true">iPhone · Safari</button>
+      <button data-dev="android" aria-pressed="false">Android · Chrome</button>
+      <button data-dev="desktop" aria-pressed="false">Desktop · Chrome</button>
+    </div>
+  </div>
+  <div class="ctl ctl-group">
+    <span class="ctl-label" id="grplab">Grouping</span>
+    <div class="seg" role="group" aria-labelledby="grplab">
+      <button data-grp="shipped" aria-pressed="false">As shipped</button>
+      <button data-grp="tight" aria-pressed="false">Tight</button>
+      <button data-grp="divider" aria-pressed="true">“or” rule</button>
+      <button data-grp="panel" aria-pressed="false">Panel</button>
+    </div>
+  </div>
+  <div class="ctl-toggles">
+    <label class="switch">
+      <input type="checkbox" id="t-next">
+      <span class="track" aria-hidden="true"></span>
+      <span class="lbl-long">Show what the button leads to</span>
+      <span class="lbl-short">Next screen</span>
+    </label>
+    <label class="switch">
+      <input type="checkbox" id="t-flag">
+      <span class="track" aria-hidden="true"></span>
+      <span class="lbl-long">Flag methods this device won’t get</span>
+      <span class="lbl-short">Flag gaps</span>
+    </label>
+    <label class="switch">
+      <input type="checkbox" id="t-lock">
+      <span class="track" aria-hidden="true"></span>
+      <span class="lbl-long">Mark what we can’t style</span>
+      <span class="lbl-short">Locked bits</span>
+    </label>
+  </div>
+</div>
+
+<!-- ============================ STAGE ============================ -->
+<main class="stage" id="stage" role="tabpanel" tabindex="0" aria-labelledby="tab-00">
+  <div class="screens">
+
+    <div class="screen-wrap">
+      <span class="screen-cap">gifts.concern.net <span class="dom">— ours</span></span>
+      <div class="phone">
+        <div class="phone-chrome">
+          <div class="phone-url"><span class="lock">🔒</span> gifts.<b>concern.net</b></div>
+        </div>
+        <div class="phone-body" id="giftsScroll">
+          <div class="gifts-head">
+            <span class="gifts-burger" aria-hidden="true"><i></i></span>
+            <span class="gifts-logo">CONCERN<span>worldwide</span></span>
+            <span class="gifts-cart" aria-hidden="true">🛒<span class="cart-pip">2</span></span>
+          </div>
+
+          <div class="gifts-main">
+            <!-- tail of the previous block, for context -->
+            <div class="prev-panel">
+              <div class="prev-check"><span class="prev-box"></span><span>I’m happy to hear from you by WhatsApp</span></div>
+              <p class="prev-legal">You may already have opted into some of our marketing, in which case we will continue to rely on that permission. We will also keep you updated by post. You can opt out of postal &amp; other marketing by contacting us at <a href="#">preferences@concern.net</a>. For further information please see our <a href="#">privacy policy</a>.</p>
+            </div>
+
+            <div class="payment-wrap">
+              <h3 class="payment-options-label" id="payHead">Choose a payment method</h3>
+
+              <!-- ---------- tabs 00-03 share this structure ---------- -->
+              <div class="payment hide-04">
+                <div class="payment__method payment__method--card">
+                  <button class="btn-card" type="button" id="cardBtn">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                      <path d="M21 4H3C1.9 4 1 4.9 1 6v12c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2Z" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                      <path d="M1 10h22" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <span class="lbl" id="cardLbl">Pay with debit or credit card</span>
+                  </button>
+
+                  <!-- the unused .payment__label slot, put to work -->
+                  <div class="payment__label" id="capSlot" hidden>
+                    <div class="method-row" id="markRow"></div>
+                    <p class="method-note" id="capNote"></p>
+                  </div>
+                </div>
+
+                <div class="or-div" aria-hidden="true">or</div>
+
+                <div class="payment__method">
+                  <button class="btn-paypal blue" type="button">
+                    <span class="pp-word"><span class="pay">Pay</span><span class="pal">Pal</span></span>
+                    <span class="checkout">Checkout</span>
+                    <span class="pp-lock" aria-hidden="true"></span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- ---------- tab 04: bordered row per method ---------- -->
+              <div class="payment only-04">
+                <div class="payment__method">
+                  <button class="mrow" type="button">
+                    <span class="mrow-txt">
+                      <span class="mrow-t">Card &amp; digital wallets</span>
+                      <span class="mrow-s">Secure payment page</span>
+                    </span>
+                    <span class="mrow-marks" id="markRow04"></span>
+                  </button>
+                </div>
+                <div class="payment__method">
+                  <div class="mrow is-paypal">
+                    <div class="pp-inner">
+                      <button class="btn-paypal blue" type="button" style="height:44px">
+                        <span class="pp-word"><span class="pay">Pay</span><span class="pal">Pal</span></span>
+                        <span class="checkout">Checkout</span>
+                        <span class="pp-lock" aria-hidden="true"></span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ---------- the Stripe page ---------- -->
+    <div class="leads-to" id="leadsTo" hidden>
+      <span class="arrow" aria-hidden="true">→</span>
+      <span class="t">one tap later</span>
+    </div>
+
+    <div class="screen-wrap" id="stripeWrap" hidden>
+      <span class="screen-cap">checkout.stripe.com <span class="dom">— not ours</span></span>
+      <div class="phone">
+        <div class="phone-chrome">
+          <div class="phone-url"><span class="lock">🔒</span> checkout.<b>stripe.com</b></div>
+        </div>
+        <div class="phone-body stripe-body">
+          <div class="stripe-top"><span class="stripe-back">←</span><span class="gifts-logo">CONCERN<span>worldwide</span></span></div>
+          <div class="stripe-hero">
+            <div class="stripe-thumb" aria-hidden="true">💧</div>
+            <p class="stripe-name">Solar Water Pump</p>
+            <p class="stripe-amt">€100.00</p>
+          </div>
+          <div class="stripe-wallets" id="stripeWallets">
+            <button class="sw-btn sw-apple" type="button" id="swApple"><svg width="16" height="19" viewBox="0 0 14 17" aria-hidden="true"><path d="M9.6 2.7c-.5.6-1.3 1.1-2.1 1-.1-.8.3-1.7.7-2.2.5-.6 1.4-1.1 2.1-1.1.1.8-.2 1.7-.7 2.3Zm.7 1.1c-1.2-.1-2.2.7-2.7.7-.6 0-1.4-.6-2.3-.6-1.2 0-2.3.7-2.9 1.8-1.2 2.1-.3 5.3.9 7 .6.9 1.3 1.8 2.2 1.8.9 0 1.2-.6 2.3-.6s1.4.6 2.3.6c1 0 1.6-.8 2.2-1.7.7-1 1-1.9 1-2-.1 0-1.9-.7-1.9-2.8 0-1.8 1.4-2.6 1.5-2.7-.8-1.2-2.1-1.4-2.6-1.5Z" fill="#fff"/></svg> Pay</button>
+            <button class="sw-btn sw-link" type="button">link</button>
+          </div>
+          <div class="stripe-or">OR</div>
+          <div class="stripe-field"><span class="k">Email</span><span class="v">jane@email.com</span></div>
+          <p class="stripe-mh">Payment method</p>
+          <div class="stripe-methods">
+            <div class="stripe-m">
+              <span class="stripe-radio"></span><span class="nm">Card</span>
+              <span class="mks" id="stripeCardMarks"></span>
+            </div>
+            <div class="stripe-m">
+              <span class="stripe-radio"></span><span class="nm">Revolut Pay</span>
+            </div>
+          </div>
+          <p class="panelnote">Reproduced from the screenshot on the ticket (iOS Safari, Dec 2025).<br>Concern’s team controls this list from Stripe settings.</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ============================ RAIL ============================ -->
+  <aside class="rail" id="rail" aria-live="polite"></aside>
+</main>
+
+<footer class="protofoot">
+  <b>SystemSeed design prototype — not an official Concern build.</b>
+  Concern Worldwide Ireland · gifts checkout, payment-method step · CWIEDEV-2739 ·
+  nothing here is live, no data is submitted, no payment is taken.
+  Payment-scheme marks are simplified placeholders drawn for layout, not official artwork.
+</footer>
+
+<script>
+/* ==================================================================
+   Marks. Simplified placeholders for layout only — production must
+   use each scheme's official brand assets.
+   ================================================================== */
+const MARKS = {
+  visa:  {w:'', svg:`<svg width="30" height="12" viewBox="0 0 30 12" aria-hidden="true"><text x="15" y="10" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="11.5" font-weight="700" font-style="italic" fill="#1434CB" letter-spacing=".5">VISA</text></svg>`, name:'Visa'},
+  mc:    {w:'', svg:`<svg width="30" height="19" viewBox="0 0 30 19" aria-hidden="true"><circle cx="11.5" cy="9.5" r="7.5" fill="#EB001B"/><circle cx="18.5" cy="9.5" r="7.5" fill="#F79E1B" fill-opacity=".85"/></svg>`, name:'Mastercard'},
+  amex:  {w:'', svg:`<svg width="31" height="19" viewBox="0 0 31 19" aria-hidden="true"><rect width="31" height="19" rx="2.5" fill="#006FCF"/><text x="15.5" y="8.5" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="6" font-weight="700" fill="#fff">AMERICAN</text><text x="15.5" y="15" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-size="6" font-weight="700" fill="#fff">EXPRESS</text></svg>`, name:'American Express'},
+  apple: {w:'wide', svg:`<svg width="42" height="18" viewBox="0 0 42 18" aria-hidden="true"><path d="M9.6 5.1c-.5.6-1.3 1.1-2.1 1-.1-.8.3-1.7.7-2.2.5-.6 1.4-1.1 2.1-1.1.1.8-.2 1.7-.7 2.3Zm.7 1.1c-1.2-.1-2.2.7-2.7.7-.6 0-1.4-.6-2.3-.6-1.2 0-2.3.7-2.9 1.8-1.2 2.1-.3 5.3.9 7 .6.9 1.3 1.8 2.2 1.8.9 0 1.2-.6 2.3-.6s1.4.6 2.3.6c1 0 1.6-.8 2.2-1.7.7-1 1-1.9 1-2-.1 0-1.9-.7-1.9-2.8 0-1.8 1.4-2.6 1.5-2.7-.8-1.2-2.1-1.4-2.6-1.5Z" fill="#000"/><text x="17" y="13.5" font-family="-apple-system,Helvetica,Arial,sans-serif" font-size="12" font-weight="500" fill="#000">Pay</text></svg>`, name:'Apple Pay'},
+  gpay:  {w:'wide', svg:`<svg width="42" height="18" viewBox="0 0 42 18" aria-hidden="true"><path d="M9.9 8.4v3.3H8.8V3.6h2.8c.7 0 1.3.2 1.8.7.5.4.8 1 .8 1.7 0 .7-.3 1.2-.8 1.7-.5.5-1.1.7-1.8.7H9.9Zm0-3.8v2.8h1.7c.4 0 .8-.2 1-.4.3-.3.4-.6.4-.9 0-.4-.1-.7-.4-.9-.3-.3-.6-.4-1-.4H9.9Z" fill="#5F6368"/><path d="M16.8 5.9c.8 0 1.4.2 1.9.6.5.4.7 1 .7 1.7v3.5h-1v-.8h-.1c-.4.6-1 1-1.8 1-.6 0-1.2-.2-1.6-.6-.4-.4-.6-.8-.6-1.4 0-.6.2-1 .7-1.4.4-.3 1-.5 1.8-.5.6 0 1.2.1 1.6.4v-.3c0-.4-.1-.7-.4-.9-.3-.3-.6-.4-1-.4-.6 0-1.1.3-1.4.8l-1-.6c.5-.7 1.2-1.1 2.2-1.1Z" fill="#5F6368"/><path d="M24.9 6.1 21.3 14h-1.1l1.3-2.9-2.3-5h1.2l1.7 4 1.6-4h1.2Z" fill="#5F6368"/><path d="M32 8.1c0-.3 0-.7-.1-1h-4.4v1.9h2.5c-.1.6-.4 1.1-.9 1.4v1.2h1.5c.9-.8 1.4-2 1.4-3.5Z" fill="#4285F4"/><path d="M27.5 12.7c1.2 0 2.2-.4 3-1.1l-1.5-1.2c-.4.3-1 .4-1.6.4-1.2 0-2.2-.8-2.6-1.9h-1.5v1.2c.8 1.6 2.4 2.6 4.2 2.6Z" fill="#34A853"/><path d="M24.9 8.9a2.6 2.6 0 0 1 0-1.6V6.1h-1.5a4.3 4.3 0 0 0 0 3.9l1.5-1.1Z" fill="#FBBC04"/><path d="M27.5 5.4c.7 0 1.3.2 1.8.7l1.3-1.3a4.2 4.2 0 0 0-3.1-1.2c-1.8 0-3.4 1-4.2 2.6l1.5 1.2c.4-1.2 1.4-2 2.7-2Z" fill="#EA4335"/></svg>`, name:'Google Pay'},
+  revolut:{w:'', svg:`<svg width="21" height="21" viewBox="0 0 21 21" aria-hidden="true"><rect x="1" y="1" width="19" height="19" rx="4" fill="#0666EB"/><path d="M5.6 5h4.7c1.8 0 3.1 1.2 3.1 2.9 0 1.4-.9 2.5-2.2 2.8l2.4 5.3h-2.2L9.2 11H7.5v5H5.6V5Zm1.9 1.7v2.6h2.7c.9 0 1.5-.5 1.5-1.3s-.6-1.3-1.5-1.3H7.5Z" fill="#fff"/></svg>`, name:'Revolut Pay'},
+  link:  {w:'wide', svg:`<svg width="42" height="18" viewBox="0 0 42 18" aria-hidden="true"><rect x="1" y="2" width="40" height="14" rx="7" fill="#33DDB3"/><text x="21" y="12.5" text-anchor="middle" font-family="Helvetica,Arial,sans-serif" font-size="10" font-weight="700" fill="#011E0F">link</text></svg>`, name:'Link'}
+};
+
+/* Which methods a given device is actually offered on the Stripe page.
+   Card is universal; the wallets are not. */
+const AVAILABILITY = {
+  ios:     {visa:1, mc:1, amex:1, apple:1, gpay:0, revolut:1, link:1},
+  android: {visa:1, mc:1, amex:1, apple:0, gpay:1, revolut:1, link:1},
+  desktop: {visa:1, mc:1, amex:1, apple:0, gpay:1, revolut:1, link:1}
+};
+
+/* The row each option shows. 02 is fixed; 03 adapts to the device. */
+const STATIC_SET  = ['visa','mc','amex','apple','gpay','revolut'];
+
+const OPTIONS = {
+  '00': {
+    label:'Pay with debit or credit card',
+    caption:false
+  },
+  '01': {
+    label:'Pay by card or digital wallet',
+    caption:false
+  },
+  '02': {
+    label:'Pay by card or digital wallet',
+    caption:true, marks:'static',
+    note:'You’ll choose how to pay on the next page.'
+  },
+  '03': {
+    label:'Pay by card or digital wallet',
+    caption:true, marks:'device',
+    note:'You’ll choose how to pay on the next page.'
+  },
+  '04': {
+    label:'Card &amp; digital wallets',
+    caption:false
+  }
+};
+
+function mk(key, absent){
+  const m = MARKS[key];
+  return `<span class="mk ${m.w} ${absent?'absent':''}" title="${m.name}${absent?' — not available on this device':''}" role="img" aria-label="${m.name}${absent?', not available on this device':''}">${m.svg}</span>`;
+}
+
+function currentMarks(tab, dev){
+  const avail = AVAILABILITY[dev];
+  if(OPTIONS[tab] && OPTIONS[tab].marks === 'device'){
+    // only what this donor will really be offered
+    return STATIC_SET.filter(k => avail[k]).map(k => mk(k,false)).join('');
+  }
+  // the fixed row: everything, whether or not this device can deliver it
+  return STATIC_SET.map(k => mk(k, !avail[k])).join('');
+}
+
+/* ------------------------------------------------------------------
+   Rail copy
+   ------------------------------------------------------------------ */
+const RAIL = {
+'00': () => `
+  <p class="kicker">00 · Current state</p>
+  <h2>Names one method. The next page offers five.</h2>
+  <div class="verdict bad"><b>Two errors in six words.</b> Says <b>card</b> — not Apple&nbsp;Pay, Link, Revolut. Says <b>“Pay with”</b> — but it only hands over.</div>
+  <p class="tip">→ Toggle <b>show what the button leads to</b>.</p>
+  <h3>Who owns what</h3>
+  <ul>
+    <li>Green button — <b>ours</b>.</li>
+    <li>PayPal — <b>an iframe</b>. Locked.</li>
+    <li>Stripe’s method list — <b>Concern’s</b>, set in Stripe settings. Changes without a deploy.</li>
+  </ul>
+  <h3>Third problem, unreported</h3>
+  <p>Donor jumps to <b>checkout.stripe.com</b> with no warning. <b>No security signal</b> on this step at all.</p>`,
+
+'01': () => `
+  <p class="kicker">01 · Label only</p>
+  <h2>Reword it. Add nothing.</h2>
+  <div class="verdict warn"><b>Fixes the lie, loses the news.</b> Nobody hunting Apple&nbsp;Pay sees a mark.</div>
+  <ul>
+    <li><b>Cheapest possible.</b> One string. Survives any squeeze.</li>
+    <li><b>“Digital wallet” is a category</b> — can’t go stale.</li>
+  </ul>
+  <h3>The label can’t carry the list</h3>
+  <div id="candidates"></div>
+  <p>The strings that name the wallets don’t fit. <b>Marks aren’t decoration — they’re the only room left.</b></p>`,
+
+'02': () => `
+  <p class="kicker">02 · Label + marks — the AC</p>
+  <h2>The row drops into a slot that already exists.</h2>
+  <div class="verdict good"><b>No new component.</b> <code>.payment__label</code> already ships, used by nothing.</div>
+  <p>One string, one row of assets, one line of copy.</p>
+  <h3>Whose marks are they?</h3>
+  <div class="verdict warn"><b>Not just spacing.</b> They already sit ~3× nearer the card button — but six saturated blocks in open space, beside a big blue button, still read as unowned.</div>
+  <div class="measured" id="ownBox"></div>
+  <p class="tip">→ Try <b>Grouping</b>. “or” rule recommended — separates hardest, <i>and</i> says the two are alternatives.</p>
+  <h3>The catch</h3>
+  <div class="verdict bad"><b>Accurate for nobody.</b> Switch <b>Device</b> — every donor sees a mark they can’t use. Refinement accepted this knowingly.</div>
+  <h3>Brand rules — checked 5 Aug</h3>
+  <div class="verdict good"><b>Nobody forbids it.</b> Apple endorses it: <i>“Use the Apple Pay mark when other payment identities are also displayed in a similar format.”</i></div>
+  <ul>
+    <li><code>isReadyToPay</code> governs the <b>button</b>, not the <b>mark</b>.</li>
+    <li>Official artwork, equal size, all-logo or all-labelled.</li>
+    <li><b>Confirm Google Pay is really on</b> in Stripe.</li>
+  </ul>
+  <p class="src">Quotes and sources → <code>research/brand-rules.md</code></p>`,
+
+'03': () => `
+  <p class="kicker">03 · Marks that tell the truth</p>
+  <h2>Same design. Stops naming what this donor can’t have.</h2>
+  <p class="tip">→ Switch <b>Device</b>. Watch the row.</p>
+  <div class="verdict good"><b>Trade-off becomes no trade-off.</b></div>
+  <div class="measured" id="ownBox"></div>
+  <div class="verdict warn"><b>Not required.</b> Brand rules checked — 02 is allowed. This is honesty, not compliance.</div>
+  <h3>Cost</h3>
+  <div class="measured">
+    <div class="mt">roughly this much code</div>
+    <div class="mline"><span style="font-family:monospace;font-size:11.5px;line-height:1.7;color:#b6e8d0">window.ApplePaySession<br>&nbsp;&nbsp;?.canMakePayments()<br><br>new PaymentRequest([{<br>&nbsp;&nbsp;supportedMethods:<br>&nbsp;&nbsp;'https://google.com/pay'<br>}], …).canMakePayment()</span></div>
+  </div>
+  <div class="verdict warn">Use <code>canMakePayments()</code>. <b>Not</b> <code>…WithActiveCard()</code> — Apple’s terms restrict that one.</div>
+  <div class="detect" id="detectBox"></div>
+  <div class="verdict warn"><b>My judgement.</b> Better design, outside agreed scope, ~15 lines. Your call.</div>`,
+
+'04': () => `
+  <p class="kicker">04 · Bordered rows</p>
+  <h2>A row per method — built, so the collision shows.</h2>
+  <p>Heading, subheading and marks in a bordered row per method. Good pattern, used by most large checkouts.</p>
+  <div class="verdict bad"><b>Breaks on row two.</b> PayPal isn’t a row — it’s a 46px pill in an iframe. Button inside a button, or the set stops looking like a set.</div>
+  <ul>
+    <li>PayPal allows <b>gold, silver, white, black</b> and a shorter label.</li>
+    <li>Not our text. Not our marks. Not no-pill.</li>
+  </ul>
+  <h3>Worth building</h3>
+  <p>“We tried it” beats “that won’t work”. On Stripe Elements this becomes the right design.</p>`
+};
+
+/* ------------------------------------------------------------------
+   Wiring
+   ------------------------------------------------------------------ */
+const body = document.body;
+const cardLbl = document.getElementById('cardLbl');
+const cardBtn = document.getElementById('cardBtn');
+const capSlot = document.getElementById('capSlot');
+const markRow = document.getElementById('markRow');
+const markRow04 = document.getElementById('markRow04');
+const capNote = document.getElementById('capNote');
+const rail = document.getElementById('rail');
+const stripeWrap = document.getElementById('stripeWrap');
+const leadsTo = document.getElementById('leadsTo');
+
+function measure(){
+  // width of the label text against the room the pill actually gives it
+  const s = getComputedStyle(cardLbl);
+  const probe = document.createElement('span');
+  probe.style.cssText = `position:absolute;visibility:hidden;white-space:nowrap;font:${s.fontWeight} ${s.fontSize}/${s.lineHeight} ${s.fontFamily}`;
+  probe.textContent = cardLbl.textContent;
+  document.body.appendChild(probe);
+  const textW = probe.getBoundingClientRect().width;
+  probe.remove();
+
+  const btnW = cardBtn.getBoundingClientRect().width;
+  const avail = btnW - 28 - 28 - 24 - 8 - 2;   // padding + icon + gap + border
+  const chars = cardLbl.textContent.length;
+  const perChar = textW / Math.max(chars,1);
+  const fits = Math.floor(avail / perChar);
+  const wraps = textW > avail;
+
+  return {textW:Math.round(textW), avail:Math.round(avail), chars, fits, wraps};
+}
+
+/* Every candidate string, measured against the room the pill really has,
+   at whatever width the phone is currently rendering. */
+const CANDIDATES = [
+  'Pay with debit or credit card',
+  'Pay by card or digital wallet',
+  'Continue to secure payment',
+  'Card &amp; digital wallets',
+  'Pay by card, Apple Pay or Google Pay',
+  'Pay by card, Apple Pay, Google Pay or Revolut'
+];
+
+function measureString(str){
+  const s = getComputedStyle(cardLbl);
+  const probe = document.createElement('span');
+  probe.style.cssText = `position:absolute;visibility:hidden;white-space:nowrap;font:${s.fontWeight} ${s.fontSize}/${s.lineHeight} ${s.fontFamily}`;
+  probe.innerHTML = str;
+  document.body.appendChild(probe);
+  const w = probe.getBoundingClientRect().width;
+  const text = probe.textContent;
+  probe.remove();
+  const btnW = cardBtn.getBoundingClientRect().width;
+  const avail = btnW - 28 - 28 - 24 - 8 - 2;
+  return {w:Math.round(w), avail:Math.round(avail), chars:text.length, fits:w <= avail, text};
+}
+
+function renderCandidates(){
+  const box = document.getElementById('candidates');
+  if(!box) return;
+  const rows = CANDIDATES.map(c=>{
+    const m = measureString(c);
+    return `<div class="mline"><span style="flex:1 1 auto;min-width:0">${m.text}</span>
+      <span class="v ${m.fits?'ok':'over'}">${m.w}px ${m.fits?'✓':'✗'}</span></div>`;
+  }).join('');
+  const room = measureString(CANDIDATES[0]).avail;
+  box.innerHTML = `<div class="measured">
+    <div class="mt">room in the pill: ${room}px — measured now</div>${rows}
+    <p style="font-size:12px;color:#8b8f8c;margin-top:9px;line-height:1.5">✗ = wraps to two lines and the pill grows.</p>
+  </div>`;
+}
+
+/* Who do the marks belong to? Proximity decides, so measure it. */
+function renderOwnership(){
+  const box = document.getElementById('ownBox');
+  if(!box) return;
+  const btn  = cardBtn.getBoundingClientRect();
+  const row  = markRow.getBoundingClientRect();
+  const note = capNote.getBoundingClientRect();
+  const pp   = document.querySelector('.hide-04 .btn-paypal');
+  if(!pp) return;
+  const ppr  = pp.getBoundingClientRect();
+  const above = Math.round(row.top - btn.bottom);
+  const below = Math.round(ppr.top - (note.height ? note.bottom : row.bottom));
+  const ratio = above > 0 ? (below/above) : 0;
+  const strong = ratio >= 4;
+  box.innerHTML = `
+    <div class="mt">proximity, measured now</div>
+    <div class="mline"><span>Gap to the card button</span><span class="v ok">${above}px</span></div>
+    <div class="mline"><span>Gap to PayPal</span><span class="v ok">${below}px</span></div>
+    <div class="mline"><span>Ratio</span><span class="v ${strong?'ok':''}">${ratio.toFixed(1)}×</span></div>
+    <p style="font-size:12px;color:#8b8f8c;margin-top:9px;line-height:1.5">${strong
+      ? 'Unambiguous — the marks read as the card button’s.'
+      : 'Correct direction, but the marks still sit in open space.'}</p>`;
+}
+
+function detectReal(){
+  const applePay = !!(window.ApplePaySession && window.ApplePaySession.canMakePayments && window.ApplePaySession.canMakePayments());
+  const hasPR = typeof window.PaymentRequest === 'function';
+  return {applePay, hasPR};
+}
+
+function renderDetect(){
+  const box = document.getElementById('detectBox');
+  if(!box) return;
+  const d = detectReal();
+  box.innerHTML = `
+    <div class="mt">your actual browser, right now</div>
+    <div class="dline"><span>ApplePaySession present</span><span class="${d.applePay?'y':'n'}">${d.applePay?'yes':'no'}</span></div>
+    <div class="dline"><span>PaymentRequest API</span><span class="${d.hasPR?'y':'n'}">${d.hasPR?'yes':'no'}</span></div>
+    <p style="font-size:12px;color:#8b8f8c;margin-top:9px;line-height:1.5">Read live from this browser by the two calls above. That is the whole mechanism — no library, no Stripe call.</p>`;
+}
+
+function render(){
+  const tab = body.dataset.tab;
+  const dev = body.dataset.device;
+  const opt = OPTIONS[tab];
+
+  cardLbl.innerHTML = opt.label;
+
+  if(opt.caption){
+    capSlot.hidden = false;
+    markRow.innerHTML = currentMarks(tab, dev);
+    capNote.innerHTML = opt.note || '';
+  } else {
+    capSlot.hidden = true;
+  }
+  markRow04.innerHTML = STATIC_SET.slice(0,4).map(k=>mk(k,false)).join('');
+
+  // Apple Pay only appears on Stripe's page for Safari
+  const swApple = document.getElementById('swApple');
+  if(swApple) swApple.style.display = AVAILABILITY[dev].apple ? '' : 'none';
+
+  document.getElementById('stripeCardMarks').innerHTML = ['visa','mc','amex'].map(k=>mk(k,false)).join('');
+
+  rail.innerHTML = RAIL[tab]();
+
+  // measurements, taken from the DOM rather than typed
+  if(tab === '01') renderCandidates();
+  if(tab === '02' || tab === '03') renderOwnership();
+  if(tab === '00'){
+    const m = measure();
+    rail.insertAdjacentHTML('beforeend', `
+      <div class="measured">
+        <div class="mt">the live label, measured now</div>
+        <div class="mline"><span>Label</span><span class="v">${m.chars} chars</span></div>
+        <div class="mline"><span>Text width</span><span class="v">${m.textW}px</span></div>
+        <div class="mline"><span>Room in the pill</span><span class="v">${m.avail}px</span></div>
+        <div class="mline"><span>Fits on one line</span><span class="v ${m.wraps?'over':'ok'}">${m.wraps?'no — wraps':'yes'}</span></div>
+      </div>`);
+  }
+  if(tab === '03') renderDetect();
+
+  // cost chips
+  const COST = {
+    '00':['—'],
+    '01':['1 string','no new markup','no assets'],
+    '02':['1 string','existing slot','6 brand assets','brand rules to check'],
+    '03':['1 string','existing slot','assets','~15 lines JS'],
+    '04':['new component','PayPal collision','biggest change']
+  };
+  rail.insertAdjacentHTML('beforeend',
+    `<h3>Cost</h3><div class="cost">${COST[tab].map(c=>`<span class="chip ${/JS|component/.test(c)?'dev':''}">${c}</span>`).join('')}</div>`);
+}
+
+const tabBtns = [...document.querySelectorAll('.swtab')];
+const stage = document.getElementById('stage');
+
+function selectTab(b, focus){
+  tabBtns.forEach(x=>{ x.setAttribute('aria-selected','false'); x.tabIndex = -1; });
+  b.setAttribute('aria-selected','true');
+  b.tabIndex = 0;
+  stage.setAttribute('aria-labelledby', b.id);
+  body.dataset.tab = b.dataset.tab;
+  history.replaceState(null,'','#'+b.dataset.tab);
+  render();
+  if(focus) b.focus();
+  // keep the selected tab visible when the switcher is scrolling horizontally
+  b.scrollIntoView({block:'nearest', inline:'nearest', behavior:'smooth'});
+}
+
+tabBtns.forEach(b=>{
+  b.addEventListener('click',()=>selectTab(b,false));
+  b.addEventListener('keydown',e=>{
+    const i = tabBtns.indexOf(b);
+    let j = null;
+    if(e.key==='ArrowRight') j = (i+1) % tabBtns.length;
+    if(e.key==='ArrowLeft')  j = (i-1+tabBtns.length) % tabBtns.length;
+    if(e.key==='Home')       j = 0;
+    if(e.key==='End')        j = tabBtns.length-1;
+    if(j !== null){ e.preventDefault(); selectTab(tabBtns[j], true); }
+  });
+});
+document.querySelectorAll('.seg button[data-dev]').forEach(b=>{
+  b.addEventListener('click',()=>{
+    document.querySelectorAll('.seg button[data-dev]').forEach(x=>x.setAttribute('aria-pressed','false'));
+    b.setAttribute('aria-pressed','true');
+    body.dataset.device = b.dataset.dev;
+    render();
+  });
+});
+document.querySelectorAll('.seg button[data-grp]').forEach(b=>{
+  b.addEventListener('click',()=>{
+    document.querySelectorAll('.seg button[data-grp]').forEach(x=>x.setAttribute('aria-pressed','false'));
+    b.setAttribute('aria-pressed','true');
+    body.dataset.group = b.dataset.grp;
+    render();
+  });
+});
+document.getElementById('t-next').addEventListener('change',e=>{
+  stripeWrap.hidden = !e.target.checked;
+  leadsTo.hidden = !e.target.checked;
+});
+document.getElementById('t-flag').addEventListener('change',e=>{ body.dataset.flag = e.target.checked?'1':'0'; });
+document.getElementById('t-lock').addEventListener('change',e=>{ body.dataset.locked = e.target.checked?'1':'0'; });
+
+// deep link: #00 … #04
+const h = (location.hash||'').replace('#','');
+if(OPTIONS[h]){
+  const target = tabBtns.find(x=>x.dataset.tab===h);
+  if(target) selectTab(target,false);
+}
+// keep the sticky controls under the bar whatever its height
+const bar = document.querySelector('.bar');
+const setBarH = () => document.documentElement.style.setProperty('--bar-h', bar.offsetHeight+'px');
+setBarH(); window.addEventListener('resize', ()=>{ setBarH(); render(); });
+
+render();
+</script>
+</body>
+</html>
