@@ -568,37 +568,43 @@ input.control:focus-visible{outline:3px solid var(--teal);outline-offset:1px}
 .optrow-text{font-size:16px;line-height:1.35}
 .optrow + .reveal,.optgroup + .reveal{margin-top:16px}
 
-/* Option 3: the row stays visually close to today's, but gains a
-   hover extent and a cursor. Nothing is drawn at rest. */
+/* Option 3 and the recommended tab: the row stays visually close to
+   today's, but gains a hover extent and a cursor. Nothing is drawn at
+   rest, so the extent only shows itself to a pointer — on a touch screen
+   there is no hover, which both rails say plainly.
+   Gap is 16px, from the Figma node 10403:2315. */
 .plainrow{
-  display:inline-flex;align-items:center;gap:10px;min-height:44px;
+  display:inline-flex;align-items:center;gap:16px;min-height:44px;
   padding:10px 14px 10px 10px;margin-left:-10px;border-radius:4px;cursor:pointer;
   transition:background var(--dur-fast) var(--ease-soft);
 }
+.plainrow + .reveal{margin-top:16px}
 .plainrow:hover{background:var(--teal-tint-soft)}
 .plainrow:has(:focus-visible){background:var(--teal-tint-soft)}
 .plainrow span{font-size:16px;line-height:1.35}
 
-/* Recommended: a real, focusable checkbox — the same input as Options
-   1-3, native role/state/keyboard, visible focus ring — carrying 0A's
-   plain visual treatment: no border, no hover tint, no pointer cursor
-   anywhere in the row. Deliberate. This tab keeps the silent target as
-   its stated, named limit (see the rail) rather than hiding it behind a
-   boundary that belongs to 01. The cursor is forced to default on the
-   input itself because appearance:none does not remove the browser’s own
-   pointer-on-checkbox default — without this override the box alone
-   would give away exactly the affordance the rest of the row withholds. */
-.quietrow{display:inline-flex;align-items:center;gap:8px;cursor:default}
-.quietrow .cbx{cursor:default}
-.quietrow span{font-size:16px;line-height:1.35}
+/* The recommended tab shares Option 3's .plainrow treatment: a real,
+   focusable checkbox with native role, state and keyboard behaviour, no
+   boundary drawn at rest, but a hover tint and a pointer cursor that show
+   the extent to anyone using a mouse. It stops short of 01's drawn
+   border, which is why 01 remains the next step rather than being folded
+   in here. */
 
-/* the conditional company block, tied to the control above it */
+/* The conditional company block, tied to the control above it.
+   Spacing and colour taken from the Donation forms Figma, node
+   10403:2315 ("Company gift checked."): 4px left bar in turquoise-800
+   #007c76 — which is --teal here, not --teal-dark — and 24px of left
+   padding, with 16px between the checkbox row and this block and 4px
+   between label, field and help text inside it. The designer's note on
+   that node reads: "Added left side green bar to emphasise its link to
+   the checkbox." */
 .reveal{
-  padding-left:14px;border-left:4px solid var(--teal-dark);
+  padding-left:24px;border-left:4px solid var(--teal);
   animation:reveal var(--dur) var(--ease) both;
 }
 .reveal[hidden]{display:none}
-.reveal .flabel{font-size:15px}
+.reveal .flabel{font-size:16px}
+.reveal .field + .helper,.reveal .flabel + .control{margin-top:4px}
 .reveal .control{max-width:340px}
 @keyframes reveal{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
 
@@ -1303,12 +1309,12 @@ input.control:focus-visible{outline:3px solid var(--teal);outline-offset:1px}
                 <p class="helptext" id="rec-phone-help" hidden>We use this only if there is a query about your donation.</p>
               </div>
 
-              <!-- The row itself: 0A's plain treatment (no border, no hover
-                   tint, no pointer cursor) on a real <input>, not the
-                   display:none construction 0A actually uses — see the
-                   .quietrow comment in the stylesheet. -->
+              <!-- The row itself: Option 3's .plainrow treatment — nothing
+                   drawn at rest, but a hover tint and pointer cursor that
+                   show the extent to a mouse — on a real <input>, not the
+                   display:none construction 0A actually uses. -->
               <div class="field" data-block>
-                <label class="quietrow" for="rec-company-donation" data-target>
+                <label class="plainrow" for="rec-company-donation" data-target>
                   <input class="cbx" type="checkbox" id="rec-company-donation" name="company_donation" value="company_donation" data-visible>
                   <span>This donation is from a company or organisation</span>
                 </label>
@@ -1586,10 +1592,10 @@ input.control:focus-visible{outline:3px solid var(--teal);outline-offset:1px}
 
     rec: {
       title: 'Recommended',
-      one: '<b>Combines 0A’s unmarked row and wider clearance with the shorter wording from 01 Obvious click/tap area and a real accessible input</b> — the cheapest change that closes the reported “N/A” problem. The target stays unmarked; 01 Obvious click/tap area is the next step.',
+      one: '<b>Combines 0A’s wider clearance with the shorter wording from 01 Obvious click/tap area, Option 3’s hover treatment and a real accessible input</b> — the cheapest change that closes the reported “N/A” problem. Nothing is drawn at rest; 01 Obvious click/tap area is the next step.',
       body: [
         '<p class="recflag">Recommended</p>',
-        '<p class="lede">This combines three existing moves: 0A’s plain row and 64px clearance, the shorter wording from 01 Obvious click/tap area, and a real, focusable checkbox in place of the <code>display:none</code> construction used elsewhere. 02 Two-way choice remains the structural alternative, where accidental opt-in is impossible rather than reduced.</p>',
+        '<p class="lede">This combines existing moves: 0A’s 64px clearance, the shorter wording and reveal block from 01 Obvious click/tap area, Option 3’s hover tint and pointer cursor, and a real, focusable checkbox in place of the <code>display:none</code> construction used elsewhere. Spacing and the green bar follow the Donation forms Figma. 02 Two-way choice remains the structural alternative, where accidental opt-in is impossible rather than reduced.</p>',
         '<h3>Pros</h3>',
         '<ul class="fix">',
         '<li>The company field’s label becomes conditional, with a line on how to remove it — a donor who ticks by accident is no longer told to enter something with no way back, which would stop the “N/A” entries.</li>',
@@ -1597,7 +1603,7 @@ input.control:focus-visible{outline:3px solid var(--teal);outline-offset:1px}
         '</ul>',
         '<h3>Cons</h3>',
         '<ul class="cost">',
-        '<li>The row has no visible boundary, hover state or pointer cursor, as 0A’s does not: it measures <b id="rec-ratio">…</b> the 24 × 24 box at this width. Accidental ticks would still happen, less often, and would no longer leave a required field with no way back.</li>',
+        '<li>Nothing is drawn around the row at rest, so it measures <b id="rec-ratio">…</b> the 24 × 24 box at this width. Hovering tints the extent and the cursor changes, which helps on a mouse — but there is no hover on a touch screen, where the row is widest. Accidental ticks would still happen, less often, and would no longer leave a required field with no way back.</li>',
         '<li>01 Obvious click/tap area is the next step: the same row with a drawn boundary, whose target measures <b id="rec-p1-ratio">…</b> the 24 × 24 box — larger than the figure above, and not a defect: a larger bounded target is what the boundary is for.</li>',
         '</ul>',
         '<h3>Accessibility</h3>',
