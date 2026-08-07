@@ -421,6 +421,15 @@ input.control:focus-visible{outline:3px solid var(--teal);outline-offset:1px}
 .ic-person{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23212431' stroke-width='1.8'%3E%3Ccircle cx='12' cy='8' r='3.6'/%3E%3Cpath d='M4.8 20c.9-3.7 3.7-5.6 7.2-5.6s6.3 1.9 7.2 5.6'/%3E%3C/svg%3E")}
 .ic-mail{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23212431' stroke-width='1.8'%3E%3Crect x='3' y='5.5' width='18' height='13' rx='1.6'/%3E%3Cpath d='M3.6 6.4L12 13l8.4-6.6'/%3E%3C/svg%3E")}
 .ic-phone{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23212431' stroke-width='1.8'%3E%3Cpath d='M6.4 3.6h3.2l1.7 4.2-2.1 1.6a12.4 12.4 0 006.2 6.2l1.6-2.1 4.2 1.7v3.2a2 2 0 01-2.2 2A17 17 0 014.4 5.8a2 2 0 012-2.2z'/%3E%3C/svg%3E")}
+/* The company field's icon, from the Donation forms Figma node 10403:2315.
+   Geometry taken from that export — apex centred at x=12, eaves at y≈9,
+   four pillars at x=6/10/14/18 spanning y=12→18, base bar y=21 — but drawn
+   in this file's own icon idiom (1.8px outline, #212431, round caps) rather
+   than embedded as the exported bytes. The export is a solid glyph built
+   from six absolutely-positioned fragments whose pediment path alone runs
+   to 4,719 characters, which would sit oddly beside three outline siblings
+   and add several KB to a published page for one 20px icon. */
+.ic-bank{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23212431' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2.9 9.4 12 2.6l9.1 6.8'/%3E%3Cpath d='M3.6 9.4h16.8'/%3E%3Cpath d='M6 12.4v5.9M10 12.4v5.9M14 12.4v5.9M18 12.4v5.9'/%3E%3Cpath d='M3.4 21h17.2'/%3E%3C/svg%3E")}
 .money{position:relative}
 .money .cur{
   position:absolute;left:14px;top:0;height:46px;display:flex;align-items:center;
@@ -1109,7 +1118,7 @@ input.control:focus-visible{outline:3px solid var(--teal);outline-offset:1px}
 
                 <div class="reveal" id="p1-reveal" hidden>
                   <label class="flabel" for="p1-company">Company name <span class="opt">(required for company donations)</span></label>
-                  <input class="control" id="p1-company" type="text" placeholder="Your company" aria-describedby="p1-escape">
+                  <input class="control ic ic-bank" id="p1-company" type="text" placeholder="Your company" aria-describedby="p1-escape">
                   <p class="hint" id="p1-escape">Only company donations need this. Untick the box above to remove it.</p>
                 </div>
               </div>
@@ -1214,7 +1223,7 @@ input.control:focus-visible{outline:3px solid var(--teal);outline-offset:1px}
 
                 <div class="reveal" id="p3-reveal" hidden style="margin-top:12px">
                   <label class="flabel" for="p3-company">Company name <span class="opt">(required for company donations)</span></label>
-                  <input class="control" id="p3-company" type="text" placeholder="Your company" aria-describedby="p3-escape">
+                  <input class="control ic ic-bank" id="p3-company" type="text" placeholder="Your company" aria-describedby="p3-escape">
                   <p class="hint" id="p3-escape">Only company donations need this. Untick the box above to remove it.</p>
                 </div>
               </div>
@@ -1321,7 +1330,7 @@ input.control:focus-visible{outline:3px solid var(--teal);outline-offset:1px}
 
                 <div class="reveal" id="rec-reveal" hidden>
                   <label class="flabel" for="rec-company">Company name <span class="opt">(required for company donations)</span></label>
-                  <input class="control" id="rec-company" type="text" placeholder="Your company" aria-describedby="rec-escape">
+                  <input class="control ic ic-bank" id="rec-company" type="text" placeholder="Your company" aria-describedby="rec-escape">
                   <p class="hint" id="rec-escape">Only company donations need this. Untick the box above to remove it.</p>
                 </div>
               </div>
