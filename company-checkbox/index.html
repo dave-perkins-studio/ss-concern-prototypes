@@ -632,8 +632,12 @@ input.control:focus-visible{outline:3px solid var(--teal);outline-offset:1px}
 }
 .reveal[hidden]{display:none}
 .reveal .flabel{font-size:16px}
+/* The company field runs the full width of the block, so its right edge
+   lines up with the phone field above it. It used to cap at 340px, which
+   left it 140px short of every other field on the step and made the
+   indent read as a mistake rather than a link to the checkbox. */
+.reveal .control{max-width:none}
 .reveal .field + .helper,.reveal .flabel + .control{margin-top:4px}
-.reveal .control{max-width:340px}
 @keyframes reveal{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
 
 /* section headings, Option 3 only */
@@ -905,8 +909,11 @@ input.control:focus-visible{outline:3px solid var(--teal);outline-offset:1px}
 
             <!-- ========================================================
                  PANE 0A — SPACING ONLY (Niamh's proposal, built)
-                 Niamh's three suggested copy changes, plus the gap to the
-                 button widened from 36px to 64px. This is Niamh’s
+                 Niamh's rewording and her conditional required label, plus
+                 the gap to the button widened from 36px to 64px. Her third
+                 suggestion, the line telling the donor they can untick,
+                 was removed at David's request on 7 Aug — so this is two
+                 of her three, not all of them. This is Niamh’s
                  own fix, built out fully and evaluated fairly — not a
                  design. Do not add a boundary, a hover state or a
                  cursor here — that is option 01, not
@@ -968,8 +975,7 @@ input.control:focus-visible{outline:3px solid var(--teal);outline-offset:1px}
 
                 <div class="field" id="d1-reveal" hidden>
                   <label class="flabel" for="d1-company">Company name <span class="opt">(required if donating on behalf of a company)</span></label>
-                  <input class="control ic ic-bank" id="d1-company" type="text" placeholder="Your company" aria-required="true" aria-describedby="d1-escape">
-                  <p class="hint" id="d1-escape">If this donation is not from a company, untick the box above to remove this field.</p>
+                  <input class="control ic ic-bank" id="d1-company" type="text" placeholder="Your company" aria-required="true">
                 </div>
 
                 <div class="vizpath" id="d1-vizpath" aria-hidden="true"></div>
@@ -996,7 +1002,8 @@ input.control:focus-visible{outline:3px solid var(--teal);outline-offset:1px}
             <!-- ========================================================
                  PANE 0B — BOX ONLY (Niamh's and Elise's proposals, built)
                  Elise's suggested fix — only the box is clickable — plus
-                 Niamh's three suggested copy changes. This is the
+                 Niamh's rewording and conditional required label (her third
+                 suggestion, the untick line, was removed 7 Aug). This is the
                  proposals built out fully and evaluated
                  fairly, on its own terms. Do not add a boundary or a
                  hover state here — that is option 01.
@@ -1059,8 +1066,7 @@ input.control:focus-visible{outline:3px solid var(--teal);outline-offset:1px}
 
                 <div class="field" id="d2-reveal" hidden>
                   <label class="flabel" for="d2-company">Company name <span class="opt">(required if donating on behalf of a company)</span></label>
-                  <input class="control ic ic-bank" id="d2-company" type="text" placeholder="Your company" aria-required="true" aria-describedby="d2-escape">
-                  <p class="hint" id="d2-escape">If this donation is not from a company, untick the box above to remove this field.</p>
+                  <input class="control ic ic-bank" id="d2-company" type="text" placeholder="Your company" aria-required="true">
                 </div>
 
                 <div class="vizpath" id="d2-vizpath" aria-hidden="true"></div>
@@ -1208,7 +1214,7 @@ input.control:focus-visible{outline:3px solid var(--teal);outline-offset:1px}
 
                 <div class="reveal" id="p2-reveal" hidden>
                   <label class="flabel" for="p2-company">Company name <span class="opt">(required)</span></label>
-                  <input class="control" id="p2-company" type="text" placeholder="Your company" aria-describedby="p2-escape">
+                  <input class="control ic ic-bank" id="p2-company" type="text" placeholder="Your company" aria-describedby="p2-escape">
                   <p class="hint" id="p2-escape">Giving as an individual? Choose “Me personally” above.</p>
                 </div>
               </fieldset>
@@ -1504,13 +1510,13 @@ input.control:focus-visible{outline:3px solid var(--teal);outline-offset:1px}
 
     d1: {
       title: '0A — spacing only',
-      one: '<b>Niamh’s suggestions, built in full.</b> Her three copy changes, plus the gap to the button widened from 36px to 64px. The required label is now conditional, with a stated way back — but the target stays silent, and the screen-reader gap stays untouched.',
+      one: '<b>Niamh’s wording, with a wider gap.</b> Her rewording and her conditional required label, plus the gap to the button widened from 36px to 64px. The label now says the field may not apply, though nothing states how to remove it — but the target stays silent, and the screen-reader gap stays untouched.',
       body: [
         '<p class="diagflag">Built from Niamh’s suggestions</p>',
-        '<p class="lede">Niamh’s three copy changes, plus the gap to the button widened from 36px to 64px.</p>',
+        '<p class="lede">Niamh’s rewording and her conditional required label, plus the gap to the button widened from 36px to 64px.</p>',
         '<h3>Pros</h3>',
         '<ul class="fix">',
-        '<li>The company field’s label becomes conditional, with a line on how to remove it — a donor who ticks by accident is no longer told to enter something with no way back — and the wider 64px gap would reduce mis-taps.</li>',
+        '<li>The company field’s label becomes conditional, so a donor who ticks by accident is no longer told flatly that an answer is required — and the wider 64px gap would reduce mis-taps.</li>',
         '</ul>',
         '<h3>Cons</h3>',
         '<ul class="cost">',
@@ -1530,10 +1536,10 @@ input.control:focus-visible{outline:3px solid var(--teal);outline-offset:1px}
       one: '<b>Niamh’s wording, with Elise’s fix to the target.</b> Niamh’s copy changes, plus only the 24 × 24 box clickable. The required label is conditional here too — but the target stays silent, the screen-reader gap stays untouched, and shrinking the target costs something of its own.',
       body: [
         '<p class="diagflag">Built from Niamh’s suggestions</p>',
-        '<p class="lede">Niamh’s copy changes, plus Elise’s proposal that only the 24 × 24 box responds to a tap, not the sentence beside it.</p>',
+        '<p class="lede">Niamh’s rewording and conditional required label, plus Elise’s proposal that only the 24 × 24 box responds to a tap, not the sentence beside it.</p>',
         '<h3>Pros</h3>',
         '<ul class="fix">',
-        '<li>The company field’s label becomes conditional, with a line on how to remove it (the same fix as 0A), and mis-taps fall further: a stray tap must land inside 24 × 24 rather than across a wider strip.</li>',
+        '<li>The company field’s label becomes conditional (the same change as 0A), and mis-taps fall further: a stray tap must land inside 24 × 24 rather than across a wider strip.</li>',
         '</ul>',
         '<h3>Cons</h3>',
         '<ul class="cost">',
