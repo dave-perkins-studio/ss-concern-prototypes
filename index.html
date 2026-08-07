@@ -56,6 +56,12 @@
     padding:32px;background:var(--mushroom);
     border:1px solid var(--mushroom);border-radius:8px;
   }
+  .card-head{display:flex;align-items:baseline;gap:24px}
+  .card-head h2{flex:1}
+  .card .date{
+    flex:none;font-size:16px;font-weight:500;line-height:1.4;
+    color:var(--lighter-black);margin:0;white-space:nowrap;
+  }
   .card h2{
     font-family:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
     font-weight:700;font-size:20px;line-height:1.35;letter-spacing:-.01em;
@@ -84,9 +90,6 @@
   }
   .story:hover{color:var(--dark-blue)}
   .story .id{font-weight:700}
-  .actions .status{
-    flex-basis:100%;margin:0;font-size:16px;line-height:1.4;color:var(--lighter-black);
-  }
 
   .note{
     margin:48px 0 0;padding:32px;background:var(--white-ish);
@@ -113,7 +116,8 @@
   @media (max-width:640px){
     .intro{padding:48px 0 32px}
     a.card,.note{padding:24px}
-    .card h2{font-size:26px}
+    .card-head{flex-direction:column-reverse;align-items:flex-start;gap:8px}
+    .card h2{font-size:16px}
     footer{margin-top:64px}
   }
 </style>
@@ -153,8 +157,11 @@
   <ul>
     <li>
       <div class="card">
-        <h2>`UX` - As a manager I would like the UX of the company checkbox on donation form
-          improved (on all donation forms (modal and normal)</h2>
+        <div class="card-head">
+          <h2>`UX` - As a manager I would like the UX of the company checkbox on donation form
+            improved (on all donation forms (modal and normal)</h2>
+          <p class="date">August 2026</p>
+        </div>
         <p class="name">Prototype: the company checkbox, six ways</p>
         <p>The “I am donating on behalf of a company” control on step 2 of the donation form:
           the live control measured and reproduced, the two fixes suggested so far built out in
@@ -163,14 +170,16 @@
           <a class="btn" href="company-checkbox/">Open the prototype</a>
           <a class="story" href="https://linear.app/systemseed/issue/CWIEDEV-2737">Story
             <span class="id">CWIEDEV-2737</span> in Linear</a>
-          <p class="status">August 2026 · Concern IE Development · in progress</p>
         </div>
       </div>
     </li>
     <li>
       <div class="card">
-        <h2>`Design` - Pay with card button label on gifts website does not correspond to
-          reality (rename button + icons)</h2>
+        <div class="card-head">
+          <h2>`Design` - Pay with card button label on gifts website does not correspond to
+            reality (rename button + icons)</h2>
+          <p class="date">August 2026</p>
+        </div>
         <p class="name">Prototype: the payment-method step, five ways</p>
         <p>The gifts checkout button says “Pay with debit or credit card” but leads to a Stripe
           page offering Apple Pay, Link and Revolut Pay too. The live step rebuilt, and four ways
@@ -179,7 +188,6 @@
           <a class="btn" href="gifts-payment-label/">Open the prototype</a>
           <a class="story" href="https://linear.app/systemseed/issue/CWIEDEV-2739">Story
             <span class="id">CWIEDEV-2739</span> in Linear</a>
-          <p class="status">August 2026 · Concern IE Development · scheduled</p>
         </div>
       </div>
     </li>
