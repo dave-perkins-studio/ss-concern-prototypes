@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2032%2032'%3E%3Crect%20width='32'%20height='32'%20rx='6'%20fill='%23015d59'/%3E%3Crect%20x='8'%20y='8'%20width='16'%20height='16'%20rx='3'%20fill='none'%20stroke='%23fff'%20stroke-width='2.4'/%3E%3Cpath%20d='M11.5%2016.2l3.2%203.2L21%2012.8'%20stroke='%23fff'%20stroke-width='2.6'%20stroke-linecap='round'%20stroke-linejoin='round'%20fill='none'/%3E%3C/svg%3E">
-<title>Concern Worldwide Ireland — the company checkbox: two suggested fixes, a recommended fix, and three more (prototype)</title>
+<title>Concern Worldwide Ireland — the company checkbox: two suggested fixes, a recommended fix, and three wildcards (prototype)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;600;700&display=swap" rel="stylesheet">
@@ -72,6 +72,15 @@
      group either side of it --- */
   --rec:#5fd987;
   --rec-active:#173c26;
+
+  /* --- accent for 01 / 02 / 03, the wildcard experiments. Red, because
+     these are not proposed for build: they were drawn to test how far the
+     idea could be pushed, and the answer informs the recommended tab
+     rather than shipping. Kept clearly apart from the green that marks
+     the one we are actually putting forward. --- */
+  --wild:#ff8f78;   /* 5.06:1 on the tab bar. #f0836b read better but
+                       measured 4.37:1, under AA for 11.5px numerals. */
+  --wild-active:#4a1c14;
 
   /* --- SystemSeed chrome --- */
   --ss-cream:#F5F3E6;
@@ -158,6 +167,12 @@ legend{padding:0}
 .swtab--rec .num{color:var(--rec)}
 .swtab--rec[aria-current="true"]{background:var(--rec-active);border-bottom-color:var(--rec)}
 
+/* 01 / 02 / 03 — wildcard experiments, red because they are not proposed
+   for build. The colour is doing real work here: without it a reader
+   walks a row of seven tabs and assumes all of them are on the table. */
+.swtab--wild .num{color:var(--wild)}
+.swtab--wild[aria-current="true"]{background:var(--wild-active);border-bottom-color:var(--wild)}
+
 /* Desktop / Mobile — always visible, never inside the scrolling tab
    list. Desktop is the loaded state on every tab; this is a deliberate
    switch the viewer makes, not something a tab choice triggers. */
@@ -230,8 +245,13 @@ legend{padding:0}
   display:inline-block;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
   color:var(--ss-black);background:var(--rec);border-radius:3px;padding:4px 9px;margin:0 0 14px;
 }
+.rail .wildflag{
+  display:inline-block;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--ss-black);background:var(--wild);border-radius:3px;padding:4px 9px;margin:0 0 14px;
+}
 .rail--diag{border-left-color:var(--diag)}
 .rail--rec{border-left-color:var(--rec)}
+.rail--wild{border-left-color:var(--wild)}
 .rail ul{display:flex;flex-direction:column;gap:7px;margin:0}
 .rail li{
   font-size:13px;line-height:1.55;color:var(--ss-dark-cream);
@@ -596,8 +616,7 @@ input.control:focus-visible{outline:3px solid var(--teal);outline-offset:1px}
    focusable checkbox with native role, state and keyboard behaviour, no
    boundary drawn at rest, but a hover tint and a pointer cursor that show
    the extent to anyone using a mouse. It stops short of 01's drawn
-   border, which is why 01 remains the next step rather than being folded
-   in here. */
+   border, which stays a wildcard rather than being folded in here. */
 
 /* The conditional company block, tied to the control above it.
    Spacing and colour taken from the Donation forms Figma, node
@@ -727,7 +746,7 @@ input.control:focus-visible{outline:3px solid var(--teal);outline-offset:1px}
       <path d="M129.14 9.00123H131.195C131.914 9.00123 132.041 8.74674 132.041 8.23776C132.041 6.62784 131.513 6.03587 130.896 6.03587C130.069 6.03587 129.35 7.0732 129.137 9.00123M130.6 16.3095C127.804 16.3095 125.621 14.2127 125.621 11.1201C125.621 7.81453 127.909 5.33603 131.045 5.33603C133.715 5.33603 135.325 6.88233 135.325 8.45076C135.325 9.02336 135.198 9.44658 135.048 9.70107H129.073V10.1464C129.073 12.3926 130.196 13.9804 132.379 13.9804C133.585 13.9804 134.265 13.7259 135.344 12.9624L135.557 13.1726C134.52 14.9098 133.057 16.3095 130.6 16.3095Z" fill="currentColor"/>
       <path d="M139.681 10.5281C139.681 13.1117 140.699 14.575 142.246 14.575C142.86 14.575 143.369 14.4699 143.751 14.3206V8.15472C143.751 6.48118 143.073 6.03582 142.163 6.03582C140.489 6.03582 139.684 7.70936 139.684 10.5281M140.702 16.3122C138.182 16.3122 136.381 14.0661 136.381 11.3746C136.381 7.87811 138.882 5.33598 142.207 5.33598C142.821 5.33598 143.289 5.42173 143.753 5.54897V1.96953L141.739 1.10095V0.782836C142.757 0.486854 145.128 0.0193633 146.824 0H147.228C147.1 1.86441 147.017 3.72882 147.017 5.59323V14.3427L148.5 14.9347V15.2528C147.482 15.7202 145.789 16.1435 144.58 16.3122H144.199L143.922 14.6387C143.372 15.4436 142.058 16.3122 140.702 16.3122Z" fill="currentColor"/>
     </svg>
-    <p class="bar-title"><b>Concern Worldwide Ireland</b> — the company checkbox on the details step. The live control, the two fixes suggested so far built out in full, the recommended fix, and three further approaches.</p>
+    <p class="bar-title"><b>Concern Worldwide Ireland</b> — the company checkbox on the details step. The live control, the two fixes suggested so far built out in full, the recommended fix, and three wildcard experiments that are not proposed for build.</p>
   </div>
 
   <div class="switcher-row">
@@ -737,9 +756,9 @@ input.control:focus-visible{outline:3px solid var(--teal);outline-offset:1px}
         <button class="swtab swtab--diag" type="button" data-pane="d1" aria-current="false"><span class="num">0A</span><span>Spacing only</span></button>
         <button class="swtab swtab--diag" type="button" data-pane="d2" aria-current="false"><span class="num">0B</span><span>Box only</span></button>
         <span class="sw-div" aria-hidden="true"></span>
-        <button class="swtab" type="button" data-pane="p1" aria-current="false"><span class="num">01</span><span>Obvious click/tap area</span></button>
-        <button class="swtab" type="button" data-pane="p2" aria-current="false"><span class="num">02</span><span>Two-way choice</span></button>
-        <button class="swtab" type="button" data-pane="p3" aria-current="false"><span class="num">03</span><span>Out of the path</span></button>
+        <button class="swtab swtab--wild" type="button" data-pane="p1" aria-current="false"><span class="num">01</span><span>Obvious click/tap area</span></button>
+        <button class="swtab swtab--wild" type="button" data-pane="p2" aria-current="false"><span class="num">02</span><span>Two-way choice</span></button>
+        <button class="swtab swtab--wild" type="button" data-pane="p3" aria-current="false"><span class="num">03</span><span>Out of the path</span></button>
         <span class="sw-div" aria-hidden="true"></span>
         <button class="swtab swtab--rec" type="button" data-pane="rec" aria-current="false"><span class="num">✓</span><span>Recommended</span></button>
       </nav>
@@ -949,7 +968,7 @@ input.control:focus-visible{outline:3px solid var(--teal);outline-offset:1px}
 
                 <div class="field" id="d1-reveal" hidden>
                   <label class="flabel" for="d1-company">Company name <span class="opt">(required if donating on behalf of a company)</span></label>
-                  <input class="control" id="d1-company" type="text" placeholder="Your company" aria-required="true" aria-describedby="d1-escape">
+                  <input class="control ic ic-bank" id="d1-company" type="text" placeholder="Your company" aria-required="true" aria-describedby="d1-escape">
                   <p class="hint" id="d1-escape">If this donation is not from a company, untick the box above to remove this field.</p>
                 </div>
 
@@ -1040,7 +1059,7 @@ input.control:focus-visible{outline:3px solid var(--teal);outline-offset:1px}
 
                 <div class="field" id="d2-reveal" hidden>
                   <label class="flabel" for="d2-company">Company name <span class="opt">(required if donating on behalf of a company)</span></label>
-                  <input class="control" id="d2-company" type="text" placeholder="Your company" aria-required="true" aria-describedby="d2-escape">
+                  <input class="control ic ic-bank" id="d2-company" type="text" placeholder="Your company" aria-required="true" aria-describedby="d2-escape">
                   <p class="hint" id="d2-escape">If this donation is not from a company, untick the box above to remove this field.</p>
                 </div>
 
@@ -1533,6 +1552,7 @@ input.control:focus-visible{outline:3px solid var(--teal);outline-offset:1px}
       title: 'Option 1 — obvious click/tap area',
       one: '<b>Changes:</b> the checkbox row gains a visible boundary, real keyboard operation, and a company field with a stated way back. <b>Costs:</b> about 40px of extra height on desktop, 60px on mobile, and a checkbox more donors will notice.',
       body: [
+        '<p class="wildflag">Wildcard experiment — not proposed for build</p>',
         '<p class="lede">Same control, same position, with a boundary drawn around it: what you can hit now matches what you can see.</p>',
         '<h3>Pros</h3>',
         '<ul class="fix">',
@@ -1557,6 +1577,7 @@ input.control:focus-visible{outline:3px solid var(--teal);outline-offset:1px}
       title: 'Option 2 — two-way choice',
       one: '<b>Changes:</b> the silent opt-in becomes a question with two visible answers, so nobody opts in without saying so. <b>Costs:</b> roughly 130px of height, and it asks every donor something only a handful need to answer.',
       body: [
+        '<p class="wildflag">Wildcard experiment — not proposed for build</p>',
         '<p class="lede">The checkbox becomes a question — “Who is this donation from?” — with two visible rows, “Me personally” preselected.</p>',
         '<h3>Pros</h3>',
         '<ul class="fix">',
@@ -1580,6 +1601,7 @@ input.control:focus-visible{outline:3px solid var(--teal);outline-offset:1px}
       title: 'Option 3 — out of the path',
       one: '<b>Changes:</b> the checkbox is unchanged but moves up beside the amount, so nothing sits between the last field and the button. <b>Costs:</b> a change to the form’s field order, and a target that is still unmarked until you hover it.',
       body: [
+        '<p class="wildflag">Wildcard experiment — not proposed for build</p>',
         '<p class="lede">Unchanged, but moved up beside the amount, under an “About this donation” heading — nothing now sits between the last field and the button.</p>',
         '<h3>Pros</h3>',
         '<ul class="fix">',
@@ -1601,7 +1623,7 @@ input.control:focus-visible{outline:3px solid var(--teal);outline-offset:1px}
 
     rec: {
       title: 'Recommended',
-      one: '<b>Combines 0A’s wider clearance with the shorter wording from 01 Obvious click/tap area, Option 3’s hover treatment and a real accessible input</b> — the cheapest change that closes the reported “N/A” problem. Nothing is drawn at rest; 01 Obvious click/tap area is the next step.',
+      one: '<b>Combines 0A’s wider clearance with the shorter wording from 01 Obvious click/tap area, Option 3’s hover treatment and a real accessible input</b> — the cheapest change that closes the reported “N/A” problem. Nothing is drawn at rest, which is the trade it makes.',
       body: [
         '<p class="recflag">Recommended</p>',
         '<p class="lede">This combines existing moves: 0A’s 64px clearance, the shorter wording and reveal block from 01 Obvious click/tap area, Option 3’s hover tint and pointer cursor, and a real, focusable checkbox in place of the <code>display:none</code> construction used elsewhere. Spacing and the green bar follow the Donation forms Figma. 02 Two-way choice remains the structural alternative, where accidental opt-in is impossible rather than reduced.</p>',
@@ -1613,7 +1635,7 @@ input.control:focus-visible{outline:3px solid var(--teal);outline-offset:1px}
         '<h3>Cons</h3>',
         '<ul class="cost">',
         '<li>Nothing is drawn around the row at rest, so it measures <b id="rec-ratio">…</b> the 24 × 24 box at this width. Hovering tints the extent and the cursor changes, which helps on a mouse — but there is no hover on a touch screen, where the row is widest. Accidental ticks would still happen, less often, and would no longer leave a required field with no way back.</li>',
-        '<li>01 Obvious click/tap area is the next step: the same row with a drawn boundary, whose target measures <b id="rec-p1-ratio">…</b> the 24 × 24 box — larger than the figure above, and not a defect: a larger bounded target is what the boundary is for.</li>',
+        '<li>Drawing a boundary would close that, and 01 Obvious click/tap area shows what it looks like — though it is a wildcard, not a proposal. Its target measures <b id="rec-p1-ratio">…</b> the 24 × 24 box, larger than the figure above and not a defect: a larger bounded target is what the boundary is for.</li>',
         '</ul>',
         '<h3>Accessibility</h3>',
         '<ul class="fix">',
@@ -1817,6 +1839,7 @@ input.control:focus-visible{outline:3px solid var(--teal);outline-offset:1px}
     if (railEl) {
       railEl.classList.toggle('rail--diag', name === 'd1' || name === 'd2');
       railEl.classList.toggle('rail--rec', name === 'rec');
+      railEl.classList.toggle('rail--wild', name === 'p1' || name === 'p2' || name === 'p3');
       railEl.scrollTop = 0;
     }
     remeasure();
