@@ -1,81 +1,231 @@
 <!doctype html>
+<!-- SystemSeed brand system v0.7 -->
 <html lang="en-GB">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <title>Concern Worldwide — SystemSeed design prototypes</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2032%2032'%3E%3Crect%20width='32'%20height='32'%20rx='6'%20fill='%23015d59'/%3E%3Cpath%20d='M8%2016h16M8%2011h16M8%2021h9'%20stroke='%23fff'%20stroke-width='2.6'%20stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2032%2032'%3E%3Crect%20width='32'%20height='32'%20rx='6'%20fill='%23024C40'/%3E%3Ccircle%20cx='11'%20cy='20'%20r='4'%20fill='%23F5F3E6'/%3E%3Cpath%20d='M21%2024c-3-2.6-4.6-6.2-4.6-9.6C16.4%2010.9%2018.5%208%2021%205c2.5%203%204.6%205.9%204.6%209.4%200%203.4-1.6%207-4.6%209.6Z'%20fill='%23DAFF00'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Newsreader:wght@400;500&display=swap" rel="stylesheet">
 <style>
+  :root{
+    --cream:#F5F3E6;
+    --white-ish:#FFFEF7;
+    --mushroom:#E2E0D2;
+    --dark-cream:#D4D2C6;
+    --creamy-grey:#B8BAB9;
+    --black:#373C39;
+    --lighter-black:#4D4C47;
+    --green:#024C40;
+    --green-muted-dark:#335651;
+    --yellow:#DAFF00;
+    --purple:#6E4EB1;
+    --dark-purple:#423066;
+    --blue:#5347E2;
+    --dark-blue:#3B32A1;
+  }
   *,*::before,*::after{box-sizing:border-box}
+  html{font-size:18px}
   body{
-    margin:0;background:#14161c;color:#e9eaec;
+    margin:0;background:var(--cream);color:var(--black);
     font-family:"DM Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
-    font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased;
+    font-size:1rem;line-height:1.5;-webkit-font-smoothing:antialiased;
   }
-  .wrap{max-width:760px;margin:0 auto;padding:72px 28px 96px}
-  .brand{font-weight:700;font-size:18px;letter-spacing:-.01em;margin:0 0 40px;color:#fff}
-  h1{font-size:clamp(28px,5vw,40px);line-height:1.15;letter-spacing:-.02em;margin:0 0 16px;color:#fff}
-  .lede{font-size:18px;color:#b6bac4;margin:0 0 48px;max-width:60ch}
-  ul{list-style:none;margin:0;padding:0;display:grid;gap:16px}
-  a.card{
-    display:block;padding:24px 26px;border:1px solid #2c2f38;border-radius:12px;
-    text-decoration:none;color:inherit;background:#191c24;
-    transition:border-color .18s ease,background .18s ease,transform .18s ease;
+  .wrap{max-width:823px;margin:0 auto;padding:0 24px}
+
+  header{padding:32px 0 0}
+  header .logo{display:block;color:var(--black);width:149px;height:22px}
+  header .logo svg{display:block;width:100%;height:100%}
+
+  .intro{padding:64px 0 48px}
+  .kicker{
+    font-size:16px;font-weight:500;color:var(--green);margin:0 0 16px;
   }
-  a.card:hover{border-color:#4a5060;background:#1e222c;transform:translateY(-2px)}
-  a.card:focus-visible{outline:3px solid #cdf94b;outline-offset:3px}
-  .card h2{margin:0 0 6px;font-size:19px;color:#fff;letter-spacing:-.01em}
-  .card p{margin:0;color:#9aa0ad;font-size:15px}
-  .meta{margin-top:12px;font-size:13px;color:#7d8393}
+  h1{
+    font-family:"Newsreader",Georgia,serif;font-weight:500;
+    font-size:clamp(40px,6vw,56px);line-height:1.2;letter-spacing:-1px;
+    margin:0 0 24px;
+  }
+  .lede{font-size:1rem;margin:0;max-width:60ch}
+
+  ul{list-style:none;margin:0;padding:0;display:grid;gap:24px}
+  .card{
+    padding:32px;background:var(--mushroom);
+    border:1px solid var(--mushroom);border-radius:8px;
+  }
+  .tag{
+    display:flex;align-items:center;gap:8px;
+    font-size:16px;font-weight:500;line-height:1.4;margin:0 0 16px;
+  }
+  .tag .dot{width:11px;height:11px;border-radius:50%;background:var(--yellow);flex:none}
+  .pill{
+    display:inline-block;font-size:20px;font-weight:700;line-height:1.2;
+    color:var(--green-muted-dark);background:var(--dark-cream);
+    padding:2px 8px;border-radius:8px;margin:0 0 16px;
+  }
+  .card h2{
+    font-family:"Newsreader",Georgia,serif;font-weight:500;
+    font-size:32px;line-height:1.2;margin:0 0 16px;
+  }
+  .card p{margin:0;font-size:1rem}
+  .card .tag{font-size:16px;line-height:1.4;margin-bottom:16px}
+  .card .pill{font-size:20px;margin-bottom:16px}
+
+  .actions{
+    display:flex;flex-wrap:wrap;align-items:center;gap:16px 24px;
+    margin-top:24px;padding-top:24px;border-top:1px solid var(--dark-cream);
+  }
+  .btn{
+    display:inline-block;background:var(--purple,#6E4EB1);color:var(--white-ish);
+    font-size:1rem;font-weight:600;line-height:1;text-decoration:none;
+    padding:14px 24px;border-radius:999px;
+    transition:background .18s ease;
+  }
+  .btn:hover{background:var(--dark-purple);color:var(--white-ish)}
+  .btn:focus-visible,.story:focus-visible{outline:3px solid var(--green);outline-offset:3px}
+  .story{
+    font-size:1rem;font-weight:600;color:var(--blue);text-decoration:underline;
+  }
+  .story:hover{color:var(--dark-blue)}
+  .story .id{font-weight:700}
+  .actions .status{
+    flex-basis:100%;margin:0;font-size:16px;line-height:1.4;color:var(--lighter-black);
+  }
+
+  .note{
+    margin:48px 0 0;padding:32px;background:var(--white-ish);
+    border:1px solid var(--dark-cream);border-radius:8px;
+  }
+  .note h2{font-size:20px;font-weight:700;margin:0 0 16px;line-height:1.2}
+  .note p{margin:0 0 16px;font-size:16px;line-height:1.5}
+  .note p:last-child{margin-bottom:0}
+  .note code{
+    font-family:"DM Sans",sans-serif;font-weight:500;
+    background:var(--mushroom);padding:1px 6px;border-radius:4px;
+  }
+  a{color:var(--blue)}
+  a:hover{color:var(--dark-blue)}
+
   footer{
-    margin-top:64px;padding-top:24px;border-top:1px solid #2c2f38;
-    font-size:13.5px;color:#8a90a0;line-height:1.6;max-width:70ch;
+    margin-top:96px;background:var(--black);color:var(--cream);
+    padding:56px 0;
   }
-  footer b{color:#c3c7d1;font-weight:500}
+  footer .logo{display:block;color:var(--cream);width:149px;height:22px;margin-bottom:24px}
+  footer .logo svg{display:block;width:100%;height:100%}
+  footer p{margin:0;font-size:14px;line-height:1.5;color:var(--dark-cream)}
+
+  @media (max-width:640px){
+    .intro{padding:48px 0 32px}
+    a.card,.note{padding:24px}
+    .card h2{font-size:26px}
+    footer{margin-top:64px}
+  }
 </style>
 </head>
 <body>
-  <div class="wrap">
-    <p class="brand">SystemSeed</p>
-    <h1>Concern Worldwide — design prototypes</h1>
-    <p class="lede">Working prototypes built to be looked at and argued with. Each one rebuilds a
-      piece of the live experience so a design question can be judged in its real surroundings.</p>
 
-    <ul>
-      <li>
-        <a class="card" href="company-checkbox/">
-          <h2>The company checkbox, six ways</h2>
-          <p>The “I am donating on behalf of a company” control on step 2 of the donation
-             form: the live control measured and reproduced, the two fixes suggested so far
-             built out in full, and three more.</p>
-          <p class="meta">August 2026</p>
-        </a>
-      </li>
-      <li>
-        <a class="card" href="gifts-payment-label/">
-          <h2>The payment-method step, five ways</h2>
-          <p>The gifts checkout button says “Pay with debit or credit card” but leads to a
-             Stripe page offering Apple Pay, Link and Revolut Pay too. The live step rebuilt,
-             and four ways to stop the button promising the wrong thing.</p>
-          <p class="meta">August 2026</p>
-        </a>
-      </li>
-    </ul>
+<div class="wrap">
+  <header>
+    <span class="logo" role="img" aria-label="SystemSeed">
+      <svg viewBox="0 0 149 22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M19.626 16.5528C21.8417 14.5335 23.2331 11.6263 23.2331 8.39258C23.2331 5.15891 21.8417 2.25165 19.626 0.23233C17.4103 2.25165 16.0189 5.15891 16.0189 8.39258C16.0189 11.6263 17.4103 14.5363 19.626 16.5528Z" fill="currentColor"/>
+        <path d="M7.01505 13.2998C7.01505 15.3053 5.44386 16.929 3.50752 16.929C1.57119 16.929 0 15.3025 0 13.2998C0 11.2971 1.57119 9.67055 3.50752 9.67055C5.44386 9.67055 7.01505 11.2971 7.01505 13.2998Z" fill="currentColor"/>
+        <path d="M11.2142 16.9289C8.97915 14.8266 7.69841 11.8059 7.70671 8.69675C7.7233 6.69126 9.2862 5.07028 11.2142 5.07028C13.1423 5.07028 14.7079 6.69126 14.7218 8.69675C14.7301 11.8059 13.4465 14.8266 11.2142 16.9289Z" fill="currentColor"/>
+        <path d="M33.5041 16.3121C31.2801 16.3121 29.7338 15.8668 28.4614 15.4657L27.9524 10.6359H28.4392C29.6674 13.5598 31.8085 15.5736 33.991 15.5736C35.2828 15.5736 36.511 14.8958 36.511 13.3495C36.511 11.7175 35.3464 10.8074 32.464 9.98033C29.2442 9.04813 27.8888 7.58481 27.8888 5.59315C27.8888 3.11465 29.9855 0.846375 33.778 0.846375C35.1749 0.846375 36.5967 1.20598 37.7834 1.52409L38.0158 5.86701H37.5289C36.6825 3.34702 35.2828 1.60985 32.9537 1.60985C31.471 1.60985 30.3258 2.47843 30.3258 3.87535C30.3258 5.52953 31.5125 6.37599 34.3091 7.0952C37.4017 7.90016 38.8429 9.29708 38.8429 11.5239C38.8429 14.1075 36.8291 16.3121 33.5041 16.3121Z" fill="currentColor"/>
+        <path d="M41.2855 21.1834C40.2897 21.1834 39.4626 17.922 40.013 17.922H42.2149C44.1015 17.922 44.5662 17.2637 44.97 16.3536L45.0558 16.1627L40.5441 6.24873L39.0836 6.43959L39.2966 5.54887H46.3946L46.1816 6.07722L45.5897 6.16297C44.7211 6.29021 44.4887 6.7577 44.8704 7.64565L46.8621 12.2652L49.6587 6.24873L47.7086 6.43959L47.9216 5.54887H52.0515L51.8385 6.07722L51.1829 6.16297C50.4416 6.24872 50.2507 6.64982 49.8053 7.58202L45.2079 17.4324C44.107 19.8058 43.0697 21.1834 41.2882 21.1834" fill="currentColor"/>
+        <path d="M55.9461 16.3123C54.5907 16.3123 53.1274 16.0993 51.9213 15.7397L51.7305 12.4341H52.2173C53.8687 14.5115 55.4178 15.5267 56.7732 15.5267C57.6418 15.5267 58.2144 15.2307 58.2144 14.4036C58.2144 13.4493 57.1135 12.8573 54.9088 12.0745C52.7899 11.311 51.7305 10.5697 51.7305 8.89611C51.7305 7.11745 53.191 5.33603 56.4966 5.33603C57.5145 5.33603 58.8478 5.56839 59.8437 5.80352L60.0567 8.76887H59.5698C58.3831 7.37194 56.6681 6.16312 55.332 6.16312C54.5686 6.16312 54.0596 6.56422 54.0596 7.22257C54.0596 8.04966 55.1412 8.64163 57.0886 9.34147C59.4813 10.2101 60.5629 10.9929 60.5629 12.7937C60.5629 14.7853 58.953 16.3095 55.9434 16.3095" fill="currentColor"/>
+        <path d="M65.9045 16.3123C64.1673 16.3123 62.7898 15.2943 62.7898 13.4299V6.2489H61.0941V5.65693L62.7898 5.08433L65.8409 2.88245H66.0539V5.55182H69.5061V6.25166H66.0539V12.7135C66.0539 13.6678 66.4135 14.4092 67.6002 14.4092C68.1949 14.4092 68.809 14.2819 69.4867 14.0689L69.6997 14.2819C68.7454 15.5958 67.4536 16.3151 65.9073 16.3151" fill="currentColor"/>
+        <path d="M73.5807 9.00123H75.6359C76.3552 9.00123 76.4824 8.74674 76.4824 8.23776C76.4824 6.62784 75.9513 6.03587 75.3372 6.03587C74.5101 6.03587 73.7909 7.0732 73.5779 9.00123M75.0412 16.3095C72.2446 16.3095 70.0621 14.2127 70.0621 11.1201C70.0621 7.81453 72.3497 5.33603 75.4866 5.33603C78.156 5.33603 79.7659 6.88233 79.7659 8.45076C79.7659 9.02336 79.6386 9.44658 79.4892 9.70107H73.5143V10.1464C73.5143 12.3926 74.6373 13.9804 76.8199 13.9804C78.0287 13.9804 78.7064 13.7259 79.7852 12.9624L79.9982 13.1726C78.9609 14.9098 77.4976 16.3095 75.0412 16.3095Z" fill="currentColor"/>
+        <path d="M94.7999 16.0992L95.0129 15.5681L95.7322 15.4823C96.1139 15.4408 96.2605 15.25 96.2605 14.8461V8.91262C96.2605 7.59868 95.6049 7.44931 94.6727 7.44931C93.8041 7.44931 93.1679 7.68167 92.5538 7.98042C92.5759 8.10766 92.5759 8.25703 92.5759 8.40364V15.3938L94.291 15.2029L94.078 16.0936H87.8485L88.0615 15.5625L88.7614 15.4768C89.1625 15.4353 89.3118 15.2444 89.3118 14.8406V9.0371C89.3118 7.64018 88.6562 7.44654 87.6161 7.44654C86.8748 7.44654 86.2386 7.6789 85.6245 7.95552V15.391L87.3395 15.2002L87.1265 16.0909H80.8971L81.1101 15.5598L81.8099 15.474C82.2138 15.4325 82.3604 15.2417 82.3604 14.8378V7.54889L80.8141 6.46731V6.1492C82.1059 5.66235 83.9703 5.34424 85.0934 5.32211H85.3064L85.583 7.41888C86.3022 6.52817 87.7877 5.32211 89.7987 5.32211C91.3865 5.32211 92.2578 6.02195 92.4902 7.41888C93.2536 6.52817 94.7585 5.32211 96.7695 5.32211C98.6754 5.32211 99.5246 6.38156 99.5246 8.30959V15.3855L101.284 15.1946L101.071 16.0854H94.7999" fill="currentColor"/>
+        <path d="M108.233 16.3121C106.009 16.3121 104.462 15.8668 103.19 15.4657L102.681 10.6359H103.168C104.396 13.5598 106.537 15.5736 108.72 15.5736C110.011 15.5736 111.24 14.8958 111.24 13.3495C111.24 11.7175 110.075 10.8074 107.193 9.98033C103.973 9.04813 102.617 7.58481 102.617 5.59315C102.617 3.11465 104.714 0.846375 108.507 0.846375C109.903 0.846375 111.325 1.20598 112.509 1.52409L112.742 5.86701H112.255C111.408 3.34702 110.009 1.60985 107.679 1.60985C106.197 1.60985 105.052 2.47843 105.052 3.87535C105.052 5.52953 106.238 6.37599 109.035 7.0952C112.127 7.90016 113.569 9.29708 113.569 11.5239C113.569 14.1075 111.555 16.3121 108.23 16.3121" fill="currentColor"/>
+        <path d="M118.407 9.00123H120.462C121.181 9.00123 121.308 8.74674 121.308 8.23776C121.308 6.62784 120.78 6.03587 120.163 6.03587C119.336 6.03587 118.617 7.0732 118.404 9.00123M119.864 16.3095C117.068 16.3095 114.885 14.2127 114.885 11.1201C114.885 7.81453 117.173 5.33603 120.31 5.33603C122.979 5.33603 124.589 6.88233 124.589 8.45076C124.589 9.02336 124.462 9.44658 124.312 9.70107H118.337V10.1464C118.337 12.3926 119.461 13.9804 121.643 13.9804C122.852 13.9804 123.53 13.7259 124.608 12.9624L124.821 13.1726C123.784 14.9098 122.321 16.3095 119.864 16.3095Z" fill="currentColor"/>
+        <path d="M129.14 9.00123H131.195C131.914 9.00123 132.041 8.74674 132.041 8.23776C132.041 6.62784 131.513 6.03587 130.896 6.03587C130.069 6.03587 129.35 7.0732 129.137 9.00123M130.6 16.3095C127.804 16.3095 125.621 14.2127 125.621 11.1201C125.621 7.81453 127.909 5.33603 131.045 5.33603C133.715 5.33603 135.325 6.88233 135.325 8.45076C135.325 9.02336 135.198 9.44658 135.048 9.70107H129.073V10.1464C129.073 12.3926 130.196 13.9804 132.379 13.9804C133.585 13.9804 134.265 13.7259 135.344 12.9624L135.557 13.1726C134.52 14.9098 133.057 16.3095 130.6 16.3095Z" fill="currentColor"/>
+        <path d="M139.681 10.5281C139.681 13.1117 140.699 14.575 142.246 14.575C142.86 14.575 143.369 14.4699 143.751 14.3206V8.15472C143.751 6.48118 143.073 6.03582 142.163 6.03582C140.489 6.03582 139.684 7.70936 139.684 10.5281M140.702 16.3122C138.182 16.3122 136.381 14.0661 136.381 11.3746C136.381 7.87811 138.882 5.33598 142.207 5.33598C142.821 5.33598 143.289 5.42173 143.753 5.54897V1.96953L141.739 1.10095V0.782836C142.757 0.486854 145.128 0.0193633 146.824 0H147.228C147.1 1.86441 147.017 3.72882 147.017 5.59323V14.3427L148.5 14.9347V15.2528C147.482 15.7202 145.789 16.1435 144.58 16.3122H144.199L143.922 14.6387C143.372 15.4436 142.058 16.3122 140.702 16.3122Z" fill="currentColor"/>
+      </svg>
+    </span>
+  </header>
 
-    <footer>
-      <p><b>These are SystemSeed design prototypes, not official Concern builds.</b>
-         The Concern branding is a reconstruction, made so each design question can be
-         judged in its real surroundings. Photography and illustration are placeholders.
-         Every page here is marked <code>noindex, nofollow</code> so none will be indexed
-         as Concern’s own.</p>
-      <p>Nothing on these pages submits, takes payment, or collects data. This repository is
-         public only so the pages can be served; the projects they belong to — briefs,
-         research, QA and decisions — stay private.</p>
-    </footer>
+  <div class="intro">
+    <p class="kicker">Design prototypes</p>
+    <h1>Concern Worldwide — design questions you can look at.</h1>
+    <p class="lede">Each prototype rebuilds one piece of the live experience so a design decision
+      can be judged where it actually happens, rather than described in a document. The live
+      control is measured and reproduced first; the alternatives sit beside it, built out in full,
+      so the team can compare them like for like before anything is committed to.</p>
   </div>
+
+  <ul>
+    <li>
+      <div class="card">
+        <p class="tag"><span class="dot" aria-hidden="true"></span>Donation form</p>
+        <p class="pill">Concern Worldwide</p>
+        <h2>The company checkbox, six ways</h2>
+        <p>The “I am donating on behalf of a company” control on step 2 of the donation form:
+          the live control measured and reproduced, the two fixes suggested so far built out in
+          full, and three more.</p>
+        <div class="actions">
+          <a class="btn" href="company-checkbox/">Open the prototype</a>
+          <a class="story" href="https://linear.app/systemseed/issue/CWIEDEV-2737">Story
+            <span class="id">CWIEDEV-2737</span> in Linear</a>
+          <p class="status">August 2026 · Concern IE Development · in progress</p>
+        </div>
+      </div>
+    </li>
+    <li>
+      <div class="card">
+        <p class="tag"><span class="dot" aria-hidden="true"></span>Gifts checkout</p>
+        <p class="pill">Concern Worldwide</p>
+        <h2>The payment-method step, five ways</h2>
+        <p>The gifts checkout button says “Pay with debit or credit card” but leads to a Stripe
+          page offering Apple Pay, Link and Revolut Pay too. The live step rebuilt, and four ways
+          to stop the button promising the wrong thing.</p>
+        <div class="actions">
+          <a class="btn" href="gifts-payment-label/">Open the prototype</a>
+          <a class="story" href="https://linear.app/systemseed/issue/CWIEDEV-2739">Story
+            <span class="id">CWIEDEV-2739</span> in Linear</a>
+          <p class="status">August 2026 · Concern IE Development · scheduled</p>
+        </div>
+      </div>
+    </li>
+  </ul>
+
+  <div class="note">
+    <h2>About these pages</h2>
+    <p>These are SystemSeed design prototypes, not official Concern builds. The Concern branding
+      is a reconstruction, made so each design question can be judged in its real surroundings.
+      Photography and illustration are placeholders. Every page here is marked
+      <code>noindex, nofollow</code> so none will be indexed as Concern’s own.</p>
+    <p>Nothing on these pages submits, takes payment, or collects data. This repository is public
+      only so the pages can be served; the projects they belong to — briefs, research, QA and
+      decisions — stay private.</p>
+  </div>
+</div>
+
+<footer>
+  <div class="wrap">
+    <span class="logo" role="img" aria-label="SystemSeed">
+      <svg viewBox="0 0 149 22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M19.626 16.5528C21.8417 14.5335 23.2331 11.6263 23.2331 8.39258C23.2331 5.15891 21.8417 2.25165 19.626 0.23233C17.4103 2.25165 16.0189 5.15891 16.0189 8.39258C16.0189 11.6263 17.4103 14.5363 19.626 16.5528Z" fill="currentColor"/>
+        <path d="M7.01505 13.2998C7.01505 15.3053 5.44386 16.929 3.50752 16.929C1.57119 16.929 0 15.3025 0 13.2998C0 11.2971 1.57119 9.67055 3.50752 9.67055C5.44386 9.67055 7.01505 11.2971 7.01505 13.2998Z" fill="currentColor"/>
+        <path d="M11.2142 16.9289C8.97915 14.8266 7.69841 11.8059 7.70671 8.69675C7.7233 6.69126 9.2862 5.07028 11.2142 5.07028C13.1423 5.07028 14.7079 6.69126 14.7218 8.69675C14.7301 11.8059 13.4465 14.8266 11.2142 16.9289Z" fill="currentColor"/>
+        <path d="M33.5041 16.3121C31.2801 16.3121 29.7338 15.8668 28.4614 15.4657L27.9524 10.6359H28.4392C29.6674 13.5598 31.8085 15.5736 33.991 15.5736C35.2828 15.5736 36.511 14.8958 36.511 13.3495C36.511 11.7175 35.3464 10.8074 32.464 9.98033C29.2442 9.04813 27.8888 7.58481 27.8888 5.59315C27.8888 3.11465 29.9855 0.846375 33.778 0.846375C35.1749 0.846375 36.5967 1.20598 37.7834 1.52409L38.0158 5.86701H37.5289C36.6825 3.34702 35.2828 1.60985 32.9537 1.60985C31.471 1.60985 30.3258 2.47843 30.3258 3.87535C30.3258 5.52953 31.5125 6.37599 34.3091 7.0952C37.4017 7.90016 38.8429 9.29708 38.8429 11.5239C38.8429 14.1075 36.8291 16.3121 33.5041 16.3121Z" fill="currentColor"/>
+        <path d="M41.2855 21.1834C40.2897 21.1834 39.4626 17.922 40.013 17.922H42.2149C44.1015 17.922 44.5662 17.2637 44.97 16.3536L45.0558 16.1627L40.5441 6.24873L39.0836 6.43959L39.2966 5.54887H46.3946L46.1816 6.07722L45.5897 6.16297C44.7211 6.29021 44.4887 6.7577 44.8704 7.64565L46.8621 12.2652L49.6587 6.24873L47.7086 6.43959L47.9216 5.54887H52.0515L51.8385 6.07722L51.1829 6.16297C50.4416 6.24872 50.2507 6.64982 49.8053 7.58202L45.2079 17.4324C44.107 19.8058 43.0697 21.1834 41.2882 21.1834" fill="currentColor"/>
+        <path d="M55.9461 16.3123C54.5907 16.3123 53.1274 16.0993 51.9213 15.7397L51.7305 12.4341H52.2173C53.8687 14.5115 55.4178 15.5267 56.7732 15.5267C57.6418 15.5267 58.2144 15.2307 58.2144 14.4036C58.2144 13.4493 57.1135 12.8573 54.9088 12.0745C52.7899 11.311 51.7305 10.5697 51.7305 8.89611C51.7305 7.11745 53.191 5.33603 56.4966 5.33603C57.5145 5.33603 58.8478 5.56839 59.8437 5.80352L60.0567 8.76887H59.5698C58.3831 7.37194 56.6681 6.16312 55.332 6.16312C54.5686 6.16312 54.0596 6.56422 54.0596 7.22257C54.0596 8.04966 55.1412 8.64163 57.0886 9.34147C59.4813 10.2101 60.5629 10.9929 60.5629 12.7937C60.5629 14.7853 58.953 16.3095 55.9434 16.3095" fill="currentColor"/>
+        <path d="M65.9045 16.3123C64.1673 16.3123 62.7898 15.2943 62.7898 13.4299V6.2489H61.0941V5.65693L62.7898 5.08433L65.8409 2.88245H66.0539V5.55182H69.5061V6.25166H66.0539V12.7135C66.0539 13.6678 66.4135 14.4092 67.6002 14.4092C68.1949 14.4092 68.809 14.2819 69.4867 14.0689L69.6997 14.2819C68.7454 15.5958 67.4536 16.3151 65.9073 16.3151" fill="currentColor"/>
+        <path d="M73.5807 9.00123H75.6359C76.3552 9.00123 76.4824 8.74674 76.4824 8.23776C76.4824 6.62784 75.9513 6.03587 75.3372 6.03587C74.5101 6.03587 73.7909 7.0732 73.5779 9.00123M75.0412 16.3095C72.2446 16.3095 70.0621 14.2127 70.0621 11.1201C70.0621 7.81453 72.3497 5.33603 75.4866 5.33603C78.156 5.33603 79.7659 6.88233 79.7659 8.45076C79.7659 9.02336 79.6386 9.44658 79.4892 9.70107H73.5143V10.1464C73.5143 12.3926 74.6373 13.9804 76.8199 13.9804C78.0287 13.9804 78.7064 13.7259 79.7852 12.9624L79.9982 13.1726C78.9609 14.9098 77.4976 16.3095 75.0412 16.3095Z" fill="currentColor"/>
+        <path d="M94.7999 16.0992L95.0129 15.5681L95.7322 15.4823C96.1139 15.4408 96.2605 15.25 96.2605 14.8461V8.91262C96.2605 7.59868 95.6049 7.44931 94.6727 7.44931C93.8041 7.44931 93.1679 7.68167 92.5538 7.98042C92.5759 8.10766 92.5759 8.25703 92.5759 8.40364V15.3938L94.291 15.2029L94.078 16.0936H87.8485L88.0615 15.5625L88.7614 15.4768C89.1625 15.4353 89.3118 15.2444 89.3118 14.8406V9.0371C89.3118 7.64018 88.6562 7.44654 87.6161 7.44654C86.8748 7.44654 86.2386 7.6789 85.6245 7.95552V15.391L87.3395 15.2002L87.1265 16.0909H80.8971L81.1101 15.5598L81.8099 15.474C82.2138 15.4325 82.3604 15.2417 82.3604 14.8378V7.54889L80.8141 6.46731V6.1492C82.1059 5.66235 83.9703 5.34424 85.0934 5.32211H85.3064L85.583 7.41888C86.3022 6.52817 87.7877 5.32211 89.7987 5.32211C91.3865 5.32211 92.2578 6.02195 92.4902 7.41888C93.2536 6.52817 94.7585 5.32211 96.7695 5.32211C98.6754 5.32211 99.5246 6.38156 99.5246 8.30959V15.3855L101.284 15.1946L101.071 16.0854H94.7999" fill="currentColor"/>
+        <path d="M108.233 16.3121C106.009 16.3121 104.462 15.8668 103.19 15.4657L102.681 10.6359H103.168C104.396 13.5598 106.537 15.5736 108.72 15.5736C110.011 15.5736 111.24 14.8958 111.24 13.3495C111.24 11.7175 110.075 10.8074 107.193 9.98033C103.973 9.04813 102.617 7.58481 102.617 5.59315C102.617 3.11465 104.714 0.846375 108.507 0.846375C109.903 0.846375 111.325 1.20598 112.509 1.52409L112.742 5.86701H112.255C111.408 3.34702 110.009 1.60985 107.679 1.60985C106.197 1.60985 105.052 2.47843 105.052 3.87535C105.052 5.52953 106.238 6.37599 109.035 7.0952C112.127 7.90016 113.569 9.29708 113.569 11.5239C113.569 14.1075 111.555 16.3121 108.23 16.3121" fill="currentColor"/>
+        <path d="M118.407 9.00123H120.462C121.181 9.00123 121.308 8.74674 121.308 8.23776C121.308 6.62784 120.78 6.03587 120.163 6.03587C119.336 6.03587 118.617 7.0732 118.404 9.00123M119.864 16.3095C117.068 16.3095 114.885 14.2127 114.885 11.1201C114.885 7.81453 117.173 5.33603 120.31 5.33603C122.979 5.33603 124.589 6.88233 124.589 8.45076C124.589 9.02336 124.462 9.44658 124.312 9.70107H118.337V10.1464C118.337 12.3926 119.461 13.9804 121.643 13.9804C122.852 13.9804 123.53 13.7259 124.608 12.9624L124.821 13.1726C123.784 14.9098 122.321 16.3095 119.864 16.3095Z" fill="currentColor"/>
+        <path d="M129.14 9.00123H131.195C131.914 9.00123 132.041 8.74674 132.041 8.23776C132.041 6.62784 131.513 6.03587 130.896 6.03587C130.069 6.03587 129.35 7.0732 129.137 9.00123M130.6 16.3095C127.804 16.3095 125.621 14.2127 125.621 11.1201C125.621 7.81453 127.909 5.33603 131.045 5.33603C133.715 5.33603 135.325 6.88233 135.325 8.45076C135.325 9.02336 135.198 9.44658 135.048 9.70107H129.073V10.1464C129.073 12.3926 130.196 13.9804 132.379 13.9804C133.585 13.9804 134.265 13.7259 135.344 12.9624L135.557 13.1726C134.52 14.9098 133.057 16.3095 130.6 16.3095Z" fill="currentColor"/>
+        <path d="M139.681 10.5281C139.681 13.1117 140.699 14.575 142.246 14.575C142.86 14.575 143.369 14.4699 143.751 14.3206V8.15472C143.751 6.48118 143.073 6.03582 142.163 6.03582C140.489 6.03582 139.684 7.70936 139.684 10.5281M140.702 16.3122C138.182 16.3122 136.381 14.0661 136.381 11.3746C136.381 7.87811 138.882 5.33598 142.207 5.33598C142.821 5.33598 143.289 5.42173 143.753 5.54897V1.96953L141.739 1.10095V0.782836C142.757 0.486854 145.128 0.0193633 146.824 0H147.228C147.1 1.86441 147.017 3.72882 147.017 5.59323V14.3427L148.5 14.9347V15.2528C147.482 15.7202 145.789 16.1435 144.58 16.3122H144.199L143.922 14.6387C143.372 15.4436 142.058 16.3122 140.702 16.3122Z" fill="currentColor"/>
+      </svg>
+    </span>
+    <p>SystemSeed · systemseed.com</p>
+  </div>
+</footer>
+
 </body>
 </html>
