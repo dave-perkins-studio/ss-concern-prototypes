@@ -219,7 +219,17 @@ body[data-device="desktop"] .phone-body{height:600px}
   background:var(--green-panel);border:1px solid var(--line);border-radius:8px;
   padding:20px 17px;margin-bottom:34px;
 }
-.prev-check{display:flex;gap:11px;align-items:flex-start;margin-bottom:13px}
+.prev-h{
+  font-family:var(--gifts-sans);font-size:19px;font-weight:700;
+  color:var(--green-head);margin:0 0 10px;
+}
+.prev-intro{font-size:14px;line-height:1.5;color:var(--ink);margin:0 0 14px}
+.prev-checks{margin-bottom:14px}
+.prev-check{
+  display:flex;gap:11px;align-items:center;
+  background:var(--white);border:1px solid var(--line);border-radius:4px;
+  padding:9px 12px;margin-bottom:6px;
+}
 .prev-box{width:22px;height:22px;border:1px solid var(--input-line);border-radius:3px;background:var(--white);flex:0 0 auto}
 .prev-check span{font-size:15px;line-height:1.35;color:var(--ink)}
 .prev-legal{font-size:13px;line-height:1.5;color:#4a4d57}
@@ -301,6 +311,8 @@ body[data-group="panel"] .payment{gap:26px}
 .or-div::before,.or-div::after{content:"";height:1px;background:var(--line);flex:1}
 body[data-group="divider"] .or-div{display:flex}
 body[data-tab="04"] .or-div{display:none !important}
+/* 00 is the live page as shipped — no rule between the two buttons */
+body[data-tab="00"] .or-div{display:none !important}
 
 /* 3. panel — the card method sits in its own container. Unambiguous. */
 body[data-group="panel"] .payment__method--card{
@@ -601,12 +613,6 @@ body[data-tab="03"] .ctl-group{display:flex}
   </div>
   <div class="ctl-toggles">
     <label class="switch">
-      <input type="checkbox" id="t-next">
-      <span class="track" aria-hidden="true"></span>
-      <span class="lbl-long">Show what the button leads to</span>
-      <span class="lbl-short">Next screen</span>
-    </label>
-    <label class="switch">
       <input type="checkbox" id="t-flag">
       <span class="track" aria-hidden="true"></span>
       <span class="lbl-long">Flag methods this device won’t get</span>
@@ -641,7 +647,14 @@ body[data-tab="03"] .ctl-group{display:flex}
           <div class="gifts-main">
             <!-- tail of the previous block, for context -->
             <div class="prev-panel">
-              <div class="prev-check"><span class="prev-box"></span><span>I’m happy to hear from you by WhatsApp</span></div>
+              <h3 class="prev-h">Keeping you informed</h3>
+              <p class="prev-intro">We would love to keep you updated about our work and let you know how you can continue to help change lives. Please tick the boxes below to confirm that we can contact you by:</p>
+              <div class="prev-checks">
+                <div class="prev-check"><span class="prev-box"></span><span>I’m happy to hear from you by email</span></div>
+                <div class="prev-check"><span class="prev-box"></span><span>I’m happy to hear from you by phone</span></div>
+                <div class="prev-check"><span class="prev-box"></span><span>I’m happy to hear from you by SMS</span></div>
+                <div class="prev-check"><span class="prev-box"></span><span>I’m happy to hear from you by WhatsApp</span></div>
+              </div>
               <p class="prev-legal">You may already have opted into some of our marketing, in which case we will continue to rely on that permission. We will also keep you updated by post. You can opt out of postal &amp; other marketing by contacting us at <a href="#">preferences@concern.net</a>. For further information please see our <a href="#">privacy policy</a>.</p>
             </div>
 
@@ -708,12 +721,12 @@ body[data-tab="03"] .ctl-group{display:flex}
     </div>
 
     <!-- ---------- the Stripe page ---------- -->
-    <div class="leads-to" id="leadsTo" hidden>
+    <div class="leads-to" id="leadsTo">
       <span class="arrow" aria-hidden="true">→</span>
       <span class="t">one tap later</span>
     </div>
 
-    <div class="screen-wrap" id="stripeWrap" hidden>
+    <div class="screen-wrap" id="stripeWrap">
       <span class="screen-cap">checkout.stripe.com <span class="dom">— not ours</span></span>
       <div class="phone">
         <div class="phone-chrome">
@@ -834,7 +847,6 @@ const RAIL = {
   <p class="kicker">00 · Current state</p>
   <h2>Names one method. The next page offers five.</h2>
   <div class="verdict bad"><b>Two errors in six words.</b> Says <b>card</b> — not Apple&nbsp;Pay, Link, Revolut. Says <b>“Pay with”</b> — but it only hands over.</div>
-  <p class="tip">→ Toggle <b>show what the button leads to</b>.</p>
   <h3>Who owns what</h3>
   <ul>
     <li>Green button — <b>ours</b>.</li>
@@ -916,8 +928,6 @@ const markRow = document.getElementById('markRow');
 const markRow04 = document.getElementById('markRow04');
 const capNote = document.getElementById('capNote');
 const rail = document.getElementById('rail');
-const stripeWrap = document.getElementById('stripeWrap');
-const leadsTo = document.getElementById('leadsTo');
 
 function measure(){
   // width of the label text against the room the pill actually gives it
@@ -1115,10 +1125,6 @@ document.querySelectorAll('.seg button[data-grp]').forEach(b=>{
     body.dataset.group = b.dataset.grp;
     render();
   });
-});
-document.getElementById('t-next').addEventListener('change',e=>{
-  stripeWrap.hidden = !e.target.checked;
-  leadsTo.hidden = !e.target.checked;
 });
 document.getElementById('t-flag').addEventListener('change',e=>{ body.dataset.flag = e.target.checked?'1':'0'; });
 document.getElementById('t-lock').addEventListener('change',e=>{ body.dataset.locked = e.target.checked?'1':'0'; });
