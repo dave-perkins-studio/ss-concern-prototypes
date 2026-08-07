@@ -9,7 +9,7 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2032%2032'%3E%3Crect%20width='32'%20height='32'%20rx='6'%20fill='%23024C40'/%3E%3Ccircle%20cx='11'%20cy='20'%20r='4'%20fill='%23F5F3E6'/%3E%3Cpath%20d='M21%2024c-3-2.6-4.6-6.2-4.6-9.6C16.4%2010.9%2018.5%208%2021%205c2.5%203%204.6%205.9%204.6%209.4%200%203.4-1.6%207-4.6%209.6Z'%20fill='%23DAFF00'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Newsreader:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Newsreader:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root{
     --cream:#F5F3E6;
@@ -56,23 +56,16 @@
     padding:32px;background:var(--mushroom);
     border:1px solid var(--mushroom);border-radius:8px;
   }
-  .tag{
-    display:flex;align-items:center;gap:8px;
-    font-size:16px;font-weight:500;line-height:1.4;margin:0 0 16px;
-  }
-  .tag .dot{width:11px;height:11px;border-radius:50%;background:var(--yellow);flex:none}
-  .pill{
-    display:inline-block;font-size:20px;font-weight:700;line-height:1.2;
-    color:var(--green-muted-dark);background:var(--dark-cream);
-    padding:2px 8px;border-radius:8px;margin:0 0 16px;
-  }
   .card h2{
-    font-family:"Newsreader",Georgia,serif;font-weight:500;
-    font-size:32px;line-height:1.2;margin:0 0 16px;
+    font-family:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+    font-weight:700;font-size:20px;line-height:1.35;letter-spacing:-.01em;
+    margin:0 0 8px;overflow-wrap:anywhere;
+  }
+  .card .name{
+    font-size:16px;font-weight:500;line-height:1.4;
+    color:var(--lighter-black);margin:0 0 16px;
   }
   .card p{margin:0;font-size:1rem}
-  .card .tag{font-size:16px;line-height:1.4;margin-bottom:16px}
-  .card .pill{font-size:20px;margin-bottom:16px}
 
   .actions{
     display:flex;flex-wrap:wrap;align-items:center;gap:16px 24px;
@@ -160,9 +153,9 @@
   <ul>
     <li>
       <div class="card">
-        <p class="tag"><span class="dot" aria-hidden="true"></span>Donation form</p>
-        <p class="pill">Concern Worldwide</p>
-        <h2>The company checkbox, six ways</h2>
+        <h2>`UX` - As a manager I would like the UX of the company checkbox on donation form
+          improved (on all donation forms (modal and normal)</h2>
+        <p class="name">Prototype: the company checkbox, six ways</p>
         <p>The “I am donating on behalf of a company” control on step 2 of the donation form:
           the live control measured and reproduced, the two fixes suggested so far built out in
           full, and three more.</p>
@@ -176,9 +169,9 @@
     </li>
     <li>
       <div class="card">
-        <p class="tag"><span class="dot" aria-hidden="true"></span>Gifts checkout</p>
-        <p class="pill">Concern Worldwide</p>
-        <h2>The payment-method step, five ways</h2>
+        <h2>`Design` - Pay with card button label on gifts website does not correspond to
+          reality (rename button + icons)</h2>
+        <p class="name">Prototype: the payment-method step, five ways</p>
         <p>The gifts checkout button says “Pay with debit or credit card” but leads to a Stripe
           page offering Apple Pay, Link and Revolut Pay too. The live step rebuilt, and four ways
           to stop the button promising the wrong thing.</p>
