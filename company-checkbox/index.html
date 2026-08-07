@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2032%2032'%3E%3Crect%20width='32'%20height='32'%20rx='6'%20fill='%23015d59'/%3E%3Crect%20x='8'%20y='8'%20width='16'%20height='16'%20rx='3'%20fill='none'%20stroke='%23fff'%20stroke-width='2.4'/%3E%3Cpath%20d='M11.5%2016.2l3.2%203.2L21%2012.8'%20stroke='%23fff'%20stroke-width='2.6'%20stroke-linecap='round'%20stroke-linejoin='round'%20fill='none'/%3E%3C/svg%3E">
-<title>Concern Worldwide Ireland — the company checkbox: two suggested fixes, and three more (prototype)</title>
+<title>Concern Worldwide Ireland — the company checkbox: two suggested fixes, a recommended fix, and three more (prototype)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;600;700&display=swap" rel="stylesheet">
@@ -15,7 +15,9 @@
    The details step of the donation form, rebuilt: the live control, the
    two suggested fixes built out in full and evaluated
    fairly (Niamh's copy on wider spacing, then on a box-only target),
-   and three designed replacements, side by side.
+   the recommended fix — the cheapest combination of those moves that
+   closes the reported problem — and three further designed
+   replacements, side by side.
 
    Concern colours, type and layout are carried over from the
    Donation forms Figma (node 10166:1078) via the attribution
@@ -63,6 +65,13 @@
      mistaken for either "today" or one of the numbered options --- */
   --diag:#e0a24a;
   --diag-active:#4a3520;
+
+  /* --- accent for the recommended tab — a third colour, off both --diag
+     (the two proposals) and the plain yellow the numbered options use, so
+     this one reads as its own thing too rather than folding into either
+     group either side of it --- */
+  --rec:#5fd987;
+  --rec-active:#173c26;
 
   /* --- SystemSeed chrome --- */
   --ss-cream:#F5F3E6;
@@ -143,6 +152,12 @@ legend{padding:0}
 .swtab--diag[aria-current="true"]{background:var(--diag-active);border-bottom-color:var(--diag)}
 .sw-div{flex:0 0 auto;align-self:stretch;width:1px;margin:8px 2px;background:var(--ss-lighter-black)}
 
+/* Recommended — sits after 03, behind its own divider, so it reads as a
+   third group rather than folding into either the diagnostic pair or the
+   three numbered options either side of it. */
+.swtab--rec .num{color:var(--rec)}
+.swtab--rec[aria-current="true"]{background:var(--rec-active);border-bottom-color:var(--rec)}
+
 /* Desktop / Mobile — always visible, never inside the scrolling tab
    list. Desktop is the loaded state on every tab; this is a deliberate
    switch the viewer makes, not something a tab choice triggers. */
@@ -211,7 +226,12 @@ legend{padding:0}
   display:inline-block;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
   color:var(--ss-black);background:var(--diag);border-radius:3px;padding:4px 9px;margin:0 0 14px;
 }
+.rail .recflag{
+  display:inline-block;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--ss-black);background:var(--rec);border-radius:3px;padding:4px 9px;margin:0 0 14px;
+}
 .rail--diag{border-left-color:var(--diag)}
+.rail--rec{border-left-color:var(--rec)}
 .rail ul{display:flex;flex-direction:column;gap:7px;margin:0}
 .rail li{
   font-size:13px;line-height:1.55;color:var(--ss-dark-cream);
@@ -470,9 +490,10 @@ input.control:focus-visible{outline:3px solid var(--teal);outline-offset:1px}
 .cs-label--boxonly{width:24px}
 .cs-item > .cs-text{min-width:0;white-space:normal}
 
-/* 0A only — the row's own CTA gap, widened a moderate amount (not the
-   most it could take — the proposal evaluated fairly). */
-.cs-cta-wide{margin-top:64px}      /* 36px → 64px: nearly double, and more than Option 1's own 48px */
+/* 0A and the recommended pane — the row's own CTA gap, widened a
+   moderate amount (not the most it could take — the proposal evaluated
+   fairly). */
+.cs-cta-wide{margin-top:64px}      /* 36px → 64px: nearly double, and more than 01's own 48px */
 
 /* 0A only — the reworded label is longer than the live text, so
    the label is left to size to its content rather than pinned at the
@@ -533,7 +554,7 @@ input.control:focus-visible{outline:3px solid var(--teal);outline-offset:1px}
 }
 .cbx:focus-visible,.rdo:focus-visible{outline:3px solid var(--teal);outline-offset:3px}
 
-/* Option 1 and 2: the row itself is the visible boundary of the target. */
+/* 01 and 02: the row itself is the visible boundary of the target. */
 .optgroup{display:flex;flex-direction:column;gap:8px}
 .optrow{
   display:flex;align-items:center;gap:13px;min-height:52px;
@@ -557,6 +578,19 @@ input.control:focus-visible{outline:3px solid var(--teal);outline-offset:1px}
 .plainrow:hover{background:var(--teal-tint-soft)}
 .plainrow:has(:focus-visible){background:var(--teal-tint-soft)}
 .plainrow span{font-size:16px;line-height:1.35}
+
+/* Recommended: a real, focusable checkbox — the same input as Options
+   1-3, native role/state/keyboard, visible focus ring — carrying 0A's
+   plain visual treatment: no border, no hover tint, no pointer cursor
+   anywhere in the row. Deliberate. This tab keeps the silent target as
+   its stated, named limit (see the rail) rather than hiding it behind a
+   boundary that belongs to 01. The cursor is forced to default on the
+   input itself because appearance:none does not remove the browser’s own
+   pointer-on-checkbox default — without this override the box alone
+   would give away exactly the affordance the rest of the row withholds. */
+.quietrow{display:inline-flex;align-items:center;gap:8px;cursor:default}
+.quietrow .cbx{cursor:default}
+.quietrow span{font-size:16px;line-height:1.35}
 
 /* the conditional company block, tied to the control above it */
 .reveal{
@@ -610,6 +644,7 @@ input.control:focus-visible{outline:3px solid var(--teal);outline-offset:1px}
     border-left:0;border-top:1px solid var(--ss-lighter-black);
   }
   .rail--diag{border-top-color:var(--diag)}  /* the accent moves from left edge to top rule once stacked */
+  .rail--rec{border-top-color:var(--rec)}
   .bar{position:static}
 }
 @media (max-width:640px){
@@ -677,7 +712,7 @@ input.control:focus-visible{outline:3px solid var(--teal);outline-offset:1px}
       <path d="M129.14 9.00123H131.195C131.914 9.00123 132.041 8.74674 132.041 8.23776C132.041 6.62784 131.513 6.03587 130.896 6.03587C130.069 6.03587 129.35 7.0732 129.137 9.00123M130.6 16.3095C127.804 16.3095 125.621 14.2127 125.621 11.1201C125.621 7.81453 127.909 5.33603 131.045 5.33603C133.715 5.33603 135.325 6.88233 135.325 8.45076C135.325 9.02336 135.198 9.44658 135.048 9.70107H129.073V10.1464C129.073 12.3926 130.196 13.9804 132.379 13.9804C133.585 13.9804 134.265 13.7259 135.344 12.9624L135.557 13.1726C134.52 14.9098 133.057 16.3095 130.6 16.3095Z" fill="currentColor"/>
       <path d="M139.681 10.5281C139.681 13.1117 140.699 14.575 142.246 14.575C142.86 14.575 143.369 14.4699 143.751 14.3206V8.15472C143.751 6.48118 143.073 6.03582 142.163 6.03582C140.489 6.03582 139.684 7.70936 139.684 10.5281M140.702 16.3122C138.182 16.3122 136.381 14.0661 136.381 11.3746C136.381 7.87811 138.882 5.33598 142.207 5.33598C142.821 5.33598 143.289 5.42173 143.753 5.54897V1.96953L141.739 1.10095V0.782836C142.757 0.486854 145.128 0.0193633 146.824 0H147.228C147.1 1.86441 147.017 3.72882 147.017 5.59323V14.3427L148.5 14.9347V15.2528C147.482 15.7202 145.789 16.1435 144.58 16.3122H144.199L143.922 14.6387C143.372 15.4436 142.058 16.3122 140.702 16.3122Z" fill="currentColor"/>
     </svg>
-    <p class="bar-title"><b>Concern Worldwide Ireland</b> — the company checkbox on the details step. The live control, the two fixes suggested so far built out in full, and three more.</p>
+    <p class="bar-title"><b>Concern Worldwide Ireland</b> — the company checkbox on the details step. The live control, the two fixes suggested so far built out in full, the recommended fix, and three further approaches.</p>
   </div>
 
   <div class="switcher-row">
@@ -687,9 +722,11 @@ input.control:focus-visible{outline:3px solid var(--teal);outline-offset:1px}
         <button class="swtab swtab--diag" type="button" data-pane="d1" aria-current="false"><span class="num">0A</span><span>Spacing only</span></button>
         <button class="swtab swtab--diag" type="button" data-pane="d2" aria-current="false"><span class="num">0B</span><span>Box only</span></button>
         <span class="sw-div" aria-hidden="true"></span>
-        <button class="swtab" type="button" data-pane="p1" aria-current="false"><span class="num">01</span><span>Honest target</span></button>
+        <button class="swtab" type="button" data-pane="p1" aria-current="false"><span class="num">01</span><span>Obvious click/tap area</span></button>
         <button class="swtab" type="button" data-pane="p2" aria-current="false"><span class="num">02</span><span>Two-way choice</span></button>
         <button class="swtab" type="button" data-pane="p3" aria-current="false"><span class="num">03</span><span>Out of the path</span></button>
+        <span class="sw-div" aria-hidden="true"></span>
+        <button class="swtab swtab--rec" type="button" data-pane="rec" aria-current="false"><span class="num">✓</span><span>Recommended</span></button>
       </nav>
     </div>
 
@@ -797,11 +834,11 @@ input.control:focus-visible{outline:3px solid var(--teal);outline-offset:1px}
               <!-- the live markup, reproduced ------------------------- -->
               <div class="cs-block" data-block>
                 <div class="cs-wrap" role="group" aria-labelledby="">
-                  <p class="sr-only">The control below reproduces the live one, including its faults: the checkbox has no role and no state, and this prototype also simulates it not responding to the keyboard. Both are deliberate here. The two proposed fixes follow, built out in full and evaluated fairly, then three designed options that are built correctly.</p>
+                  <p class="sr-only">The control below reproduces the live one, including its faults: the checkbox has no role and no state, and this prototype also simulates it not responding to the keyboard. Both are deliberate here. The two proposed fixes follow, built out in full and evaluated fairly, then three designed options that are built correctly, then the recommended fix that combines them at the lowest cost.</p>
                   <div class="cs-item">
                     <label class="cs-label" for="p0-company-donation" tabindex="0" data-target>
                       <input id="p0-company-donation" data-analytics="opt-in" type="checkbox" value="company_donation" name="company_donation">
-                      <span class="indicator"></span>
+                      <span class="indicator" data-visible></span>
                       <span class="cs-text">I am donating on behalf of a company</span>
                     </label>
                   </div>
@@ -885,11 +922,11 @@ input.control:focus-visible{outline:3px solid var(--teal);outline-offset:1px}
                    only the wording and the gap below change -->
               <div class="cs-block" data-block>
                 <div class="cs-wrap" role="group" aria-labelledby="">
-                  <p class="sr-only">This combines Niamh’s suggested wording with a wider gap to the button below: 64px instead of 36px. The missing role and state and the simulated keyboard failure are unchanged, on purpose — this is Niamh’s proposal, evaluated in full, not a redesign. See “01 Honest target” onward for the three options that follow.</p>
+                  <p class="sr-only">This combines Niamh’s suggested wording with a wider gap to the button below: 64px instead of 36px. The missing role and state and the simulated keyboard failure are unchanged, on purpose — this is Niamh’s proposal, evaluated in full, not a redesign. See “01 Obvious click/tap area” onward for the designed options and the recommended fix that follow.</p>
                   <div class="cs-item">
                     <label class="cs-label cs-label--fit" for="d1-company-donation" tabindex="0" data-target>
                       <input id="d1-company-donation" data-analytics="opt-in" type="checkbox" value="company_donation" name="company_donation">
-                      <span class="indicator"></span>
+                      <span class="indicator" data-visible></span>
                       <span class="cs-text">This donation is being made by a company or organisation</span>
                     </label>
                   </div>
@@ -976,11 +1013,11 @@ input.control:focus-visible{outline:3px solid var(--teal);outline-offset:1px}
                    box is wired to the input. -->
               <div class="cs-block" data-block>
                 <div class="cs-wrap" role="group" aria-labelledby="">
-                  <p class="sr-only">This combines Niamh’s suggested wording with Elise’s suggestion that only the 24 × 24 box below should be clickable, not the label text beside it. The missing role and state and the simulated keyboard failure are unchanged, on purpose — this is Niamh’s proposal, evaluated in full, not a redesign. See “01 Honest target” onward for the three options that follow.</p>
+                  <p class="sr-only">This combines Niamh’s suggested wording with Elise’s suggestion that only the 24 × 24 box below should be clickable, not the label text beside it. The missing role and state and the simulated keyboard failure are unchanged, on purpose — this is Niamh’s proposal, evaluated in full, not a redesign. See “01 Obvious click/tap area” onward for the designed options and the recommended fix that follow.</p>
                   <div class="cs-item">
                     <label class="cs-label cs-label--boxonly" for="d2-company-donation" tabindex="0" data-target>
                       <input id="d2-company-donation" data-analytics="opt-in" type="checkbox" value="company_donation" name="company_donation">
-                      <span class="indicator"></span>
+                      <span class="indicator" data-visible></span>
                     </label>
                     <span class="cs-text">This donation is being made by a company or organisation</span>
                   </div>
@@ -1013,12 +1050,12 @@ input.control:focus-visible{outline:3px solid var(--teal);outline-offset:1px}
             </section>
 
             <!-- ========================================================
-                 PANE 01 — HONEST TARGET
+                 PANE 01 — OBVIOUS CLICK/TAP AREA
                  Same control, same position. It gains a visible
                  boundary, real keyboard operation, more clearance from
                  the button, and a stated way out of the company field.
                  ======================================================== -->
-            <section class="pane" id="pane-p1" aria-label="Option 1 — honest target, conditional requirement, visible escape" hidden>
+            <section class="pane" id="pane-p1" aria-label="Option 1 — obvious click/tap area, conditional requirement, visible escape" hidden>
               <div class="field" style="margin-top:28px">
                 <label class="flabel" for="p1-amount">Your donation <span class="opt">(required)</span></label>
                 <div class="money"><span class="cur" aria-hidden="true">€</span>
@@ -1216,6 +1253,78 @@ input.control:focus-visible{outline:3px solid var(--teal);outline-offset:1px}
               </div>
             </section>
 
+            <!-- ========================================================
+                 PANE REC — RECOMMENDED
+                 The cheapest combination that closes the reported
+                 problem: 0A's unmarked row and 64px clearance, 01's
+                 shorter wording, and 01's reveal-block styling — but on
+                 a real, focusable input, never the display:none +
+                 tabindex="0" construction the 00 pane demonstrates.
+                 Still a silent target; see the rail and 01 Obvious
+                 click/tap area for the fuller fix.
+                 ======================================================== -->
+            <section class="pane" id="pane-rec" aria-label="Recommended — the cheapest fix that closes the reported problem" hidden>
+              <div class="field" style="margin-top:28px">
+                <label class="flabel" for="rec-amount">Your donation <span class="opt">(required)</span></label>
+                <div class="money"><span class="cur" aria-hidden="true">€</span>
+                  <input class="control" id="rec-amount" type="text" inputmode="decimal" value="104"></div>
+              </div>
+
+              <div class="field row2">
+                <div>
+                  <label class="flabel" for="rec-first">First name <span class="opt">(required)</span></label>
+                  <input class="control ic ic-person" id="rec-first" type="text" autocomplete="given-name" placeholder="Jane">
+                </div>
+                <div>
+                  <label class="flabel" for="rec-last">Last name <span class="opt">(required)</span></label>
+                  <input class="control" id="rec-last" type="text" autocomplete="family-name" placeholder="Bloggs">
+                </div>
+              </div>
+
+              <div class="field">
+                <div class="labelrow">
+                  <label class="flabel" for="rec-email">Email address <span class="opt">(required)</span></label>
+                  <button class="help" type="button" aria-expanded="false" aria-controls="rec-email-help" aria-label="Why we ask for your email address">
+                    <span aria-hidden="true">?</span>
+                  </button>
+                </div>
+                <input class="control ic ic-mail" id="rec-email" type="email" inputmode="email" autocomplete="email" placeholder="jane@email.com">
+                <p class="helptext" id="rec-email-help" hidden>We send your receipt to this address.</p>
+              </div>
+
+              <div class="field">
+                <div class="labelrow">
+                  <label class="flabel" for="rec-phone">Phone number <span class="opt">(required)</span></label>
+                  <button class="help" type="button" aria-expanded="false" aria-controls="rec-phone-help" aria-label="Why we ask for your phone number">
+                    <span aria-hidden="true">?</span>
+                  </button>
+                </div>
+                <input class="control ic ic-phone" id="rec-phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="+353 1 000 0000">
+                <p class="helptext" id="rec-phone-help" hidden>We use this only if there is a query about your donation.</p>
+              </div>
+
+              <!-- The row itself: 0A's plain treatment (no border, no hover
+                   tint, no pointer cursor) on a real <input>, not the
+                   display:none construction 0A actually uses — see the
+                   .quietrow comment in the stylesheet. -->
+              <div class="field" data-block>
+                <label class="quietrow" for="rec-company-donation" data-target>
+                  <input class="cbx" type="checkbox" id="rec-company-donation" name="company_donation" value="company_donation" data-visible>
+                  <span>This donation is from a company or organisation</span>
+                </label>
+
+                <div class="reveal" id="rec-reveal" hidden>
+                  <label class="flabel" for="rec-company">Company name <span class="opt">(required for company donations)</span></label>
+                  <input class="control" id="rec-company" type="text" placeholder="Your company" aria-describedby="rec-escape">
+                  <p class="hint" id="rec-escape">Only company donations need this. Untick the box above to remove it.</p>
+                </div>
+              </div>
+
+              <div class="cs-cta-wide">
+                <button class="submit" type="button" data-cta>Proceed to address</button>
+              </div>
+            </section>
+
             <p class="sr-only" role="status" aria-live="polite" id="live"></p>
           </form>
         </div>
@@ -1327,142 +1436,103 @@ input.control:focus-visible{outline:3px solid var(--teal);outline-offset:1px}
   }
 
   /* ------------------------------------------------------------------
-     Copy for the six tabs: the current state, the two
-     proposed fixes (d1/d2 — Niamh's copy changes on top of a wider gap,
-     then on top of a box-only target, each built out in full and judged
-     fairly, on their own terms), and three of our own
-     designed options. "One line" in the bar, full annotation in the
-     rail. Honest about the cost of each — a sheet that only lists
-     benefits is a sales document, not a design one.
+     Copy for the seven tabs: the current state, the two proposed fixes
+     (d1/d2 — Niamh's copy changes on top of a wider gap, then on top of
+     a box-only target, each built out in full and judged fairly, on
+     their own terms), the recommended fix (rec — the cheapest
+     combination that closes the reported problem), and three further
+     designed options (p1/p2/p3). "One line" in the bar; a short idea /
+     pros / cons / accessibility summary in the rail, kept brief enough
+     to read in a meeting. A sheet that only lists benefits is a sales
+     document, not a design one.
      ------------------------------------------------------------------ */
   var CONTENT = {
 
     current: {
       title: 'Current state',
-      one: '<b>The live control, reproduced.</b> A 306 × 24 clickable strip with nothing drawn around it, 36px above the button and across the route to it — then a field marked “(required)” with no way out. It costs Donor Care a manual clean-up per junk record, and it gives screen-reader users a focusable sentence with no role and no state.',
+      one: '<b>The live control, reproduced.</b> A 306 × 24 clickable strip with no visible boundary around a 24 × 24 box, 36px above the button and overlapping it. Ticking it reveals a field marked “(required)” with no stated way to remove it.',
       body: [
-        '<p class="lede">This is what donors meet today, rebuilt to the measurements taken from production.</p>',
-        '<h3>The chain</h3>',
-        '<ul>',
-        '<li>The clickable label is <b>306 × 24</b>. The box the donor can see is <b>24 × 24</b>. The target is <b>12.75×</b> the area of the thing that signals it, with no hover state and no pointer cursor.</li>',
-        '<li>It sits <b>36px</b> above the primary button and overlaps it horizontally — directly across the route from the phone field to “Proceed to address”.</li>',
-        '<li>Tick it and a field appears marked <b>“Company name (required)”</b>. Nothing on screen says unticking removes it.</li>',
-        '<li>So the donor types “N/A”, and Donor Care fixes it by hand.</li>',
-        '</ul>',
-        '<h3>Also broken here</h3>',
+        '<p class="lede">What donors meet today, rebuilt from measurements taken on the live form.</p>',
+        '<h3>Cons</h3>',
         '<ul class="cost">',
-        '<li>The real <code>&lt;input&gt;</code> is <code>display:none</code>, so it is not in the accessibility tree and cannot be focused.</li>',
-        '<li>The <code>&lt;label&gt;</code> takes <code>tabindex="0"</code> but has <b>no role and no checked state</b>. A screen-reader user focusing it hears a plain sentence — not a checkbox, and not whether it is ticked.</li>',
-        '<li>WCAG 2.2 <b>4.1.2 Name, Role, Value</b> — Level A, failed. This one is provable from the markup.</li>',
-        '<li>WCAG 2.2 <b>2.1.1 Keyboard</b> — Level A, <b>very likely failed, pending manual confirmation</b>. Synthetic key events reach the label and toggle nothing, and the input cannot be focused — but that stops short of proof. Tab to the control on the live form and press Space to settle it.</li>',
+        '<li>The label is <b>306 × 24</b> — <b>12.75×</b> the area of the <b>24 × 24</b> box it wraps — with no hover state or pointer cursor, and it sits <b>36px</b> above the button, overlapping it.</li>',
+        '<li>Ticking it reveals a field marked <b>“Company name (required)”</b> with no stated way to remove it — the mechanism behind the “N/A” entries Donor Care correct by hand.</li>',
+        '<li>“Make only the box clickable” is the right diagnosis but the wrong lever: it would shrink the target without making it visible.</li>',
         '</ul>',
-        '<p>The reproduction above is built the same way as the live one, so it behaves the same way. Use the buttons below to see the hit area and the ticked state.</p>',
-        '<h3>“Make only the box clickable”?</h3>',
-        '<p>The diagnosis behind that suggestion is right — this is accidental activation, not misreading. The remedy is the wrong lever, for three reasons.</p>',
+        '<h3>Accessibility</h3>',
         '<ul class="cost">',
-        '<li>It would cut the target to exactly <b>24 × 24</b>: the bare floor of WCAG 2.2 <b>2.5.8</b> with no margin, and well under the 44 × 44 and 48dp that Apple and Google set for touch. Note the 24 × 24 box as built <i>passes</i> 2.5.8 — the defect is a concealed larger hit area, not an undersized one, so this is not a target-size failure and should not be argued as one.</li>',
-        '<li>Label-clickability is standard, expected behaviour. Removing it penalises <b>every</b> corporate donor — the people we want to succeed — to guard against a mistake made by a different group.</li>',
-        '<li>On its own it does nothing about the “(required)” trap, so a donor who mis-taps the smaller box still ends up typing “N/A”. Paired with Niamh’s copy changes it is a different proposition — see <b>0B</b>, where that trap is genuinely closed and only the first two costs remain.</li>',
-        '</ul>',
-        '<p>The useful half of the insight is that the hit area is <i>silent and badly placed</i>, not that it is too big. <b>0A</b> and <b>0B</b> build the suggestions already on the table out in full; the three numbered options then act on the silence itself.</p>',
-        '<h3>Side note</h3>',
-        '<p>This checkbox is one of five instances of the same shared component. That is the argument for fixing the component rather than patching this one instance — once it is open, the marginal cost of doing it properly is close to zero, and the fix carries to all five.</p>'
+        '<li>The <code>&lt;input&gt;</code> is <code>display:none</code> and unfocusable; the <code>&lt;label&gt;</code> carries <code>tabindex="0"</code> with no role or <code>aria-checked</code>. WCAG <b>4.1.2 Name, Role, Value</b> fails, provable from the markup.</li>',
+        '<li>WCAG <b>2.1.1 Keyboard</b> is <b>very likely failed, pending manual confirmation</b> — synthetic key presses reach the label and toggle nothing, which stops short of proof.</li>',
+        '</ul>'
       ].join(''),
       note: 'Measured from production, 5 Aug 2026.'
     },
 
     d1: {
       title: '0A — spacing only',
-      one: '<b>Niamh’s suggestions, built in full.</b> Her three copy changes, plus the gap to the button widened from 36px to 64px. The “(required)” trap is genuinely gone — but the target stays silent, and the screen-reader failure stays untouched.',
+      one: '<b>Niamh’s suggestions, built in full.</b> Her three copy changes, plus the gap to the button widened from 36px to 64px. The required label is now conditional, with a stated way back — but the target stays silent, and the screen-reader gap stays untouched.',
       body: [
         '<p class="diagflag">Built from Niamh’s suggestions</p>',
-        '<p class="lede">Niamh’s three suggested copy changes, plus more room before the button. Built out in full and judged on its own merits.</p>',
-        '<h3>What changes</h3>',
-        '<ul>',
-        '<li>The label reads <b>“This donation is being made by a company or organisation”</b>, replacing “I am donating on behalf of a company”.</li>',
-        '<li>The revealed field reads <b>“Company name (required if donating on behalf of a company)”</b> — the required text is now conditional, not absolute.</li>',
-        '<li>A new line under the field: <b>“If this donation is not from a company, untick the box above to remove this field.”</b></li>',
-        '<li>The gap to the button goes from 36px to <b>64px</b> — nearly double, and more than Option 1’s own 48px clearance, though deliberately short of the most it could take: more would cost too much height on mobile for what it buys.</li>',
-        '</ul>',
-        '<h3>What this achieves</h3>',
+        '<p class="lede">Niamh’s three copy changes, plus the gap to the button widened from 36px to 64px.</p>',
+        '<h3>Pros</h3>',
         '<ul class="fix">',
-        '<li>The “(required)” trap is genuinely gone. A donor who ticks by accident now meets a field that says plainly it only applies to company donations, with a stated line telling them how to remove it. This is a real fix, credited in full — not a smaller version of one.</li>',
-        '<li>The extra clearance does reduce mis-taps caused by reaching for “Proceed to address”: one genuine trigger, genuinely reduced.</li>',
+        '<li>The company field’s label becomes conditional, with a line on how to remove it — a donor who ticks by accident is no longer told to enter something with no way back — and the wider 64px gap would reduce mis-taps.</li>',
         '</ul>',
-        '<h3>What it still leaves</h3>',
+        '<h3>Cons</h3>',
         '<ul class="cost">',
-        '<li><b>The target is still silent.</b> Niamh’s rewording changes what the label says, not what it is: the clickable strip still has no visible boundary, no hover state and no pointer cursor, so the donor still cannot see where it begins and ends. Worth stating plainly, because the effect runs the opposite way to what you would expect: the new wording is longer than today’s, so the same unbounded strip now measures <b>446 × 24</b> on desktop — <b>18.59×</b> the visible box, up from 12.75× today — and <b>335 × 48</b> on mobile, where it wraps to two lines: <b>27.92×</b>. Better copy, bigger invisible target.</li>',
-        '<li><b>The screen-reader failure is untouched.</b> The real input is still <code>display:none</code>, and the <code>&lt;label tabindex="0"&gt;</code> still carries no role and no <code>aria-checked</code>. A screen-reader user gets a focusable sentence with no role and no state — just a longer one now. WCAG 2.2 <b>4.1.2 Name, Role, Value</b> fails, provably, from the markup; <b>2.1.1 Keyboard</b> is very likely failed too, pending the thirty seconds of manual confirmation on the live form that this still needs.</li>',
+        '<li>The label still has no visible boundary, hover state or pointer cursor. Niamh’s longer wording makes the strip wider: <b>446 × 24</b> desktop (<b>18.59×</b>), <b>335 × 48</b> mobile (<b>27.92×</b>) — up from 12.75× today.</li>',
+        '<li>The wording changes what a donor reads, not the label’s extent, role or state.</li>',
         '</ul>',
-        '<p><b>Niamh’s changes fix what the donor reads. They don’t change what the control is.</b></p>'
+        '<h3>Accessibility</h3>',
+        '<ul class="cost">',
+        '<li>WCAG <b>4.1.2 Name, Role, Value</b> fails, provable from the markup; <b>2.1.1 Keyboard</b> is very likely failed, pending manual confirmation. Both unchanged here.</li>',
+        '</ul>'
       ].join(''),
       note: 'Gap and target measured live in this page, both widths. Wording is Niamh’s, verbatim.'
     },
 
     d2: {
       title: '0B — box only',
-      one: '<b>Niamh’s wording, with Elise’s fix to the target.</b> Niamh’s copy changes, plus only the 24 × 24 box clickable. The “(required)” trap is genuinely gone too — but the same two gaps remain, and shrinking the target costs something of its own.',
+      one: '<b>Niamh’s wording, with Elise’s fix to the target.</b> Niamh’s copy changes, plus only the 24 × 24 box clickable. The required label is conditional here too — but the target stays silent, the screen-reader gap stays untouched, and shrinking the target costs something of its own.',
       body: [
         '<p class="diagflag">Built from Niamh’s suggestions</p>',
-        '<p class="lede">Niamh’s own three suggested copy changes, plus Elise’s suggested fix to the target: only the 24 × 24 box responds to a tap, the sentence beside it no longer does. Built out in full and judged on its own merits.</p>',
-        '<h3>What changes</h3>',
-        '<ul>',
-        '<li>The label reads <b>“This donation is being made by a company or organisation”</b>, replacing “I am donating on behalf of a company”.</li>',
-        '<li>The revealed field reads <b>“Company name (required if donating on behalf of a company)”</b> — the required text is now conditional, not absolute.</li>',
-        '<li>A new line under the field: <b>“If this donation is not from a company, untick the box above to remove this field.”</b></li>',
-        '<li>The label text moves outside the clickable element entirely: only the 24 × 24 box toggles the control now.</li>',
-        '</ul>',
-        '<h3>What this achieves</h3>',
+        '<p class="lede">Niamh’s copy changes, plus Elise’s proposal that only the 24 × 24 box responds to a tap, not the sentence beside it.</p>',
+        '<h3>Pros</h3>',
         '<ul class="fix">',
-        '<li>The “(required)” trap is genuinely gone here too, for the same reason as 0A: the conditional wording and the escape line together give a donor who ticks by accident a stated way back.</li>',
-        '<li>It reduces mis-taps further than 0A: a stray tap now has to land inside a 24 × 24 box rather than anywhere across a much wider strip. The diagnosis behind it — accidental activation, not misunderstanding — is correct, and credited as such.</li>',
+        '<li>The company field’s label becomes conditional, with a line on how to remove it (the same fix as 0A), and mis-taps fall further: a stray tap must land inside 24 × 24 rather than across a wider strip.</li>',
         '</ul>',
-        '<h3>What it still leaves</h3>',
+        '<h3>Cons</h3>',
         '<ul class="cost">',
-        '<li><b>The target is still silent.</b> Niamh’s rewording changes what the label says, not what the box is. Nothing here signals the box’s extent — no boundary, no hover, no cursor change — and the longer sentence beside it now reads as more prominent than ever, while doing nothing at all when tapped.</li>',
-        '<li><b>The screen-reader failure is untouched.</b> The real input is still <code>display:none</code>, and the <code>&lt;label tabindex="0"&gt;</code> still carries no role and no <code>aria-checked</code>. WCAG 2.2 <b>4.1.2 Name, Role, Value</b> fails, provably; <b>2.1.1 Keyboard</b> is very likely failed too, pending manual confirmation on the live form.</li>',
+        '<li>The target is still unmarked — no boundary, no hover, no cursor — which swaps a visible problem for an invisible one: fewer junk records, but also donors who quietly miss the box, unreported.</li>',
+        '<li>24 × 24 is the floor of WCAG 2.5.8, harder to hit for anyone with limited dexterity or a moving phone, and it drops standard label-click behaviour, which corporate donors may notice most.</li>',
         '</ul>',
-        '<p><b>Niamh’s changes fix what the donor reads. They don’t change what the control is.</b></p>',
-        '<h3>What it costs, beyond that</h3>',
+        '<h3>Accessibility</h3>',
         '<ul class="cost">',
-        '<li>The strongest reason, stated first: <b>it converts a visible problem into an invisible one.</b> Today’s failure produces junk records Donor Care can see and report. Shrink the target and you get fewer of those — and more corporate donors who quietly fail to tick a box they meant to tick, which nobody files a ticket about. Fewer complaints is not the same as fewer problems.</li>',
-        '<li>24 × 24 is the bare floor of WCAG 2.2 SC 2.5.8, with no margin, and well under the 44 × 44 (Apple) and 48dp (Material) set for touch. It is also hostile to anyone with a tremor, limited dexterity, or a phone in motion.</li>',
-        '<li>Clicking a checkbox’s label to toggle it is universal, expected behaviour. Removing it makes the control feel broken <b>to the people who actually want it</b> — corporate donors, the high-value minority the field exists to serve.</li>',
+        '<li>WCAG <b>4.1.2 Name, Role, Value</b> fails, provable from the markup; <b>2.1.1 Keyboard</b> is very likely failed, pending manual confirmation — the target’s size touches neither.</li>',
         '</ul>'
       ].join(''),
       note: 'Target measured live in this page, unaffected by the wording at either width. The wording itself is Niamh’s, verbatim.'
     },
 
     p1: {
-      title: 'Option 1 — honest target',
-      one: '<b>Changes:</b> the checkbox row gets a visible boundary so the hit area stops being a secret, real keyboard operation, and a company field you are told how to escape. <b>Costs:</b> about 40px of extra height on desktop and 60px on mobile, and a checkbox that more people will now notice.',
+      title: 'Option 1 — obvious click/tap area',
+      one: '<b>Changes:</b> the checkbox row gains a visible boundary, real keyboard operation, and a company field with a stated way back. <b>Costs:</b> about 40px of extra height on desktop, 60px on mobile, and a checkbox more donors will notice.',
       body: [
-        '<p class="lede">The smallest change that treats every link in the chain. Same control, same place — it just stops hiding.</p>',
-        '<h3>What changes</h3>',
-        '<ul>',
-        '<li>The row is drawn: 1px border, white fill, 4px radius. What you can hit is now exactly what you can see, and it fills the column rather than stopping at 306px.</li>',
-        '<li>A hover tint and a pointer cursor, so the target announces itself before you commit.</li>',
-        '<li>Clearance to the button goes from 36px to 48px, so it is no longer a near miss.</li>',
-        '<li>Wording moves from “I am donating on behalf of a company” to <b>“This donation is from a company or organisation”</b> — third person, no “on behalf of” to over-read, and “organisation” covers the clubs, schools and parishes that also give.</li>',
-        '<li>The revealed field reads <b>“Company name (required for company donations)”</b> and carries one line beneath it: <b>“Only company donations need this. Untick the box above to remove it.”</b></li>',
+        '<p class="lede">Same control, same position, with a boundary drawn around it: what you can hit now matches what you can see.</p>',
+        '<h3>Pros</h3>',
+        '<ul class="fix">',
+        '<li>The row is drawn — border, fill, radius, filling the column — and clearance to the button grows from 36px to 48px, so the target is no wider than what you can see.</li>',
+        '<li>The company field’s label becomes conditional, with a line on how to remove it: a donor who ticks by accident is no longer told to enter something with no way back.</li>',
         '</ul>',
-        '<h3>Why this one</h3>',
-        '<p>The measurements say the tick is accidental, not misunderstood — a donor who misread the label would type a real company name, not “N/A”. So the fix has to be about the target, not the sentence. Drawing a boundary around it does that without taking anything away from the corporate donors we want to succeed.</p>',
-        '<p>And the second half matters as much: the moment a donor sees “required” with no stated exit, typing something is the rational move. Naming the exit is one line of copy and it removes the reason the junk data exists.</p>',
-        '<h3>What it costs</h3>',
+        '<h3>Cons</h3>',
         '<ul class="cost">',
-        '<li>About 40px more height on desktop — 28px on the row, 12px on the extra clearance. Nearer 60px on mobile, where the label wraps to two lines and the row grows to 71px.</li>',
-        '<li>A drawn row is more noticeable than a bare line of text, so expect a few more deliberate ticks from curious donors. Better than silent ones, but not nothing.</li>',
-        '<li>It does not stop a determined mis-tap. It makes one obvious, reversible, and non-blocking — which is the realistic goal.</li>',
-        '<li>Two visual changes plus copy, not one, so it will not land in a fifteen-minute patch.</li>',
-        '<li><b>The escape line has no precedent.</b> Desk research turned up no guidance anywhere on how to tell a donor that a revealed field can be dismissed by reversing the control that revealed it. This wording is original, so it is the thing to test rather than assume.</li>',
+        '<li>A drawn row invites more deliberate ticks from donors who had not noticed the control before, though it would not stop a determined mis-tap — it makes one visible, reversible and non-blocking.</li>',
+        '<li>The escape line has no precedent found in research, so it is the thing to test rather than assume.</li>',
         '</ul>',
         '<h3>Accessibility</h3>',
         '<ul class="fix">',
-        '<li>A real <code>&lt;input type="checkbox"&gt;</code> styled with <code>appearance:none</code>, so it keeps its native role, state and keyboard behaviour. Space toggles it.</li>',
-        '<li>3px teal focus ring on the box, plus a row tint, both visible against the card (4.9:1).</li>',
-        '<li>Target 508 × 52 on desktop, 335 × 71 on mobile — clears WCAG 2.5.5 (44 × 44) and Material’s 48dp, never mind the 24px floor of 2.5.8.</li>',
-        '<li>Revealing the field announces it politely through a live region and does not steal focus, so an accidental ticker is not dropped into a text box with the keyboard up. GOV.UK’s own testing found conditional reveal was the single biggest problem screen-reader users reported, mostly because the change goes unannounced — so this part is deliberate, not incidental.</li>',
+        '<li>A real checkbox (<code>appearance:none</code> over a native input) keeps native role, state and keyboard behaviour, with a 3px focus ring — target 508 × 52 desktop, 335 × 71 mobile, clearing WCAG 2.5.5 and Material’s 48dp.</li>',
+        '<li>The revealed field is announced through a live region and does not take focus, so an accidental tick does not drop the donor into a text box with the keyboard up.</li>',
         '</ul>'
       ].join(''),
       note: 'Compared with the current state, measured live in this page.'
@@ -1470,31 +1540,22 @@ input.control:focus-visible{outline:3px solid var(--teal);outline-offset:1px}
 
     p2: {
       title: 'Option 2 — two-way choice',
-      one: '<b>Changes:</b> the silent opt-in becomes a question with two visible answers, so nobody can opt in without saying so. <b>Costs:</b> roughly 130px of height, and it asks every donor something only a handful need to answer.',
+      one: '<b>Changes:</b> the silent opt-in becomes a question with two visible answers, so nobody opts in without saying so. <b>Costs:</b> roughly 130px of height, and it asks every donor something only a handful need to answer.',
       body: [
-        '<p class="lede">Replace the checkbox with a question. Both answers stay on screen, so the way back is never hidden.</p>',
-        '<h3>What changes</h3>',
-        '<ul>',
-        '<li>“Who is this donation from?” with two equal rows: <b>Me personally</b> (preselected) and <b>A company or organisation</b>.</li>',
-        '<li>A stray tap now selects a visible answer that is plainly wrong, rather than switching on a state the donor never saw. Correcting it is one tap on the row above.</li>',
-        '<li>Because the other answer is permanently on screen, “(required)” on the company field stops being a trap and can stay — the escape route is the thing next to it.</li>',
-        '<li>Every record now carries an explicit individual-or-company flag rather than a checkbox that is usually absent.</li>',
+        '<p class="lede">The checkbox becomes a question — “Who is this donation from?” — with two visible rows, “Me personally” preselected.</p>',
+        '<h3>Pros</h3>',
+        '<ul class="fix">',
+        '<li>Accidental opt-in becomes structurally impossible rather than less likely: a stray tap selects a visibly wrong answer, corrected with one tap.</li>',
+        '<li>The company field’s “required” label can stay, because the other answer sits on screen beside it, and every record now carries an explicit individual-or-company flag rather than a usually-unticked checkbox.</li>',
         '</ul>',
-        '<h3>Why this one</h3>',
-        '<p>It is the only option here where accidental opt-in is structurally impossible rather than made less likely. If the “N/A” records are costing real money, or Donor Care want certainty rather than an improvement, this is the one that gives it.</p>',
-        '<h3>What it costs</h3>',
+        '<h3>Cons</h3>',
         '<ul class="cost">',
-        '<li>The most height of the three: the block goes from 24px to 141px, and with the extra clearance the step grows about 130px on the longest page of the form.</li>',
-        '<li>It taxes the 99% to protect against a mistake made by a few: every donor now reads a question they did not need. That is a real conversion argument, not a hypothetical one.</li>',
-        '<li>Biggest development change — a new field type, a new value, and a CRM mapping to agree. Furthest from the “small tweak” framing.</li>',
-        '<li>A preselected default is still a default. Most people will leave it, which is what we want, but nobody should claim it makes the answer meaningful data.</li>',
-        '<li><b>It breaks a GOV.UK rule to keep a different promise.</b> “Do not pre-select radio options” is explicit in their Radios guidance. Preselecting is what keeps this a zero-effort step for the ordinary donor; leaving both blank would make every donor answer before they can continue. Worth deciding deliberately rather than inheriting from this build.</li>',
+        '<li>The step grows by around 130px, and every donor answers a question only a handful need to — the largest development change here, with a new field type, a new value and a CRM mapping to agree.</li>',
+        '<li>Preselecting “Me personally” keeps the step close to zero-effort, but runs against GOV.UK’s guidance not to pre-select radio options.</li>',
         '</ul>',
         '<h3>Accessibility</h3>',
         '<ul class="fix">',
-        '<li>A real radio group in a <code>&lt;fieldset&gt;</code> with a <code>&lt;legend&gt;</code>, so the question is announced with each answer.</li>',
-        '<li>Arrow keys move between the two, Space selects — native behaviour, nothing reimplemented.</li>',
-        '<li>Rows are 508 × 52 desktop, 335 × 52 mobile, with 8px between them so neighbours are not mis-tapped.</li>',
+        '<li>A real radio group inside a <code>&lt;fieldset&gt;</code> and <code>&lt;legend&gt;</code> announces the question with each answer; arrow keys move between them and Space selects.</li>',
         '</ul>'
       ].join(''),
       note: 'Compared with the current state, measured live in this page.'
@@ -1502,33 +1563,50 @@ input.control:focus-visible{outline:3px solid var(--teal);outline-offset:1px}
 
     p3: {
       title: 'Option 3 — out of the path',
-      one: '<b>Changes:</b> the checkbox barely changes — it moves up beside the amount, where the nature of the gift belongs, so nothing sits between the last field and the button. <b>Costs:</b> a change to the form’s field order, and a target that is still invisible until you hover it.',
+      one: '<b>Changes:</b> the checkbox is unchanged but moves up beside the amount, so nothing sits between the last field and the button. <b>Costs:</b> a change to the form’s field order, and a target that is still unmarked until you hover it.',
       body: [
-        '<p class="lede">Do not redesign the control. Move it. The step gains two headings and the button gains a clear run-up.</p>',
-        '<h3>What changes</h3>',
-        '<ul>',
-        '<li>Two groups: <b>About this donation</b> (amount, and who it is from) and <b>About you</b> (name, email, phone). The checkbox belongs with the first — it describes the gift, not the person.</li>',
-        '<li>That puts four fields between the checkbox and the button — 447px of clearance on desktop, 547px on mobile, against 36px today. The route from the last field to “Proceed to address” is now empty.</li>',
-        '<li>The row keeps today’s look — no border, no fill — but gains a hover tint, a pointer cursor and a proper focus ring, so it is no longer completely silent.</li>',
-        '<li>Same wording change and same escape line as Option 1, because moving the control does nothing about the “(required)” trap on its own.</li>',
+        '<p class="lede">Unchanged, but moved up beside the amount, under an “About this donation” heading — nothing now sits between the last field and the button.</p>',
+        '<h3>Pros</h3>',
+        '<ul class="fix">',
+        '<li>Clearance to the button grows to 447px desktop, 547px mobile (36px today), and the row gains a hover tint, a pointer cursor and a focus ring — no longer completely unmarked.</li>',
         '</ul>',
-        '<h3>Why this one</h3>',
-        '<p>The strip is only dangerous because of where it is. Put it somewhere the donor is not travelling through and the accident rate falls without touching the control, the component’s visual language, or the height of the step. It is also the option that best matches Concern’s own framing of a small change.</p>',
-        '<h3>What it costs</h3>',
+        '<h3>Cons</h3>',
         '<ul class="cost">',
-        '<li><b>Hover does nothing on a phone</b> — and the phone is where the mis-taps happen. On touch this option is protected by position alone.</li>',
-        '<li>Corporate donors meet the question before they have invested anything, which is arguably better, but anyone hunting for it near the button will not find it there any more.</li>',
-        '<li>Two new headings are new furniture for the shared component, and reordering fields may touch form configuration rather than CSS.</li>',
-        '<li>It leaves the hit area larger than the visible box. Safer, but not honest.</li>',
+        '<li>Hover has no effect on a phone, where most mis-taps happen — on touch, this option is protected by position, not the control.</li>',
+        '<li>The hit area is still larger than the visible box — safer by position, not boundary — and reordering fields may touch configuration as well as styling.</li>',
         '</ul>',
         '<h3>Accessibility</h3>',
         '<ul class="fix">',
-        '<li>Same real checkbox as Option 1: native role, native state, Space toggles, visible focus ring.</li>',
-        '<li>The two <code>&lt;h2&gt;</code> headings give screen-reader users a way to skim the step, which the current one does not have.</li>',
-        '<li>Row is 401 × 44 on desktop and 345 × 63 on mobile, so it meets WCAG 2.5.5’s 44 × 44 but sits under Material’s 48dp on desktop, and it does not fill the column the way Options 1 and 2 do.</li>',
+        '<li>The same real checkbox as 01 Obvious click/tap area: native role, native state, Space toggles it, a visible focus ring.</li>',
+        '<li>Two new headings help screen-reader users skim the step. Row: 401 × 44 desktop, 345 × 63 mobile — clears WCAG 2.5.5, sits under Material’s 48dp.</li>',
         '</ul>'
       ].join(''),
       note: 'Compared with the current state, measured live in this page.'
+    },
+
+    rec: {
+      title: 'Recommended',
+      one: '<b>Combines 0A’s unmarked row and wider clearance with the shorter wording from 01 Obvious click/tap area and a real accessible input</b> — the cheapest change that closes the reported “N/A” problem. The target stays unmarked; 01 Obvious click/tap area is the next step.',
+      body: [
+        '<p class="recflag">Recommended</p>',
+        '<p class="lede">This combines three existing moves: 0A’s plain row and 64px clearance, the shorter wording from 01 Obvious click/tap area, and a real, focusable checkbox in place of the <code>display:none</code> construction used elsewhere. 02 Two-way choice remains the structural alternative, where accidental opt-in is impossible rather than reduced.</p>',
+        '<h3>Pros</h3>',
+        '<ul class="fix">',
+        '<li>The company field’s label becomes conditional, with a line on how to remove it — a donor who ticks by accident is no longer told to enter something with no way back, which would stop the “N/A” entries.</li>',
+        '<li>The wider clearance to the button — 64px, up from 36px — would reduce mis-taps.</li>',
+        '</ul>',
+        '<h3>Cons</h3>',
+        '<ul class="cost">',
+        '<li>The row has no visible boundary, hover state or pointer cursor, as 0A’s does not: it measures <b id="rec-ratio">…</b> the 24 × 24 box at this width. Accidental ticks would still happen, less often, and would no longer leave a required field with no way back.</li>',
+        '<li>01 Obvious click/tap area is the next step: the same row with a drawn boundary, whose target measures <b id="rec-p1-ratio">…</b> the 24 × 24 box — larger than the figure above, and not a defect: a larger bounded target is what the boundary is for.</li>',
+        '</ul>',
+        '<h3>Accessibility</h3>',
+        '<ul class="fix">',
+        '<li>The checkbox is a real, focusable input (<code>appearance:none</code> over a native checkbox) with native role, state and keyboard behaviour, and a visible focus ring — unlike the <code>display:none</code> construction the other reproduction panes use.</li>',
+        '<li>Revealing the company field does not take focus, so an accidental tick does not drop the donor into a text box with the keyboard up.</li>',
+        '</ul>'
+      ].join(''),
+      note: 'Row and target measured live in this page. Wording is 01 Obvious click/tap area’s, shortened from Niamh’s.'
     }
   };
 
@@ -1556,10 +1634,14 @@ input.control:focus-visible{outline:3px solid var(--teal);outline-offset:1px}
     var t = target.getBoundingClientRect();
     var c = cta.getBoundingClientRect();
 
-    /* On the current state the visible boundary is only the 24 × 24
-       indicator; on the options the visible boundary is the target. */
-    var ind = target.querySelector('.indicator');
-    var v = ind ? ind.getBoundingClientRect() : t;
+    /* On panes where a wider, unmarked label extends the hit area beyond
+       a smaller drawn box (current, 0A, 0B, recommended), that box carries
+       [data-visible] so it can be measured separately from the target.
+       On panes where the drawn/interactive element IS the whole hit area
+       (01, 02, 03) nothing carries the attribute, so the visible boundary
+       correctly falls back to the target itself. */
+    var vis = target.querySelector('[data-visible]');
+    var v = vis ? vis.getBoundingClientRect() : t;
 
     return {
       targetW: t.width, targetH: t.height, targetA: t.width * t.height,
@@ -1619,9 +1701,10 @@ input.control:focus-visible{outline:3px solid var(--teal);outline-offset:1px}
     [].forEach.call(p.querySelectorAll('input[type=checkbox]'), function (i) { i.checked = false; });
     var me = p.querySelector('#p2-from-me');
     if (me) me.checked = true;
-    /* Options 1–3 mark their reveal with class="reveal"; the current
-       state and the two diagnostics use a plain field div instead, so
-       catch those by id pattern rather than hardcoding each one. */
+    /* 01–03 and the recommended pane mark their reveal with
+       class="reveal"; the current state and the two diagnostics use a
+       plain field div instead, so catch those by id pattern rather than
+       hardcoding each one. */
     [].forEach.call(p.querySelectorAll('.reveal, [id$="-reveal"]'), function (r) { r.hidden = true; });
     [].forEach.call(p.querySelectorAll('input[type=text], input[type=email], input[type=tel]'), function (i) {
       if (i.id.indexOf('-company') > -1) i.value = '';
@@ -1713,10 +1796,12 @@ input.control:focus-visible{outline:3px solid var(--teal);outline-offset:1px}
     railB.innerHTML   = CONTENT[name].body;
     railControls(name);
     /* start each set of notes at the top rather than wherever the last set
-       was left, and flag the rail itself while a diagnostic pane is shown */
+       was left, and flag the rail itself while a diagnostic pane or the
+       recommended pane is shown */
     var railEl = document.querySelector('.rail');
     if (railEl) {
       railEl.classList.toggle('rail--diag', name === 'd1' || name === 'd2');
+      railEl.classList.toggle('rail--rec', name === 'rec');
       railEl.scrollTop = 0;
     }
     remeasure();
@@ -1727,7 +1812,7 @@ input.control:focus-visible{outline:3px solid var(--teal);outline-offset:1px}
        happened, and that pass lands at an inconsistent point: two rAFs
        was enough for 0A's label but not for Option 2's row, which only
        settled after a second full hide/show cycle. getBoundingClientRect
-       is never "wrong" exactly, it is answering honestly for a frame
+       is never "wrong" exactly, it is correctly describing a frame
        that has not finished settling — so rather than chase the exact
        point for every element that can do this, remeasure a few more
        times over the following half-second. Cheap (paint only changes
@@ -1755,7 +1840,7 @@ input.control:focus-visible{outline:3px solid var(--teal);outline-offset:1px}
      used to hard-code its "actually clickable" figure per pane, one of
      them labelled "(desktop)" — accurate only at desktop width, and
      visibly wrong once shown inside a genuine mobile render. Reading it
-     from the same measurement as the rail keeps it honest at any width
+     from the same measurement as the rail keeps it accurate at any width
      and satisfies the same "never hardcode a number" rule the rest of
      the rail already follows. */
   function updateVizLegend(m) {
@@ -1766,6 +1851,46 @@ input.control:focus-visible{outline:3px solid var(--teal);outline-offset:1px}
       var ratioEl = document.getElementById('p0-legend-ratio');
       if (ratioEl) ratioEl.textContent = (m.targetA / m.visA).toFixed(2) + ' times';
     }
+  }
+
+  /* Measure any pane by name without disturbing whichever one is actually
+     showing — the same swap-and-restore trick measureBaseline() (below)
+     already uses for 'current', generalised to any pane name. Runs
+     synchronously, so nothing paints in between: the browser does not
+     render mid-script. Used for the recommended pane's rail, which names
+     01's own target size for scale. */
+  function measurePaneOffscreen(name) {
+    var p = pane(name);
+    if (!p.hidden) return measure(p);
+    var showingEl = pane(current);
+    showingEl.hidden = true;
+    p.hidden = false;
+    var m = measure(p);
+    p.hidden = true;
+    showingEl.hidden = false;
+    return m;
+  }
+
+  /* The recommended pane's rail states 01's own target size next to its
+     own, to make the point that a larger *bounded* target (01) is not the
+     same defect as a larger *silent* one (here). Both figures divide by
+     the same fixed 24 × 24 box rather than each pane's own visible
+     boundary — dividing by 01's own boundary would just read back ~1×,
+     since 01's boundary already equals its target — so this is a
+     separate, deliberately-constructed comparison, not a read of the
+     standard metrics box. Only meaningful while the parent document's own
+     #screenDesktop is actually laid out, hence the call site below being
+     inside the same "viewMode !== 'mobile'" guard as paint(). */
+  function updateRecComparison() {
+    if (current !== 'rec') return;
+    var recEl = document.getElementById('rec-ratio');
+    var p1El  = document.getElementById('rec-p1-ratio');
+    if (!recEl && !p1El) return;
+    var recM = measure(pane('rec'));
+    var p1M  = measurePaneOffscreen('p1');
+    var REF  = 24 * 24;
+    if (recEl && recM) recEl.textContent = (recM.targetA / REF).toFixed(1) + '×';
+    if (p1El && p1M)   p1El.textContent  = (p1M.targetA  / REF).toFixed(1) + '×';
   }
 
   function remeasure() {
@@ -1779,6 +1904,7 @@ input.control:focus-visible{outline:3px solid var(--teal);outline-offset:1px}
     if (viewMode !== 'mobile') {
       paint(m, current === 'current');
       if (pane(current).classList.contains('viz')) drawPath();
+      updateRecComparison();
     }
     /* Tell the parent fresh numbers are ready, in case this document is
        the mobile iframe and something inside it changed on its own
@@ -1808,7 +1934,9 @@ input.control:focus-visible{outline:3px solid var(--teal);outline-offset:1px}
   }
 
   /* ------------------------------------------------------------------
-     The conditional company field, on all three options.
+     The conditional company field, wired identically wherever this
+     function is used (01, 03, recommended — 02 uses its own sync()
+     below, to the same rule).
 
      Deliberately does NOT move focus. A donor who ticked by accident
      should not find themselves inside a text box with the software
@@ -1834,6 +1962,10 @@ input.control:focus-visible{outline:3px solid var(--teal);outline-offset:1px}
     'Company name field removed.');
 
   wireReveal('p3-company-donation', 'p3-reveal',
+    'Company name field added below. Untick the box to remove it.',
+    'Company name field removed.');
+
+  wireReveal('rec-company-donation', 'rec-reveal',
     'Company name field added below. Untick the box to remove it.',
     'Company name field removed.');
 
@@ -1971,7 +2103,12 @@ input.control:focus-visible{outline:3px solid var(--teal);outline-offset:1px}
       var doc;
       try { doc = mobileFrame.contentDocument; } catch (e) { doc = null; }
       if (!doc) return;
-      ['m-target', 'm-visible', 'm-height', 'm-gap'].forEach(function (id) {
+      /* The rail's own comparison figures mirror too. Without this they
+         would hold their last desktop reading while the sentence around
+         them says "at this width", which read as a like-for-like
+         comparison against a mobile figure and was not one. */
+      ['m-target', 'm-visible', 'm-height', 'm-gap',
+       'rec-ratio', 'rec-p1-ratio'].forEach(function (id) {
         var s = doc.getElementById(id), d = document.getElementById(id);
         if (s && d) { d.textContent = s.textContent; d.className = s.className; }
       });
@@ -2166,6 +2303,15 @@ input.control:focus-visible{outline:3px solid var(--teal);outline-offset:1px}
     }, 250);
   })();
   checkTabOverflow();
+
+  /* Re-check once the webfonts land. On first load at a narrow width the
+     tabs are still measured in the fallback face, come out narrower than
+     they end up, and the switcher reports no overflow — so the scroll fade
+     never appeared until something else forced a re-check. Anyone opening
+     the link on a phone saw the tab list scroll with nothing to say so. */
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(checkTabOverflow).catch(function () {});
+  }
 
   /* #d1 / #d2 / #p1 / #p2 / #p3 open straight on that pane. ?tick=1 opens
      with the company field already showing, whichever pane is on. ?viz=1
